@@ -6,6 +6,7 @@
 
 <title>OX Fighter Jets</title>
 
+```html
 <style>
 *{
     box-sizing:border-box;
@@ -13,12 +14,104 @@
     padding:0;
 }
 
+:root{
+    --black:#030508;
+    --black2:#070b12;
+    --panel:#0a1019;
+    --panel2:#0d1521;
+
+    --white:#f7fbff;
+    --muted:#8b9aad;
+
+    --red:#ff1744;
+    --red2:#ff003c;
+    --blue:#00aaff;
+    --blue2:#006eff;
+
+    --line:rgba(255,255,255,.10);
+
+    --red-glow:
+        0 0 8px rgba(255,23,68,.8),
+        0 0 20px rgba(255,23,68,.5),
+        0 0 45px rgba(255,23,68,.25);
+
+    --blue-glow:
+        0 0 8px rgba(0,170,255,.8),
+        0 0 20px rgba(0,170,255,.5),
+        0 0 45px rgba(0,170,255,.25);
+
+    --white-glow:
+        0 0 8px rgba(255,255,255,.5),
+        0 0 25px rgba(255,255,255,.15);
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
 body{
     font-family:Inter,Arial,sans-serif;
+
     background:
-        radial-gradient(circle at top,#182a4d 0%,#08101f 45%,#04070d 100%);
-    color:#fff;
+        radial-gradient(
+            circle at 15% 10%,
+            rgba(255,23,68,.13),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 85% 15%,
+            rgba(0,170,255,.15),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 50% 100%,
+            rgba(255,255,255,.06),
+            transparent 35%
+        ),
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #e9edf2 9%,
+            #0a0d12 22%,
+            #020408 70%,
+            #070c14 100%
+        );
+
+    background-attachment:fixed;
+
+    color:var(--white);
     min-height:100vh;
+
+    overflow-x:hidden;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+
+    background:
+        linear-gradient(
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        );
+
+    background-size:45px 45px;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,.7),
+            transparent
+        );
+
+    z-index:-1;
 }
 
 button,
@@ -39,26 +132,52 @@ button{
 ========================================================= */
 
 header{
-    height:70px;
+    height:72px;
+
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 25px;
-    background:rgba(5,10,20,.92);
-    border-bottom:1px solid rgba(255,255,255,.1);
+
+    padding:0 28px;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,23,68,.08),
+            rgba(3,5,8,.96) 35%,
+            rgba(3,5,8,.96) 65%,
+            rgba(0,170,255,.08)
+        );
+
+    border-bottom:1px solid rgba(255,255,255,.12);
+
+    box-shadow:
+        0 5px 30px rgba(0,0,0,.7),
+        0 1px 15px rgba(0,170,255,.08);
+
     position:sticky;
     top:0;
     z-index:100;
+
+    backdrop-filter:blur(18px);
 }
 
 .logo{
-    font-size:22px;
-    font-weight:900;
-    letter-spacing:1px;
+    font-size:23px;
+    font-weight:1000;
+    letter-spacing:2px;
+
+    color:#fff;
+
+    text-shadow:
+        0 0 8px rgba(255,255,255,.7),
+        0 0 20px rgba(255,255,255,.25);
 }
 
 .logo span{
-    color:#ff304f;
+    color:var(--red);
+
+    text-shadow:var(--red-glow);
 }
 
 .header-right{
@@ -68,20 +187,54 @@ header{
 }
 
 .player-badge{
-    background:#101b31;
-    border:1px solid #273958;
-    padding:8px 14px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.07),
+            rgba(255,255,255,.02)
+        );
+
+    border:1px solid rgba(255,255,255,.14);
+
+    padding:9px 15px;
     border-radius:30px;
+
     font-size:13px;
+    font-weight:700;
+
+    box-shadow:
+        inset 0 0 15px rgba(255,255,255,.03),
+        0 0 15px rgba(255,255,255,.04);
 }
 
 .logout-btn{
-    background:#ff304f;
+    background:linear-gradient(
+        135deg,
+        #ff1744,
+        #b9002b
+    );
+
     color:white;
-    border:0;
-    padding:9px 15px;
+
+    border:1px solid rgba(255,100,120,.5);
+
+    padding:9px 16px;
     border-radius:9px;
-    font-weight:700;
+
+    font-weight:800;
+
+    box-shadow:
+        0 0 10px rgba(255,23,68,.55);
+
+    transition:.2s;
+}
+
+.logout-btn:hover{
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 0 12px rgba(255,23,68,.8),
+        0 0 30px rgba(255,23,68,.4);
 }
 
 /* =========================================================
@@ -89,26 +242,70 @@ header{
 ========================================================= */
 
 .container{
-    width:min(1200px,94%);
-    margin:30px auto;
+    width:min(1250px,94%);
+    margin:32px auto;
 }
 
 .card{
-    background:rgba(13,23,41,.94);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:18px;
-    padding:22px;
-    box-shadow:0 15px 45px rgba(0,0,0,.25);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(17,25,37,.94),
+            rgba(4,8,14,.96)
+        );
+
+    border:1px solid rgba(255,255,255,.10);
+
+    border-radius:20px;
+
+    padding:24px;
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.5),
+        inset 0 0 30px rgba(255,255,255,.015);
+
+    backdrop-filter:blur(15px);
+
+    position:relative;
+    overflow:hidden;
+}
+
+.card::before{
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:10%;
+    right:10%;
+
+    height:1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            var(--red),
+            white,
+            var(--blue),
+            transparent
+        );
+
+    box-shadow:
+        0 0 10px rgba(255,255,255,.4);
 }
 
 .title{
-    font-size:28px;
-    font-weight:900;
+    font-size:29px;
+    font-weight:1000;
     margin-bottom:8px;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,.25);
 }
 
 .subtitle{
-    color:#9eabc1;
+    color:#9baabd;
     font-size:14px;
     margin-bottom:25px;
 }
@@ -122,27 +319,56 @@ header{
     margin:70px auto;
 }
 
+.auth-wrapper .card{
+    box-shadow:
+        0 25px 80px rgba(0,0,0,.7),
+        0 0 30px rgba(0,170,255,.08);
+}
+
 .auth-tabs{
     display:flex;
-    background:#080f1d;
+
+    background:#03070d;
+
+    border:1px solid #182435;
+
     border-radius:12px;
+
     padding:4px;
+
     margin-bottom:22px;
 }
 
 .auth-tab{
     width:50%;
+
     padding:12px;
+
     border:0;
     border-radius:9px;
+
     background:transparent;
-    color:#8e9ab0;
-    font-weight:800;
+
+    color:#78869a;
+
+    font-weight:900;
+
+    transition:.2s;
 }
 
 .auth-tab.active{
-    background:#1769ff;
+    background:
+        linear-gradient(
+            135deg,
+            #006eff,
+            #00aaff
+        );
+
     color:#fff;
+
+    box-shadow:
+        0 0 10px rgba(0,170,255,.65),
+        0 0 25px rgba(0,110,255,.25);
 }
 
 .form-group{
@@ -151,38 +377,76 @@ header{
 
 .form-group label{
     display:block;
-    color:#b9c4d7;
+
+    color:#c2ccd9;
+
     font-size:13px;
-    font-weight:700;
+    font-weight:800;
+
     margin-bottom:7px;
 }
 
 .form-group input{
     width:100%;
+
     padding:13px 14px;
-    background:#080f1d;
-    border:1px solid #263653;
+
+    background:#03070d;
+
+    border:1px solid #253449;
+
     color:#fff;
+
     border-radius:10px;
+
     outline:none;
+
+    transition:.2s;
+
+    box-shadow:
+        inset 0 0 15px rgba(0,0,0,.5);
 }
 
 .form-group input:focus{
-    border-color:#1769ff;
+    border-color:var(--blue);
+
+    box-shadow:
+        0 0 8px rgba(0,170,255,.5),
+        0 0 20px rgba(0,170,255,.15);
 }
 
 .primary-btn{
     width:100%;
+
     padding:13px;
-    border:0;
+
+    border:1px solid rgba(0,200,255,.5);
+
     border-radius:10px;
-    background:#1769ff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #006eff,
+            #00aaff
+        );
+
     color:white;
-    font-weight:900;
+
+    font-weight:1000;
+
+    box-shadow:
+        0 0 10px rgba(0,170,255,.5);
+
+    transition:.2s;
 }
 
 .primary-btn:hover{
-    background:#3280ff;
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 0 12px rgba(0,170,255,.9),
+        0 0 30px rgba(0,170,255,.35);
 }
 
 .auth-message{
@@ -193,11 +457,17 @@ header{
 }
 
 .success{
-    color:#40e58b;
+    color:#48ffad;
+
+    text-shadow:
+        0 0 8px rgba(72,255,173,.5);
 }
 
 .error{
-    color:#ff5b6e;
+    color:#ff4967;
+
+    text-shadow:
+        0 0 8px rgba(255,73,103,.45);
 }
 
 /* =========================================================
@@ -230,22 +500,48 @@ header{
 }
 
 .action-btn{
-    border:1px solid #293958;
-    background:#0b1528;
+    border:1px solid #27374d;
+
+    background:
+        linear-gradient(
+            145deg,
+            #0d1725,
+            #05090f
+        );
+
     color:#fff;
+
     border-radius:12px;
+
     padding:15px;
-    font-weight:800;
+
+    font-weight:900;
+
     transition:.2s;
+
+    box-shadow:
+        inset 0 0 20px rgba(255,255,255,.015);
 }
 
 .action-btn:hover{
-    border-color:#1769ff;
-    transform:translateY(-1px);
+    border-color:var(--blue);
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 0 10px rgba(0,170,255,.45),
+        inset 0 0 15px rgba(0,170,255,.05);
 }
 
 .action-btn.red{
     border-color:#612435;
+}
+
+.action-btn.red:hover{
+    border-color:var(--red);
+
+    box-shadow:
+        0 0 12px rgba(255,23,68,.55);
 }
 
 .action-btn.green{
@@ -273,16 +569,26 @@ header{
 }
 
 .stat{
-    background:#080f1d;
+    background:#03070d;
+
     border:1px solid #202e48;
+
     border-radius:12px;
+
     padding:16px;
+
     text-align:center;
+
+    box-shadow:
+        inset 0 0 20px rgba(255,255,255,.015);
 }
 
 .stat-number{
     font-size:25px;
-    font-weight:900;
+    font-weight:1000;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,.35);
 }
 
 .stat-label{
@@ -299,85 +605,289 @@ header{
     display:flex;
     flex-direction:column;
     align-items:center;
+
+    width:100%;
 }
 
 .game-status{
     text-align:center;
-    margin-bottom:20px;
+    margin-bottom:22px;
 }
 
 .turn-text{
-    font-size:19px;
-    font-weight:900;
+    font-size:20px;
+    font-weight:1000;
+
+    color:#fff;
+
+    text-shadow:
+        0 0 8px rgba(255,255,255,.4);
 }
 
 .game-result{
-    margin-top:7px;
-    color:#40e58b;
-    font-weight:800;
+    margin-top:8px;
+
+    color:#40ffac;
+
+    font-weight:900;
+
+    text-shadow:
+        0 0 8px rgba(64,255,172,.7),
+        0 0 20px rgba(64,255,172,.25);
 }
+
+/* =========================================================
+   10 x 10 NEON BOARD
+========================================================= */
 
 .board{
-    width:min(480px,90vw);
-    aspect-ratio:1;
+    width:min(680px,94vw);
+
+    aspect-ratio:1 / 1;
+
     display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:7px;
-    padding:7px;
-    background:#273958;
-    border-radius:15px;
+
+    grid-template-columns:repeat(10,1fr);
+
+    gap:5px;
+
+    padding:8px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #101b2a,
+            #03070d
+        );
+
+    border:1px solid rgba(255,255,255,.15);
+
+    border-radius:18px;
+
+    box-shadow:
+        0 0 8px rgba(255,255,255,.12),
+        0 0 25px rgba(0,170,255,.18),
+        0 0 45px rgba(255,23,68,.10),
+        inset 0 0 25px rgba(255,255,255,.04);
 }
+
+/* =========================================================
+   10 x 10 CELLS
+========================================================= */
 
 .cell{
-    border:0;
-    border-radius:9px;
-    background:#0b1528;
+    width:100%;
+    height:100%;
+
+    min-width:0;
+    min-height:0;
+
+    border:1px solid rgba(255,255,255,.07);
+
+    border-radius:6px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #0b1420,
+            #03070c
+        );
+
     color:white;
-    font-size:clamp(30px,8vw,58px);
+
+    font-size:clamp(18px,4vw,42px);
+
     font-weight:1000;
-    transition:.15s;
+
+    transition:
+        transform .12s,
+        background .15s,
+        box-shadow .15s,
+        border-color .15s;
+
+    box-shadow:
+        inset 0 0 8px rgba(255,255,255,.025);
 }
 
-.cell:hover{
-    background:#132441;
+.cell:hover:not(:disabled){
+
+    transform:scale(.94);
+
+    background:
+        linear-gradient(
+            145deg,
+            #122238,
+            #07111d
+        );
+
+    border-color:rgba(255,255,255,.35);
+
+    box-shadow:
+        0 0 8px rgba(255,255,255,.18),
+        inset 0 0 10px rgba(0,170,255,.08);
 }
+
+.cell:disabled{
+    cursor:default;
+}
+
+/* =========================================================
+   X — NEON RED
+========================================================= */
 
 .cell.x{
-    color:#ff405c;
+    color:#ff1744;
+
+    text-shadow:
+        0 0 5px #ff1744,
+        0 0 12px #ff1744,
+        0 0 25px rgba(255,23,68,.8);
+
+    border-color:rgba(255,23,68,.45);
+
+    box-shadow:
+        inset 0 0 10px rgba(255,23,68,.08),
+        0 0 7px rgba(255,23,68,.25);
 }
+
+/* =========================================================
+   O — NEON BLUE
+========================================================= */
 
 .cell.o{
-    color:#4d9aff;
+    color:#00aaff;
+
+    text-shadow:
+        0 0 5px #00aaff,
+        0 0 12px #00aaff,
+        0 0 25px rgba(0,170,255,.8);
+
+    border-color:rgba(0,170,255,.45);
+
+    box-shadow:
+        inset 0 0 10px rgba(0,170,255,.08),
+        0 0 7px rgba(0,170,255,.25);
 }
 
+/* =========================================================
+   WINNING CELLS
+========================================================= */
+
 .cell.win{
-    background:#1f8b58;
-    color:white;
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #dcecff
+        );
+
+    color:#05070b !important;
+
+    border-color:#fff;
+
+    animation:
+        winningPulse .75s infinite alternate;
+
+    box-shadow:
+        0 0 10px #fff,
+        0 0 25px rgba(255,255,255,.8),
+        0 0 45px rgba(0,170,255,.5),
+        0 0 60px rgba(255,23,68,.35);
+
+    text-shadow:none;
 }
+
+@keyframes winningPulse{
+
+    from{
+        transform:scale(.94);
+
+        box-shadow:
+            0 0 8px #fff,
+            0 0 20px rgba(255,255,255,.55);
+    }
+
+    to{
+        transform:scale(1);
+
+        box-shadow:
+            0 0 12px #fff,
+            0 0 30px rgba(255,255,255,.9),
+            0 0 50px rgba(0,170,255,.45);
+    }
+}
+
+/* =========================================================
+   GAME ACTIONS
+========================================================= */
 
 .game-actions{
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
+
     gap:10px;
-    margin-top:20px;
+
+    margin-top:22px;
 }
 
 .small-btn{
-    border:0;
-    padding:10px 16px;
+    border:1px solid rgba(255,255,255,.15);
+
+    padding:10px 17px;
+
     border-radius:9px;
+
     color:white;
-    background:#1769ff;
-    font-weight:800;
+
+    background:
+        linear-gradient(
+            135deg,
+            #006eff,
+            #00aaff
+        );
+
+    font-weight:900;
+
+    box-shadow:
+        0 0 8px rgba(0,170,255,.4);
+
+    transition:.2s;
+}
+
+.small-btn:hover{
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 0 12px rgba(0,170,255,.8),
+        0 0 25px rgba(0,170,255,.3);
 }
 
 .small-btn.red{
-    background:#d92f48;
+    background:
+        linear-gradient(
+            135deg,
+            #ff1744,
+            #b9002b
+        );
+
+    box-shadow:
+        0 0 8px rgba(255,23,68,.45);
+}
+
+.small-btn.red:hover{
+    box-shadow:
+        0 0 12px rgba(255,23,68,.85),
+        0 0 25px rgba(255,23,68,.3);
 }
 
 .small-btn.dark{
-    background:#24334d;
+    background:
+        linear-gradient(
+            135deg,
+            #182438,
+            #080e18
+        );
 }
 
 /* =========================================================
@@ -400,21 +910,44 @@ header{
 
 .input-row input{
     flex:1;
-    background:#080f1d;
+
+    background:#03070d;
+
     border:1px solid #293958;
+
     color:white;
+
     padding:12px;
+
     border-radius:9px;
+
     outline:none;
 }
 
+.input-row input:focus{
+    border-color:var(--blue);
+
+    box-shadow:
+        0 0 10px rgba(0,170,255,.3);
+}
+
 .input-row button{
-    border:0;
+    border:1px solid rgba(0,170,255,.4);
+
     padding:0 17px;
-    background:#1769ff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #006eff,
+            #00aaff
+        );
+
     color:#fff;
+
     border-radius:9px;
-    font-weight:800;
+
+    font-weight:900;
 }
 
 /* =========================================================
@@ -432,10 +965,30 @@ header{
     justify-content:space-between;
     align-items:center;
     gap:12px;
-    background:#080f1d;
+
+    background:
+        linear-gradient(
+            145deg,
+            #0b1421,
+            #03070d
+        );
+
     border:1px solid #202e48;
+
     padding:13px;
+
     border-radius:11px;
+
+    transition:.2s;
+}
+
+.list-item:hover{
+    border-color:rgba(255,255,255,.25);
+
+    transform:translateX(2px);
+
+    box-shadow:
+        0 0 12px rgba(0,170,255,.08);
 }
 
 .list-main{
@@ -454,8 +1007,11 @@ header{
 
 .rank{
     font-size:18px;
-    font-weight:900;
-    color:#ffd34d;
+    font-weight:1000;
+    color:#fff;
+
+    text-shadow:
+        0 0 8px rgba(255,255,255,.5);
 }
 
 /* =========================================================
@@ -465,38 +1021,82 @@ header{
 .modal{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,.72);
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(0,170,255,.08),
+            rgba(0,0,0,.88)
+        );
+
     display:flex;
+
     align-items:center;
     justify-content:center;
+
     z-index:500;
+
     padding:20px;
+
+    backdrop-filter:blur(8px);
 }
 
 .modal-box{
     width:min(520px,100%);
-    background:#0d1729;
-    border:1px solid #293958;
+
+    background:
+        linear-gradient(
+            145deg,
+            #101a29,
+            #03070d
+        );
+
+    border:1px solid rgba(255,255,255,.15);
+
     border-radius:18px;
+
     padding:22px;
+
     max-height:90vh;
+
     overflow:auto;
+
+    box-shadow:
+        0 0 15px rgba(255,255,255,.08),
+        0 0 40px rgba(0,170,255,.12),
+        0 25px 80px rgba(0,0,0,.8);
 }
 
 .modal-header{
     display:flex;
     align-items:center;
     justify-content:space-between;
+
     margin-bottom:18px;
 }
 
 .close{
-    border:0;
-    background:#202e48;
+    border:1px solid rgba(255,255,255,.15);
+
+    background:#101c2d;
+
     color:white;
+
     width:35px;
     height:35px;
+
     border-radius:50%;
+
+    transition:.2s;
+}
+
+.close:hover{
+    background:var(--red);
+
+    border-color:var(--red);
+
+    box-shadow:
+        0 0 12px rgba(255,23,68,.6);
 }
 
 /* =========================================================
@@ -506,11 +1106,22 @@ header{
 .loading{
     position:fixed;
     inset:0;
-    background:rgba(3,7,14,.78);
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,170,255,.08),
+            rgba(0,0,0,.92)
+        );
+
     z-index:1000;
+
     display:flex;
+
     align-items:center;
     justify-content:center;
+
+    backdrop-filter:blur(8px);
 }
 
 .loader-box{
@@ -518,13 +1129,23 @@ header{
 }
 
 .spinner{
-    width:45px;
-    height:45px;
-    border:4px solid #263653;
-    border-top-color:#1769ff;
+    width:50px;
+    height:50px;
+
+    border:3px solid #263653;
+
+    border-top-color:var(--blue);
+    border-right-color:var(--red);
+
     border-radius:50%;
-    animation:spin .8s linear infinite;
+
+    animation:spin .75s linear infinite;
+
     margin:auto auto 15px;
+
+    box-shadow:
+        0 0 12px rgba(0,170,255,.5),
+        0 0 20px rgba(255,23,68,.25);
 }
 
 @keyframes spin{
@@ -539,26 +1160,142 @@ header{
 
 .toast{
     position:fixed;
+
     right:20px;
     bottom:20px;
-    background:#101c31;
+
+    background:
+        linear-gradient(
+            145deg,
+            #111d2d,
+            #05090f
+        );
+
     border:1px solid #30415e;
+
     color:white;
+
     padding:14px 18px;
+
     border-radius:10px;
+
     z-index:2000;
+
     max-width:350px;
-    box-shadow:0 10px 30px rgba(0,0,0,.4);
+
+    box-shadow:
+        0 0 15px rgba(0,0,0,.6),
+        0 0 20px rgba(0,170,255,.08);
 }
 
 .toast.success{
     border-color:#236242;
+
+    box-shadow:
+        0 0 12px rgba(64,255,172,.2);
 }
 
 .toast.error{
     border-color:#6b2938;
+
+    box-shadow:
+        0 0 12px rgba(255,23,68,.2);
+}
+
+/* =========================================================
+   MOBILE — 10 x 10 BOARD
+========================================================= */
+
+@media(max-width:600px){
+
+    header{
+        height:64px;
+        padding:0 14px;
+    }
+
+    .logo{
+        font-size:18px;
+    }
+
+    .player-badge{
+        display:none;
+    }
+
+    .container{
+        width:96%;
+        margin:20px auto;
+    }
+
+    .card{
+        padding:17px;
+        border-radius:16px;
+    }
+
+    .title{
+        font-size:24px;
+    }
+
+    .board{
+        width:min(96vw,560px);
+
+        gap:3px;
+
+        padding:5px;
+
+        border-radius:12px;
+    }
+
+    .cell{
+        border-radius:4px;
+
+        font-size:
+            clamp(
+                14px,
+                6vw,
+                28px
+            );
+    }
+
+    .game-actions{
+        width:100%;
+    }
+
+    .small-btn{
+        flex:1;
+        min-width:110px;
+    }
+
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media(max-width:380px){
+
+    .board{
+        width:98vw;
+        gap:2px;
+        padding:4px;
+    }
+
+    .cell{
+        font-size:14px;
+        border-radius:3px;
+    }
+
+    .game-actions{
+        gap:6px;
+    }
+
+    .small-btn{
+        padding:9px 10px;
+        font-size:12px;
+    }
 }
 </style>
+```
+
 </head>
 
 <body>
@@ -1974,55 +2711,53 @@ function openGame(game){
     });
 }
 
-
 /* =========================================================
-   RENDER GAME
+   RENDER GAME — 10 x 10 BOARD
+   WIN = 5 CONSECUTIVE X/O
 ========================================================= */
 
 function renderGame(){
 
     if(!currentGame){
-
         return;
     }
 
-
-    const board =
-        $("board");
+    const board = $("board");
 
     board.innerHTML = "";
 
-
     const myPlayer =
-        currentGame.players
-        .find(
+        currentGame.players.find(
             p =>
-            p.playerId ===
-            currentPlayer.playerId
+                p.playerId === currentPlayer.playerId
         );
 
 
-    for(let r=0;r<5;r++){
+    /* =====================================================
+       10 x 10 BOARD
+    ===================================================== */
 
-        for(let c=0;c<5;c++){
+    for(let r = 0; r < 10; r++){
+
+        for(let c = 0; c < 10; c++){
 
             const button =
-                document.createElement(
-                    "button"
-                );
+                document.createElement("button");
 
-            button.className =
-                "cell";
+            button.className = "cell";
 
 
             const value =
-                currentGame.board[r][c];
+                currentGame.board[r]?.[c] || "";
 
+
+            /* =================================================
+               CELL VALUE
+            ================================================= */
 
             if(value){
 
-                button.textContent =
-                    value;
+                button.textContent = value;
 
                 button.classList.add(
                     value.toLowerCase()
@@ -2030,29 +2765,39 @@ function renderGame(){
             }
 
 
+            /* =================================================
+               WINNING LINE
+            ================================================= */
+
             if(
                 currentGame.winningLine &&
                 currentGame.winningLine.some(
                     cell =>
-                    cell[0] === r &&
-                    cell[1] === c
+                        cell[0] === r &&
+                        cell[1] === c
                 )
             ){
 
-                button.classList.add(
-                    "win"
-                );
+                button.classList.add("win");
             }
 
 
-            button.onclick =
-                () => makeMove(r,c);
+            /* =================================================
+               MOVE
+            ================================================= */
 
+            button.onclick =
+                () => makeMove(r, c);
+
+
+            /* =================================================
+               DISABLE CONDITIONS
+            ================================================= */
 
             if(
                 currentGame.status !== "active" ||
                 currentGame.currentTurn !==
-                currentPlayer.playerId ||
+                    currentPlayer.playerId ||
                 value
             ){
 
@@ -2060,19 +2805,20 @@ function renderGame(){
             }
 
 
-            board.appendChild(
-                button
-            );
+            board.appendChild(button);
         }
     }
 
 
+    /* =====================================================
+       TURN TEXT
+    ===================================================== */
+
     const turnPlayer =
-        currentGame.players
-        .find(
+        currentGame.players.find(
             p =>
-            p.playerId ===
-            currentGame.currentTurn
+                p.playerId ===
+                currentGame.currentTurn
         );
 
 
@@ -2102,13 +2848,16 @@ function renderGame(){
     }
 
 
+    /* =====================================================
+       REMATCH BUTTON
+    ===================================================== */
+
     $("rematchBtn")
         .classList.toggle(
             "hidden",
             currentGame.status !== "finished"
         );
 }
-
 
 /* =========================================================
    GAME RESULT
