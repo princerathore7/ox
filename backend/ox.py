@@ -1,173 +1,100 @@
-# ============================================================
-# OX GAME BACKEND
-# File: routes/ox.py
-#
-# COMPLETELY SEPARATE OX GAME BACKEND
-#
-# Flask + MongoDB
-#
-# Features:
-#   1. Player registration
-#   2. Persistent playerId
-#   3. Random matchmaking
-#   4. 5x5 OX board
-#   5. Five consecutive X/O = WIN
-#   6. Horizontal / Vertical / Diagonal wins
-#   7. Draw support
-#   8. Private rooms
-#   9. Groups
-#  10. Direct game requests
-#  11. Group game requests
-#  12. Accept / reject / cancel requests
-#  13. Leaderboard
-#  14. Player statistics
-#  15. Game history
-#  16. Rematch
-#  17. Resign
-#  18. Matchmaking cleanup
-#  19. Request cleanup
-#  20. Health check
-#
-# Blueprint prefix:
-#
-#       /api/ox
-#
-# Example:
-#
-#       POST /api/ox/player/register
-#       POST /api/ox/matchmaking/join
-#       POST /api/ox/move
-#       GET  /api/ox/game/<game_id>
-#       GET  /api/ox/leaderboard
-#
-# ============================================================
-
-from flask import Blueprint, request, jsonify
-
-from pymongo import (
-    MongoClient,
-    ASCENDING,
-    DESCENDING
-)
-
-from datetime import datetime, timezone, timedelta
-
 import os
 import uuid
-import random
-import string
-import re
+import secrets
+from datetime import datetime, timezone, timedelta
+
+from flask import Blueprint, request, jsonify
+from pymongo import MongoClient, ASCENDING, DESCENDING
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 # ============================================================
-# BLUEPRINT
+# OX GAME BLUEPRINT
 # ============================================================
 
-ox_bp = Blueprint(
-    "ox",
-    __name__,
-    url_prefix="/api/ox"
-)
+ox_bp = Blueprint("ox", __name__, url_prefix="/api/ox")
 
 
 # ============================================================
-# OX MONGODB CONFIGURATION
-#
-# THIS DATABASE IS COMPLETELY SEPARATE.
-#
-# REQUIRED RENDER ENV:
-#
-# MONGO_URI=mongodb+srv://...
-#
-# OPTIONAL:
-#
-# MONGO_DB_NAME=ox_game
-#
+# MONGODB
 # ============================================================
 
-MONGO_URI = os.getenv("MONGO_URI")
+OX_MONGO_URI = os.getenv("OX_MONGO_URI")
 
-if not MONGO_URI:
+if not OX_MONGO_URI:
     raise RuntimeError(
-        "MONGO_URI environment variable is not configured for OX Game."
+        "OX_MONGO_URI environment variable is missing."
     )
 
-
-OX_DB_NAME = os.getenv(
-    "MONGO_DB_NAME",
-    "ox_game"
-)
-
-
-# ============================================================
-# MONGODB CLIENT
-# ============================================================
+OX_DB_NAME = os.getenv("OX_MONGO_DB_NAME", "ox_game")
 
 ox_client = MongoClient(
-    MONGO_URI,
-    serverSelectionTimeoutMS=10000,
-    connectTimeoutMS=10000,
-    socketTimeoutMS=20000
+    OX_MONGO_URI,
+    serverSelectionTimeoutMS=10000
 )
-
-
-# ============================================================
-# OX DATABASE
-# ============================================================
 
 ox_db = ox_client[OX_DB_NAME]
 
 
 # ============================================================
 # COLLECTIONS
-#
-# ALL COLLECTIONS BELONG ONLY TO OX GAME DATABASE.
 # ============================================================
 
 players_col = ox_db["players"]
-
 games_col = ox_db["games"]
-
 rooms_col = ox_db["rooms"]
-
 queue_col = ox_db["matchmaking"]
-
 groups_col = ox_db["groups"]
-
 requests_col = ox_db["requests"]
+sessions_col = ox_db["sessions"]
 
 
 # ============================================================
-# CONSTANTS
+# SETTINGS
 # ============================================================
 
 BOARD_SIZE = 5
-
 WIN_LENGTH = 5
 
 MAX_NAME_LENGTH = 40
+MAX_USERNAME_LENGTH = 30
+MIN_USERNAME_LENGTH = 3
+
+MAX_PASSWORD_LENGTH = 128
+MIN_PASSWORD_LENGTH = 6
 
 MAX_GROUP_NAME_LENGTH = 60
-
 MAX_ROOM_ID_LENGTH = 30
 
-VALID_SYMBOLS = {
-    "X",
-    "O"
-}
+VALID_SYMBOLS = {"X", "O"}
+
+SESSION_DAYS = 30
 
 
 # ============================================================
-# MONGODB CONNECTION TEST
+# ADMIN SETTINGS
+# ============================================================
+
+ADMIN_USERNAME = os.getenv("OX_ADMIN_USERNAME")
+ADMIN_PASSWORD = os.getenv("OX_ADMIN_PASSWORD")
+
+if not ADMIN_USERNAME or not ADMIN_PASSWORD:
+    print(
+        "WARNING: OX_ADMIN_USERNAME / OX_ADMIN_PASSWORD "
+        "environment variables are not configured."
+    )
+
+
+# ============================================================
+# DATABASE CONNECTION TEST
 # ============================================================
 
 try:
-
     ox_client.admin.command("ping")
 
-    print("============================================")
+    print("=" * 44)
     print("OX GAME MONGODB CONNECTED")
-    print("============================================")
+    print("=" * 44)
     print(f"Database: {OX_DB_NAME}")
     print("Collections:")
     print(" - players")
@@ -176,30 +103,36 @@ try:
     print(" - matchmaking")
     print(" - groups")
     print(" - requests")
-    print("============================================")
+    print(" - sessions")
+    print("=" * 44)
 
 except Exception as e:
-
-    print("============================================")
-    print("OX GAME MONGODB CONNECTION FAILED")
-    print("============================================")
-    print(str(e))
-    print("============================================")
+    print("OX MongoDB connection error:", e)
 
 
 # ============================================================
-# DATABASE INDEXES
+# INDEXES
 # ============================================================
 
 try:
-
     players_col.create_index(
-        [("playerId", ASCENDING)],
-        unique=True
+        [("username", ASCENDING)],
+        unique=True,
+        name="unique_username"
     )
 
     players_col.create_index(
-        [("nameLower", ASCENDING)]
+        [("playerId", ASCENDING)],
+        unique=True,
+        name="unique_player_id"
+    )
+
+    players_col.create_index(
+        [("blocked", ASCENDING)]
+    )
+
+    players_col.create_index(
+        [("suspended", ASCENDING)]
     )
 
     games_col.create_index(
@@ -208,15 +141,20 @@ try:
     )
 
     games_col.create_index(
-        [("status", ASCENDING)]
+        [("players.playerId", ASCENDING)]
     )
 
     games_col.create_index(
-        [("players.playerId", ASCENDING)]
+        [("createdAt", DESCENDING)]
     )
 
     rooms_col.create_index(
         [("roomId", ASCENDING)],
+        unique=True
+    )
+
+    queue_col.create_index(
+        [("playerId", ASCENDING)],
         unique=True
     )
 
@@ -230,5001 +168,2963 @@ try:
         unique=True
     )
 
-    requests_col.create_index(
-        [
-            ("toPlayerId", ASCENDING),
-            ("status", ASCENDING)
-        ]
-    )
-
-    requests_col.create_index(
-        [
-            ("fromPlayerId", ASCENDING),
-            ("status", ASCENDING)
-        ]
-    )
-
-    queue_col.create_index(
-        [("playerId", ASCENDING)],
+    sessions_col.create_index(
+        [("token", ASCENDING)],
         unique=True
     )
 
-    queue_col.create_index(
-        [("joinedAt", ASCENDING)]
+    sessions_col.create_index(
+        [("expiresAt", ASCENDING)],
+        expireAfterSeconds=0
     )
 
 except Exception as e:
-
-    print("OX index creation warning:", str(e))
+    print("Index creation warning:", e)
 
 
 # ============================================================
-# GENERAL HELPERS
+# HELPERS
 # ============================================================
 
-def now():
+def now_utc():
     return datetime.now(timezone.utc)
 
 
-def make_id(prefix=""):
-    return prefix + uuid.uuid4().hex
+def iso_date(value):
+    if not value:
+        return None
+
+    if isinstance(value, datetime):
+        return value.isoformat()
+
+    return value
 
 
-# ============================================================
-# NAME CLEANING
-# ============================================================
-
-def clean_name(name):
-
-    if not isinstance(name, str):
+def clean_string(value):
+    if value is None:
         return ""
 
-    name = name.strip()
+    return str(value).strip()
 
-    name = re.sub(
-        r"\s+",
-        " ",
-        name
+
+def generate_player_id():
+    return "OX" + uuid.uuid4().hex[:10].upper()
+
+
+def generate_game_id():
+    return "GAME-" + uuid.uuid4().hex[:12].upper()
+
+
+def generate_room_id():
+    return uuid.uuid4().hex[:8].upper()
+
+
+def generate_group_id():
+    return "GRP-" + uuid.uuid4().hex[:10].upper()
+
+
+def generate_request_id():
+    return "REQ-" + uuid.uuid4().hex[:12].upper()
+
+
+def valid_username(username):
+    if not username:
+        return False
+
+    if len(username) < MIN_USERNAME_LENGTH:
+        return False
+
+    if len(username) > MAX_USERNAME_LENGTH:
+        return False
+
+    allowed = (
+        username.replace("_", "")
+        .replace("-", "")
+        .isalnum()
     )
 
-    return name[:MAX_NAME_LENGTH]
+    return allowed
 
 
-def clean_group_name(name):
-
-    if not isinstance(name, str):
-        return ""
-
-    name = name.strip()
-
-    name = re.sub(
-        r"\s+",
-        " ",
-        name
-    )
-
-    return name[:MAX_GROUP_NAME_LENGTH]
-
-
-def clean_room_id(room_id):
-
-    if not isinstance(room_id, str):
-        return ""
-
-    room_id = room_id.strip().upper()
-
-    room_id = re.sub(
-        r"[^A-Z0-9_-]",
-        "",
-        room_id
-    )
-
-    return room_id[:MAX_ROOM_ID_LENGTH]
-
-
-# ============================================================
-# PLAYER PUBLIC DATA
-# ============================================================
-
-def player_public(player):
-
+def sanitize_player(player):
     if not player:
         return None
 
     return {
         "playerId": player.get("playerId"),
         "name": player.get("name"),
-
-        "wins": int(
-            player.get("wins", 0)
-        ),
-
-        "losses": int(
-            player.get("losses", 0)
-        ),
-
-        "draws": int(
-            player.get("draws", 0)
-        ),
-
-        "games": int(
-            player.get("games", 0)
-        )
+        "username": player.get("username"),
+        "wins": int(player.get("wins", 0)),
+        "losses": int(player.get("losses", 0)),
+        "draws": int(player.get("draws", 0)),
+        "gamesPlayed": int(player.get("gamesPlayed", 0)),
+        "winRate": calculate_win_rate(player),
+        "blocked": bool(player.get("blocked", False)),
+        "suspended": bool(player.get("suspended", False)),
+        "createdAt": iso_date(player.get("createdAt")),
+        "lastLogin": iso_date(player.get("lastLogin")),
     }
 
 
-# ============================================================
-# GET PLAYER
-# ============================================================
+def calculate_win_rate(player):
+    wins = int(player.get("wins", 0))
+    losses = int(player.get("losses", 0))
+    draws = int(player.get("draws", 0))
 
-def get_player(player_id):
+    total = wins + losses + draws
 
-    if not player_id:
-        return None
+    if total <= 0:
+        return 0
 
-    return players_col.find_one({
-        "playerId": str(player_id)
-    })
-
-
-# ============================================================
-# REQUIRE PLAYER
-# ============================================================
-
-def require_player(data):
-
-    player_id = data.get("playerId")
-
-    if not player_id:
-
-        return None, jsonify({
-            "success": False,
-            "error": "playerId is required."
-        }), 400
-
-    player = get_player(player_id)
-
-    if not player:
-
-        return None, jsonify({
-            "success": False,
-            "error": "Player not found. Register first."
-        }), 404
-
-    return player, None, None
+    return round((wins / total) * 100, 2)
 
 
-# ============================================================
-# ENSURE PLAYER
-# ============================================================
-
-def ensure_player(
-    player_id=None,
-    name=None
-):
-
-    if not player_id:
-
-        player_id = make_id("p_")
-
-    player_id = str(player_id).strip()
-
-    player = get_player(player_id)
-
-    if player:
-
-        if name:
-
-            clean = clean_name(name)
-
-            if clean and clean != player.get("name"):
-
-                players_col.update_one(
-                    {
-                        "playerId": player_id
-                    },
-                    {
-                        "$set": {
-                            "name": clean,
-                            "nameLower": clean.lower(),
-                            "updatedAt": now()
-                        }
-                    }
-                )
-
-        return get_player(player_id)
-
-    clean = clean_name(
-        name or "Player"
-    )
-
-    if not clean:
-        clean = "Player"
-
-    document = {
-
-        "playerId": player_id,
-
-        "name": clean,
-
-        "nameLower": clean.lower(),
-
-        "wins": 0,
-
-        "losses": 0,
-
-        "draws": 0,
-
-        "games": 0,
-
-        "createdAt": now(),
-
-        "updatedAt": now(),
-
-        "lastSeen": now()
-    }
-
-    try:
-
-        players_col.insert_one(
-            document
-        )
-
-    except Exception:
-
-        existing = get_player(
-            player_id
-        )
-
-        if existing:
-            return existing
-
-        raise
-
-    return document
-
-
-# ============================================================
-# TOUCH PLAYER
-# ============================================================
-
-def touch_player(player_id):
-
-    try:
-
-        players_col.update_one(
-            {
-                "playerId": player_id
-            },
-            {
-                "$set": {
-                    "lastSeen": now(),
-                    "updatedAt": now()
-                }
-            }
-        )
-
-    except Exception:
-        pass
-
-
-# ============================================================
-# BOARD
-# ============================================================
-
-def empty_board():
-
+def create_empty_board():
     return [
-        [
-            None
-            for _ in range(BOARD_SIZE)
-        ]
+        [None for _ in range(BOARD_SIZE)]
         for _ in range(BOARD_SIZE)
     ]
 
 
-def valid_cell(row, col):
+def create_session(player_id, is_admin=False):
+    token = secrets.token_urlsafe(48)
 
-    return (
-        isinstance(row, int)
-        and isinstance(col, int)
-        and 0 <= row < BOARD_SIZE
-        and 0 <= col < BOARD_SIZE
-    )
+    expires = now_utc() + timedelta(days=SESSION_DAYS)
+
+    sessions_col.insert_one({
+        "token": token,
+        "playerId": player_id,
+        "isAdmin": bool(is_admin),
+        "createdAt": now_utc(),
+        "expiresAt": expires
+    })
+
+    return token
+
+
+def get_token():
+    auth = request.headers.get("Authorization", "")
+
+    if auth.startswith("Bearer "):
+        return auth[7:].strip()
+
+    token = request.headers.get("X-OX-Token")
+
+    if token:
+        return token.strip()
+
+    return None
+
+
+def get_session():
+    token = get_token()
+
+    if not token:
+        return None
+
+    session = sessions_col.find_one({
+        "token": token,
+        "expiresAt": {"$gt": now_utc()}
+    })
+
+    return session
+
+
+def get_current_player():
+    session = get_session()
+
+    if not session:
+        return None
+
+    if session.get("isAdmin"):
+        return None
+
+    player = players_col.find_one({
+        "playerId": session.get("playerId")
+    })
+
+    return player
+
+
+def require_player():
+    player = get_current_player()
+
+    if not player:
+        return None, (
+            jsonify({
+                "success": False,
+                "message": "Login required."
+            }),
+            401
+        )
+
+    if player.get("blocked"):
+        return None, (
+            jsonify({
+                "success": False,
+                "message": "Your account has been blocked."
+            }),
+            403
+        )
+
+    if player.get("suspended"):
+        return None, (
+            jsonify({
+                "success": False,
+                "message": "Your account has been suspended."
+            }),
+            403
+        )
+
+    return player, None
+
+
+def require_admin():
+    session = get_session()
+
+    if not session or not session.get("isAdmin"):
+        return None, (
+            jsonify({
+                "success": False,
+                "message": "Admin authentication required."
+            }),
+            401
+        )
+
+    return session, None
+
+
+def find_game_for_player(game_id, player_id):
+    return games_col.find_one({
+        "gameId": game_id,
+        "players.playerId": player_id
+    })
+
+
+def player_in_game(game, player_id):
+    for p in game.get("players", []):
+        if p.get("playerId") == player_id:
+            return p
+
+    return None
+
+
+def find_winning_line(board, symbol):
+    directions = [
+        (0, 1),    # horizontal
+        (1, 0),    # vertical
+        (1, 1),    # diagonal
+        (1, -1)    # reverse diagonal
+    ]
+
+    for r in range(BOARD_SIZE):
+        for c in range(BOARD_SIZE):
+
+            if board[r][c] != symbol:
+                continue
+
+            for dr, dc in directions:
+
+                cells = []
+
+                for i in range(WIN_LENGTH):
+                    nr = r + dr * i
+                    nc = c + dc * i
+
+                    if (
+                        nr < 0 or
+                        nr >= BOARD_SIZE or
+                        nc < 0 or
+                        nc >= BOARD_SIZE
+                    ):
+                        break
+
+                    if board[nr][nc] != symbol:
+                        break
+
+                    cells.append([nr, nc])
+
+                if len(cells) == WIN_LENGTH:
+                    return cells
+
+    return None
 
 
 def board_full(board):
-
     for row in board:
-
         for cell in row:
-
             if cell is None:
                 return False
 
     return True
 
 
-# ============================================================
-# WIN CHECK
-# ============================================================
-
-def find_winning_line(
-    board,
-    row,
-    col,
-    symbol
-):
-
-    directions = [
-
-        (0, 1),
-
-        (1, 0),
-
-        (1, 1),
-
-        (1, -1)
-    ]
-
-    for dr, dc in directions:
-
-        cells = []
-
-        r = row
-        c = col
-
-        # --------------------------------------------
-        # MOVE BACKWARDS
-        # --------------------------------------------
-
-        while (
-
-            0 <= r - dr < BOARD_SIZE
-
-            and
-
-            0 <= c - dc < BOARD_SIZE
-
-            and
-
-            board[r - dr][c - dc] == symbol
-        ):
-
-            r -= dr
-            c -= dc
-
-        # --------------------------------------------
-        # MOVE FORWARD
-        # --------------------------------------------
-
-        while (
-
-            0 <= r < BOARD_SIZE
-
-            and
-
-            0 <= c < BOARD_SIZE
-
-            and
-
-            board[r][c] == symbol
-        ):
-
-            cells.append([
-                r,
-                c
-            ])
-
-            r += dr
-            c += dc
-
-        if len(cells) >= WIN_LENGTH:
-
-            return cells
-
-    return None
-
-
-def check_winner(
-    board,
-    row,
-    col,
-    symbol
-):
-
-    return find_winning_line(
-        board,
-        row,
-        col,
-        symbol
-    )
-
-
-# ============================================================
-# SERIALIZE GAME
-# ============================================================
-
-def serialize_game(game):
-
+def game_public(game):
     if not game:
         return None
 
-    return {
-
-        "gameId": game.get(
-            "gameId"
-        ),
-
-        "board": game.get(
-            "board"
-        ),
-
-        "boardSize": BOARD_SIZE,
-
-        "winLength": WIN_LENGTH,
-
-        "players": game.get(
-            "players",
-            []
-        ),
-
-        "currentTurn": game.get(
-            "currentTurn"
-        ),
-
-        "status": game.get(
-            "status"
-        ),
-
-        "winner": game.get(
-            "winner"
-        ),
-
-        "winnerSymbol": game.get(
-            "winnerSymbol"
-        ),
-
-        "loser": game.get(
-            "loser"
-        ),
-
-        "draw": bool(
-            game.get(
-                "draw",
-                False
-            )
-        ),
-
-        "winningCells": game.get(
-            "winningCells",
-            []
-        ),
-
-        "roomId": game.get(
-            "roomId"
-        ),
-
-        "groupId": game.get(
-            "groupId"
-        ),
-
-        "createdAt": game.get(
-            "createdAt"
-        ),
-
-        "updatedAt": game.get(
-            "updatedAt"
-        )
+    result = {
+        "gameId": game.get("gameId"),
+        "board": game.get("board"),
+        "players": game.get("players"),
+        "status": game.get("status"),
+        "currentTurn": game.get("currentTurn"),
+        "winner": game.get("winner"),
+        "winningLine": game.get("winningLine"),
+        "result": game.get("result"),
+        "createdAt": iso_date(game.get("createdAt")),
+        "updatedAt": iso_date(game.get("updatedAt")),
+        "finishedAt": iso_date(game.get("finishedAt")),
+        "rematchOf": game.get("rematchOf")
     }
 
+    return result
 
-# ============================================================
-# CREATE GAME
-# ============================================================
 
-def create_game(
-    player1_id,
-    player2_id,
-    room_id=None,
-    group_id=None
-):
+def make_game(player1, player2):
+    game_id = generate_game_id()
 
-    if player1_id == player2_id:
+    first = secrets.choice([
+        player1,
+        player2
+    ])
 
-        raise ValueError(
-            "A player cannot play against themselves."
-        )
+    second = player2 if first["playerId"] == player1["playerId"] else player1
 
-    p1 = get_player(
-        player1_id
-    )
-
-    p2 = get_player(
-        player2_id
-    )
-
-    if not p1 or not p2:
-
-        raise ValueError(
-            "Both players must exist."
-        )
-
-    # --------------------------------------------
-    # RANDOM X / O
-    # --------------------------------------------
-
-    if random.choice(
-        [True, False]
-    ):
-
-        x_player = player1_id
-        o_player = player2_id
-
-    else:
-
-        x_player = player2_id
-        o_player = player1_id
-
-    x_name = (
-        p1["name"]
-        if p1["playerId"] == x_player
-        else p2["name"]
-    )
-
-    o_name = (
-        p1["name"]
-        if p1["playerId"] == o_player
-        else p2["name"]
-    )
-
-    game_id = make_id(
-        "game_"
-    )
+    players = [
+        {
+            "playerId": first["playerId"],
+            "name": first["name"],
+            "username": first["username"],
+            "symbol": "X"
+        },
+        {
+            "playerId": second["playerId"],
+            "name": second["name"],
+            "username": second["username"],
+            "symbol": "O"
+        }
+    ]
 
     game = {
-
         "gameId": game_id,
-
-        "board": empty_board(),
-
-        "players": [
-
-            {
-                "playerId": x_player,
-                "name": x_name,
-                "symbol": "X"
-            },
-
-            {
-                "playerId": o_player,
-                "name": o_name,
-                "symbol": "O"
-            }
-        ],
-
-        # X always starts.
-        "currentTurn": x_player,
-
-        "status": "playing",
-
+        "board": create_empty_board(),
+        "players": players,
+        "currentTurn": first["playerId"],
+        "status": "active",
         "winner": None,
-
-        "winnerSymbol": None,
-
-        "loser": None,
-
-        "draw": False,
-
-        "winningCells": [],
-
-        "roomId": room_id,
-
-        "groupId": group_id,
-
-        "createdAt": now(),
-
-        "updatedAt": now()
+        "winningLine": None,
+        "result": None,
+        "createdAt": now_utc(),
+        "updatedAt": now_utc(),
+        "finishedAt": None,
+        "rematchOf": None
     }
 
-    games_col.insert_one(
-        game
-    )
-
-    # Remove players from queue.
-    queue_col.delete_many({
-        "playerId": {
-            "$in": [
-                player1_id,
-                player2_id
-            ]
-        }
-    })
+    games_col.insert_one(game)
 
     return game
 
 
-# ============================================================
-# GET PLAYER SYMBOL
-# ============================================================
-
-def get_player_symbol(
-    game,
-    player_id
-):
-
-    for player in game.get(
-        "players",
-        []
-    ):
-
-        if player.get(
-            "playerId"
-        ) == player_id:
-
-            return player.get(
-                "symbol"
-            )
-
-    return None
-
-
-# ============================================================
-# GET OPPONENT
-# ============================================================
-
-def get_opponent(
-    game,
-    player_id
-):
-
-    for player in game.get(
-        "players",
-        []
-    ):
-
-        if player.get(
-            "playerId"
-        ) != player_id:
-
-            return player
-
-    return None
-
-
-# ============================================================
-# PLAYER REGISTER
-# ============================================================
-
-@ox_bp.route(
-    "/player/register",
-    methods=["POST"]
-)
-def register_player():
-
-    try:
-
-        data = request.get_json(
-            silent=True
-        ) or {}
-
-        name = clean_name(
-            data.get(
-                "name",
-                ""
-            )
-        )
-
-        player_id = data.get(
-            "playerId"
-        )
-
-        if not name:
-
-            return jsonify({
-                "success": False,
-                "error": "Name is required."
-            }), 400
-
-        if len(name) < 2:
-
-            return jsonify({
-                "success": False,
-                "error": "Name must contain at least 2 characters."
-            }), 400
-
-        if player_id:
-
-            player_id = str(
-                player_id
-            ).strip()
-
-        player = ensure_player(
-            player_id,
-            name
-        )
-
-        touch_player(
-            player["playerId"]
-        )
-
-        return jsonify({
-
-            "success": True,
-
-            "message":
-                "Player registered successfully.",
-
-            "player":
-                player_public(
-                    get_player(
-                        player["playerId"]
-                    )
-                )
-        })
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
-
-# ============================================================
-# GET PLAYER
-# ============================================================
-
-@ox_bp.route(
-    "/player/<player_id>",
-    methods=["GET"]
-)
-def get_player_route(
-    player_id
-):
-
-    try:
-
-        player = get_player(
-            player_id
-        )
-
-        if not player:
-
-            return jsonify({
-                "success": False,
-                "error": "Player not found."
-            }), 404
-
-        return jsonify({
-
-            "success": True,
-
-            "player":
-                player_public(
-                    player
-                )
-        })
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
-
-# ============================================================
-# RANDOM MATCHMAKING JOIN
-# ============================================================
-
-@ox_bp.route(
-    "/matchmaking/join",
-    methods=["POST"]
-)
-def join_matchmaking():
-
-    try:
-
-        data = request.get_json(
-            silent=True
-        ) or {}
-
-        player, error_response, status = require_player(
-            data
-        )
-
-        if error_response:
-            return error_response, status
-
-        player_id = player[
-            "playerId"
-        ]
-
-        touch_player(
-            player_id
-        )
-
-        # --------------------------------------------
-        # CHECK ACTIVE GAME
-        # --------------------------------------------
-
-        existing_game = games_col.find_one({
-
-            "players.playerId":
-                player_id,
-
-            "status":
-                "playing"
-        })
-
-        if existing_game:
-
-            return jsonify({
-
-                "success": True,
-
-                "matched": True,
-
-                "waiting": False,
-
-                "message":
-                    "You already have an active game.",
-
-                "game":
-                    serialize_game(
-                        existing_game
-                    )
-            })
-
-        # --------------------------------------------
-        # REMOVE OLD QUEUE ENTRY
-        # --------------------------------------------
-
-        queue_col.delete_many({
-            "playerId":
-                player_id
-        })
-
-        # --------------------------------------------
-        # FIND OLDEST WAITING PLAYER
-        # --------------------------------------------
-
-        opponent_entry = queue_col.find_one(
-            {
-                "playerId": {
-                    "$ne":
-                        player_id
+def update_finished_stats(game):
+    winner_id = game.get("winner")
+
+    if winner_id:
+        loser_id = None
+
+        for player in game.get("players", []):
+            if player["playerId"] != winner_id:
+                loser_id = player["playerId"]
+                break
+
+        if loser_id:
+            players_col.update_one(
+                {"playerId": winner_id},
+                {
+                    "$inc": {
+                        "wins": 1,
+                        "gamesPlayed": 1
+                    }
                 }
-            },
-            sort=[
-                (
-                    "joinedAt",
-                    ASCENDING
-                )
-            ]
-        )
-
-        if opponent_entry:
-
-            opponent_id = opponent_entry[
-                "playerId"
-            ]
-
-            opponent = get_player(
-                opponent_id
             )
 
-            if not opponent:
-
-                queue_col.delete_one({
-                    "_id":
-                        opponent_entry["_id"]
-                })
-
-                return jsonify({
-
-                    "success": True,
-
-                    "matched": False,
-
-                    "waiting": True,
-
-                    "message":
-                        "Waiting for another player."
-                })
-
-            # ----------------------------------------
-            # CHECK OPPONENT ACTIVE GAME
-            # ----------------------------------------
-
-            active_opponent_game = games_col.find_one({
-
-                "players.playerId":
-                    opponent_id,
-
-                "status":
-                    "playing"
-            })
-
-            if active_opponent_game:
-
-                queue_col.delete_one({
-                    "_id":
-                        opponent_entry["_id"]
-                })
-
-                return jsonify({
-
-                    "success": True,
-
-                    "matched": False,
-
-                    "waiting": True,
-
-                    "message":
-                        "Waiting for another player."
-                })
-
-            # ----------------------------------------
-            # CREATE GAME
-            # ----------------------------------------
-
-            game = create_game(
-                player_id,
-                opponent_id
+            players_col.update_one(
+                {"playerId": loser_id},
+                {
+                    "$inc": {
+                        "losses": 1,
+                        "gamesPlayed": 1
+                    }
+                }
             )
 
-            return jsonify({
+    elif game.get("result") == "draw":
+        for player in game.get("players", []):
+            players_col.update_one(
+                {"playerId": player["playerId"]},
+                {
+                    "$inc": {
+                        "draws": 1,
+                        "gamesPlayed": 1
+                    }
+                }
+            )
 
-                "success": True,
 
-                "matched": True,
+# ============================================================
+# AUTH — SIGNUP
+# ============================================================
 
-                "waiting": False,
+@ox_bp.route("/auth/signup", methods=["POST"])
+def signup():
 
-                "message":
-                    "Opponent found!",
+    data = request.get_json(silent=True) or {}
 
-                "game":
-                    serialize_game(
-                        game
-                    )
-            })
+    name = clean_string(data.get("name"))
+    username = clean_string(data.get("username")).lower()
+    password = data.get("password", "")
 
-        # --------------------------------------------
-        # NOBODY WAITING
-        # --------------------------------------------
-
-        queue_col.insert_one({
-
-            "playerId":
-                player_id,
-
-            "name":
-                player["name"],
-
-            "joinedAt":
-                now()
-        })
-
-        return jsonify({
-
-            "success": True,
-
-            "matched": False,
-
-            "waiting": True,
-
-            "message":
-                "Waiting for an opponent..."
-        })
-
-    except Exception as e:
-
+    if not name:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "message": "Name is required."
+        }), 400
 
+    if len(name) > MAX_NAME_LENGTH:
+        return jsonify({
+            "success": False,
+            "message": "Name is too long."
+        }), 400
 
-# ============================================================
-# LEAVE MATCHMAKING
-# ============================================================
+    if not valid_username(username):
+        return jsonify({
+            "success": False,
+            "message": (
+                f"Username must be {MIN_USERNAME_LENGTH}-"
+                f"{MAX_USERNAME_LENGTH} characters and contain "
+                "only letters, numbers, _ or -."
+            )
+        }), 400
 
-@ox_bp.route(
-    "/matchmaking/leave",
-    methods=["POST"]
-)
-def leave_matchmaking():
+    if not isinstance(password, str):
+        return jsonify({
+            "success": False,
+            "message": "Password must be text."
+        }), 400
+
+    if len(password) < MIN_PASSWORD_LENGTH:
+        return jsonify({
+            "success": False,
+            "message": (
+                f"Password must be at least "
+                f"{MIN_PASSWORD_LENGTH} characters."
+            )
+        }), 400
+
+    if len(password) > MAX_PASSWORD_LENGTH:
+        return jsonify({
+            "success": False,
+            "message": "Password is too long."
+        }), 400
+
+    existing = players_col.find_one({
+        "username": username
+    })
+
+    if existing:
+        return jsonify({
+            "success": False,
+            "message": "Username already exists."
+        }), 409
+
+    player_id = generate_player_id()
+
+    player = {
+        "playerId": player_id,
+        "name": name,
+        "username": username,
+        "passwordHash": generate_password_hash(password),
+
+        "wins": 0,
+        "losses": 0,
+        "draws": 0,
+        "gamesPlayed": 0,
+
+        "blocked": False,
+        "suspended": False,
+
+        "createdAt": now_utc(),
+        "lastLogin": None
+    }
 
     try:
-
-        data = request.get_json(
-            silent=True
-        ) or {}
-
-        player_id = data.get(
-            "playerId"
-        )
-
-        if not player_id:
-
-            return jsonify({
-                "success": False,
-                "error": "playerId is required."
-            }), 400
-
-        result = queue_col.delete_many({
-            "playerId":
-                str(player_id)
-        })
-
-        return jsonify({
-
-            "success": True,
-
-            "removed":
-                result.deleted_count
-        })
+        players_col.insert_one(player)
 
     except Exception as e:
 
+        if "duplicate" in str(e).lower():
+            return jsonify({
+                "success": False,
+                "message": "Username already exists."
+            }), 409
+
+        print("Signup error:", e)
+
         return jsonify({
             "success": False,
-            "error": str(e)
+            "message": "Unable to create account."
         }), 500
 
+    token = create_session(player_id)
+
+    return jsonify({
+        "success": True,
+        "message": "Signup successful.",
+        "token": token,
+        "player": sanitize_player(player)
+    }), 201
+
 
 # ============================================================
-# MATCHMAKING STATUS
+# AUTH — LOGIN
 # ============================================================
 
-@ox_bp.route(
-    "/matchmaking/status",
-    methods=["GET"]
-)
+@ox_bp.route("/auth/login", methods=["POST"])
+def login():
+
+    data = request.get_json(silent=True) or {}
+
+    username = clean_string(data.get("username")).lower()
+    password = data.get("password", "")
+
+    if not username or not password:
+        return jsonify({
+            "success": False,
+            "message": "Username and password are required."
+        }), 400
+
+    player = players_col.find_one({
+        "username": username
+    })
+
+    if not player:
+        return jsonify({
+            "success": False,
+            "message": "Invalid username or password."
+        }), 401
+
+    if player.get("blocked"):
+        return jsonify({
+            "success": False,
+            "message": "Your account has been blocked."
+        }), 403
+
+    if player.get("suspended"):
+        return jsonify({
+            "success": False,
+            "message": "Your account has been suspended."
+        }), 403
+
+    password_hash = player.get("passwordHash")
+
+    if not password_hash or not check_password_hash(
+        password_hash,
+        password
+    ):
+        return jsonify({
+            "success": False,
+            "message": "Invalid username or password."
+        }), 401
+
+    players_col.update_one(
+        {
+            "playerId": player["playerId"]
+        },
+        {
+            "$set": {
+                "lastLogin": now_utc()
+            }
+        }
+    )
+
+    player["lastLogin"] = now_utc()
+
+    token = create_session(player["playerId"])
+
+    return jsonify({
+        "success": True,
+        "message": "Login successful.",
+        "token": token,
+        "player": sanitize_player(player)
+    })
+
+
+# ============================================================
+# AUTH — LOGOUT
+# ============================================================
+
+@ox_bp.route("/auth/logout", methods=["POST"])
+def logout():
+
+    token = get_token()
+
+    if token:
+        sessions_col.delete_one({
+            "token": token
+        })
+
+    return jsonify({
+        "success": True,
+        "message": "Logged out successfully."
+    })
+
+
+# ============================================================
+# CURRENT PLAYER
+# ============================================================
+
+@ox_bp.route("/auth/me", methods=["GET"])
+def auth_me():
+
+    player, error = require_player()
+
+    if error:
+        return error
+
+    return jsonify({
+        "success": True,
+        "player": sanitize_player(player)
+    })
+
+
+# ============================================================
+# PLAYER PROFILE
+# ============================================================
+
+@ox_bp.route("/player/<player_id>", methods=["GET"])
+def get_player(player_id):
+
+    player = players_col.find_one({
+        "playerId": player_id
+    })
+
+    if not player:
+        return jsonify({
+            "success": False,
+            "message": "Player not found."
+        }), 404
+
+    return jsonify({
+        "success": True,
+        "player": sanitize_player(player)
+    })
+
+
+# ============================================================
+# OLD PLAYER REGISTER COMPATIBILITY ROUTE
+# ============================================================
+
+@ox_bp.route("/player/register", methods=["POST"])
+def player_register():
+
+    data = request.get_json(silent=True) or {}
+
+    name = clean_string(data.get("name"))
+    username = clean_string(data.get("username")).lower()
+    password = data.get("password", "")
+
+    if not username or not password:
+        return jsonify({
+            "success": False,
+            "message": (
+                "Username and password are now required. "
+                "Use /api/ox/auth/signup."
+            )
+        }), 400
+
+    data["name"] = name
+
+    # Reuse signup logic internally
+    if not name:
+        data["name"] = username
+
+    existing = players_col.find_one({
+        "username": username
+    })
+
+    if existing:
+        return jsonify({
+            "success": False,
+            "message": "Username already exists."
+        }), 409
+
+    if not valid_username(username):
+        return jsonify({
+            "success": False,
+            "message": "Invalid username."
+        }), 400
+
+    if len(password) < MIN_PASSWORD_LENGTH:
+        return jsonify({
+            "success": False,
+            "message": "Password is too short."
+        }), 400
+
+    player_id = generate_player_id()
+
+    player = {
+        "playerId": player_id,
+        "name": data["name"][:MAX_NAME_LENGTH],
+        "username": username,
+        "passwordHash": generate_password_hash(password),
+
+        "wins": 0,
+        "losses": 0,
+        "draws": 0,
+        "gamesPlayed": 0,
+
+        "blocked": False,
+        "suspended": False,
+
+        "createdAt": now_utc(),
+        "lastLogin": None
+    }
+
+    try:
+        players_col.insert_one(player)
+    except Exception as e:
+        print("Register error:", e)
+
+        return jsonify({
+            "success": False,
+            "message": "Unable to create account."
+        }), 500
+
+    token = create_session(player_id)
+
+    return jsonify({
+        "success": True,
+        "message": "Player registered successfully.",
+        "token": token,
+        "player": sanitize_player(player)
+    }), 201
+
+
+# ============================================================
+# RANDOM MATCHMAKING — JOIN
+# ============================================================
+
+@ox_bp.route("/matchmaking/join", methods=["POST"])
+def matchmaking_join():
+
+    player, error = require_player()
+
+    if error:
+        return error
+
+    player_id = player["playerId"]
+
+    existing_game = games_col.find_one({
+        "players.playerId": player_id,
+        "status": "active"
+    })
+
+    if existing_game:
+        return jsonify({
+            "success": True,
+            "matched": True,
+            "game": game_public(existing_game)
+        })
+
+    existing_queue = queue_col.find_one({
+        "playerId": player_id
+    })
+
+    if existing_queue:
+        return jsonify({
+            "success": True,
+            "matched": False,
+            "message": "Already waiting for an opponent."
+        })
+
+    opponent_queue = queue_col.find_one({
+        "playerId": {
+            "$ne": player_id
+        }
+    })
+
+    if opponent_queue:
+
+        opponent = players_col.find_one({
+            "playerId": opponent_queue["playerId"]
+        })
+
+        if opponent and not opponent.get("blocked") and not opponent.get("suspended"):
+
+            queue_col.delete_one({
+                "_id": opponent_queue["_id"]
+            })
+
+            game = make_game(
+                player,
+                opponent
+            )
+
+            return jsonify({
+                "success": True,
+                "matched": True,
+                "game": game_public(game)
+            })
+
+    queue_col.insert_one({
+        "playerId": player_id,
+        "name": player["name"],
+        "username": player["username"],
+        "joinedAt": now_utc()
+    })
+
+    return jsonify({
+        "success": True,
+        "matched": False,
+        "message": "Waiting for opponent."
+    })
+
+
+# ============================================================
+# MATCHMAKING — LEAVE
+# ============================================================
+
+@ox_bp.route("/matchmaking/leave", methods=["POST"])
+def matchmaking_leave():
+
+    player, error = require_player()
+
+    if error:
+        return error
+
+    queue_col.delete_one({
+        "playerId": player["playerId"]
+    })
+
+    return jsonify({
+        "success": True,
+        "message": "Removed from matchmaking queue."
+    })
+
+
+# ============================================================
+# MATCHMAKING — STATUS
+# ============================================================
+
+@ox_bp.route("/matchmaking/status", methods=["GET"])
 def matchmaking_status():
 
-    try:
+    player, error = require_player()
 
-        player_id = request.args.get(
-            "playerId"
-        )
+    if error:
+        return error
 
-        if not player_id:
+    queued = queue_col.find_one({
+        "playerId": player["playerId"]
+    })
 
-            return jsonify({
-                "success": False,
-                "error": "playerId is required."
-            }), 400
+    active_game = games_col.find_one({
+        "players.playerId": player["playerId"],
+        "status": "active"
+    })
 
-        queue = queue_col.find_one({
-            "playerId":
-                player_id
-        })
-
-        active_game = games_col.find_one({
-
-            "players.playerId":
-                player_id,
-
-            "status":
-                "playing"
-        })
-
-        return jsonify({
-
-            "success": True,
-
-            "waiting":
-                bool(queue),
-
-            "matched":
-                bool(active_game),
-
-            "game":
-                serialize_game(
-                    active_game
-                )
-                if active_game
-                else None
-        })
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+    return jsonify({
+        "success": True,
+        "waiting": bool(queued),
+        "game": game_public(active_game) if active_game else None
+    })
 
 
 # ============================================================
 # GET GAME
 # ============================================================
 
-@ox_bp.route(
-    "/game/<game_id>",
-    methods=["GET"]
-)
-def get_game(
-    game_id
-):
+@ox_bp.route("/game/<game_id>", methods=["GET"])
+def get_game(game_id):
 
-    try:
+    player, error = require_player()
 
-        game = games_col.find_one({
-            "gameId":
-                game_id
-        })
+    if error:
+        return error
 
-        if not game:
+    game = find_game_for_player(
+        game_id,
+        player["playerId"]
+    )
 
-            return jsonify({
-                "success": False,
-                "error": "Game not found."
-            }), 404
-
-        return jsonify({
-
-            "success": True,
-
-            "game":
-                serialize_game(
-                    game
-                )
-        })
-
-    except Exception as e:
-
+    if not game:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "message": "Game not found."
+        }), 404
+
+    return jsonify({
+        "success": True,
+        "game": game_public(game)
+    })
 
 
 # ============================================================
 # MAKE MOVE
 # ============================================================
 
-@ox_bp.route(
-    "/move",
-    methods=["POST"]
-)
+@ox_bp.route("/move", methods=["POST"])
 def make_move():
 
+    player, error = require_player()
+
+    if error:
+        return error
+
+    data = request.get_json(silent=True) or {}
+
+    game_id = clean_string(data.get("gameId"))
+
     try:
-
-        data = request.get_json(
-            silent=True
-        ) or {}
-
-        player_id = data.get(
-            "playerId"
-        )
-
-        game_id = data.get(
-            "gameId"
-        )
-
-        row = data.get(
-            "row"
-        )
-
-        col = data.get(
-            "col"
-        )
-
-        if not player_id:
-
-            return jsonify({
-                "success": False,
-                "error": "playerId is required."
-            }), 400
-
-        if not game_id:
-
-            return jsonify({
-                "success": False,
-                "error": "gameId is required."
-            }), 400
-
-        try:
-
-            row = int(row)
-            col = int(col)
-
-        except Exception:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "row and col must be integers."
-            }), 400
-
-        if not valid_cell(
-            row,
-            col
-        ):
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Invalid board position."
-            }), 400
-
-        game = games_col.find_one({
-            "gameId":
-                game_id
-        })
-
-        if not game:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Game not found."
-            }), 404
-
-        if game.get(
-            "status"
-        ) != "playing":
-
-            return jsonify({
-
-                "success": False,
-
-                "error":
-                    "Game has already ended.",
-
-                "game":
-                    serialize_game(
-                        game
-                    )
-            }), 400
-
-        symbol = get_player_symbol(
-            game,
-            player_id
-        )
-
-        if not symbol:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "You are not a player in this game."
-            }), 403
-
-        if game.get(
-            "currentTurn"
-        ) != player_id:
-
-            return jsonify({
-
-                "success": False,
-
-                "error":
-                    "It is not your turn.",
-
-                "currentTurn":
-                    game.get(
-                        "currentTurn"
-                    )
-            }), 403
-
-        board = game.get(
-            "board"
-        )
-
-        if not board:
-
-            board = empty_board()
-
-        if board[row][col] is not None:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "This cell is already occupied."
-            }), 400
-
-        # --------------------------------------------
-        # PLACE SYMBOL
-        # --------------------------------------------
-
-        board[row][col] = symbol
-
-        # --------------------------------------------
-        # CHECK WIN
-        # --------------------------------------------
-
-        winning_cells = check_winner(
-            board,
-            row,
-            col,
-            symbol
-        )
-
-        if winning_cells:
-
-            opponent = get_opponent(
-                game,
-                player_id
-            )
-
-            opponent_id = (
-
-                opponent["playerId"]
-
-                if opponent
-
-                else None
-            )
-
-            games_col.update_one(
-
-                {
-                    "gameId":
-                        game_id,
-
-                    "status":
-                        "playing"
-                },
-
-                {
-                    "$set": {
-
-                        "board":
-                            board,
-
-                        "status":
-                            "finished",
-
-                        "winner":
-                            player_id,
-
-                        "winnerSymbol":
-                            symbol,
-
-                        "loser":
-                            opponent_id,
-
-                        "draw":
-                            False,
-
-                        "winningCells":
-                            winning_cells,
-
-                        "updatedAt":
-                            now()
-                    }
-                }
-            )
-
-            # ----------------------------------------
-            # WINNER STATS
-            # ----------------------------------------
-
-            players_col.update_one(
-
-                {
-                    "playerId":
-                        player_id
-                },
-
-                {
-                    "$inc": {
-
-                        "wins":
-                            1,
-
-                        "games":
-                            1
-                    },
-
-                    "$set": {
-
-                        "lastSeen":
-                            now(),
-
-                        "updatedAt":
-                            now()
-                    }
-                }
-            )
-
-            # ----------------------------------------
-            # LOSER STATS
-            # ----------------------------------------
-
-            if opponent_id:
-
-                players_col.update_one(
-
-                    {
-                        "playerId":
-                            opponent_id
-                    },
-
-                    {
-                        "$inc": {
-
-                            "losses":
-                                1,
-
-                            "games":
-                                1
-                        },
-
-                        "$set": {
-
-                            "lastSeen":
-                                now(),
-
-                            "updatedAt":
-                                now()
-                        }
-                    }
-                )
-
-            final_game = games_col.find_one({
-                "gameId":
-                    game_id
-            })
-
-            return jsonify({
-
-                "success": True,
-
-                "result":
-                    "win",
-
-                "message":
-                    f"{symbol} wins!",
-
-                "game":
-                    serialize_game(
-                        final_game
-                    )
-            })
-
-        # --------------------------------------------
-        # CHECK DRAW
-        # --------------------------------------------
-
-        if board_full(
-            board
-        ):
-
-            games_col.update_one(
-
-                {
-                    "gameId":
-                        game_id,
-
-                    "status":
-                        "playing"
-                },
-
-                {
-                    "$set": {
-
-                        "board":
-                            board,
-
-                        "status":
-                            "finished",
-
-                        "winner":
-                            None,
-
-                        "winnerSymbol":
-                            None,
-
-                        "loser":
-                            None,
-
-                        "draw":
-                            True,
-
-                        "winningCells":
-                            [],
-
-                        "updatedAt":
-                            now()
-                    }
-                }
-            )
-
-            for player in game.get(
-                "players",
-                []
-            ):
-
-                players_col.update_one(
-
-                    {
-                        "playerId":
-                            player["playerId"]
-                    },
-
-                    {
-                        "$inc": {
-
-                            "draws":
-                                1,
-
-                            "games":
-                                1
-                        },
-
-                        "$set": {
-
-                            "lastSeen":
-                                now(),
-
-                            "updatedAt":
-                                now()
-                        }
-                    }
-                )
-
-            final_game = games_col.find_one({
-                "gameId":
-                    game_id
-            })
-
-            return jsonify({
-
-                "success": True,
-
-                "result":
-                    "draw",
-
-                "message":
-                    "Game draw!",
-
-                "game":
-                    serialize_game(
-                        final_game
-                    )
-            })
-
-        # --------------------------------------------
-        # CONTINUE
-        # --------------------------------------------
-
-        opponent = get_opponent(
-            game,
-            player_id
-        )
-
-        if not opponent:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Opponent not found."
-            }), 500
-
-        next_player = opponent[
-            "playerId"
-        ]
-
-        games_col.update_one(
-
-            {
-                "gameId":
-                    game_id,
-
-                "status":
-                    "playing",
-
-                "currentTurn":
-                    player_id
-            },
-
-            {
-                "$set": {
-
-                    "board":
-                        board,
-
-                    "currentTurn":
-                        next_player,
-
-                    "updatedAt":
-                        now()
-                }
-            }
-        )
-
-        final_game = games_col.find_one({
-            "gameId":
-                game_id
-        })
-
-        return jsonify({
-
-            "success": True,
-
-            "result":
-                "continue",
-
-            "message":
-                f"{symbol} placed successfully.",
-
-            "game":
-                serialize_game(
-                    final_game
-                )
-        })
-
-    except Exception as e:
-
+        row = int(data.get("row"))
+        col = int(data.get("col"))
+    except Exception:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "message": "row and col must be numbers."
+        }), 400
+
+    if row < 0 or row >= BOARD_SIZE:
+        return jsonify({
+            "success": False,
+            "message": "Invalid row."
+        }), 400
+
+    if col < 0 or col >= BOARD_SIZE:
+        return jsonify({
+            "success": False,
+            "message": "Invalid column."
+        }), 400
+
+    game = find_game_for_player(
+        game_id,
+        player["playerId"]
+    )
+
+    if not game:
+        return jsonify({
+            "success": False,
+            "message": "Game not found."
+        }), 404
+
+    if game.get("status") != "active":
+        return jsonify({
+            "success": False,
+            "message": "Game has already ended."
+        }), 400
+
+    if game.get("currentTurn") != player["playerId"]:
+        return jsonify({
+            "success": False,
+            "message": "It is not your turn."
+        }), 400
+
+    board = game.get("board", create_empty_board())
+
+    if board[row][col] is not None:
+        return jsonify({
+            "success": False,
+            "message": "This cell is already occupied."
+        }), 400
+
+    current_player = player_in_game(
+        game,
+        player["playerId"]
+    )
+
+    if not current_player:
+        return jsonify({
+            "success": False,
+            "message": "Player is not part of this game."
+        }), 403
+
+    symbol = current_player["symbol"]
+
+    board[row][col] = symbol
+
+    winning_line = find_winning_line(
+        board,
+        symbol
+    )
+
+    update_data = {
+        "board": board,
+        "updatedAt": now_utc()
+    }
+
+    if winning_line:
+
+        update_data.update({
+            "status": "finished",
+            "winner": player["playerId"],
+            "winningLine": winning_line,
+            "result": "win",
+            "finishedAt": now_utc()
+        })
+
+        updated = games_col.find_one_and_update(
+            {
+                "gameId": game_id,
+                "status": "active",
+                "currentTurn": player["playerId"]
+            },
+            {
+                "$set": update_data
+            },
+            return_document=True
+        )
+
+        if not updated:
+            return jsonify({
+                "success": False,
+                "message": "Move could not be completed. Reload the game."
+            }), 409
+
+        update_finished_stats(updated)
+
+        return jsonify({
+            "success": True,
+            "game": game_public(updated)
+        })
+
+    if board_full(board):
+
+        update_data.update({
+            "status": "finished",
+            "winner": None,
+            "winningLine": None,
+            "result": "draw",
+            "finishedAt": now_utc()
+        })
+
+        updated = games_col.find_one_and_update(
+            {
+                "gameId": game_id,
+                "status": "active",
+                "currentTurn": player["playerId"]
+            },
+            {
+                "$set": update_data
+            },
+            return_document=True
+        )
+
+        if not updated:
+            return jsonify({
+                "success": False,
+                "message": "Move could not be completed. Reload the game."
+            }), 409
+
+        update_finished_stats(updated)
+
+        return jsonify({
+            "success": True,
+            "game": game_public(updated)
+        })
+
+    opponent = None
+
+    for p in game["players"]:
+        if p["playerId"] != player["playerId"]:
+            opponent = p
+            break
+
+    update_data["currentTurn"] = opponent["playerId"]
+
+    updated = games_col.find_one_and_update(
+        {
+            "gameId": game_id,
+            "status": "active",
+            "currentTurn": player["playerId"]
+        },
+        {
+            "$set": update_data
+        },
+        return_document=True
+    )
+
+    if not updated:
+        return jsonify({
+            "success": False,
+            "message": "Move could not be completed. Reload the game."
+        }), 409
+
+    return jsonify({
+        "success": True,
+        "game": game_public(updated)
+    })
 
 
 # ============================================================
 # RESIGN
 # ============================================================
 
-@ox_bp.route(
-    "/game/resign",
-    methods=["POST"]
-)
-def resign_game():
+@ox_bp.route("/game/resign", methods=["POST"])
+def resign():
 
-    try:
+    player, error = require_player()
 
-        data = request.get_json(
-            silent=True
-        ) or {}
+    if error:
+        return error
 
-        player_id = data.get(
-            "playerId"
-        )
+    data = request.get_json(silent=True) or {}
 
-        game_id = data.get(
-            "gameId"
-        )
+    game_id = clean_string(data.get("gameId"))
 
-        if not player_id or not game_id:
+    game = find_game_for_player(
+        game_id,
+        player["playerId"]
+    )
 
-            return jsonify({
-                "success": False,
-                "error":
-                    "playerId and gameId are required."
-            }), 400
-
-        game = games_col.find_one({
-            "gameId":
-                game_id
-        })
-
-        if not game:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Game not found."
-            }), 404
-
-        if game.get(
-            "status"
-        ) != "playing":
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Game already ended."
-            }), 400
-
-        symbol = get_player_symbol(
-            game,
-            player_id
-        )
-
-        if not symbol:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "You are not in this game."
-            }), 403
-
-        opponent = get_opponent(
-            game,
-            player_id
-        )
-
-        if not opponent:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Opponent not found."
-            }), 500
-
-        winner_id = opponent[
-            "playerId"
-        ]
-
-        games_col.update_one(
-
-            {
-                "gameId":
-                    game_id,
-
-                "status":
-                    "playing"
-            },
-
-            {
-                "$set": {
-
-                    "status":
-                        "finished",
-
-                    "winner":
-                        winner_id,
-
-                    "winnerSymbol":
-                        opponent["symbol"],
-
-                    "loser":
-                        player_id,
-
-                    "draw":
-                        False,
-
-                    "winningCells":
-                        [],
-
-                    "updatedAt":
-                        now()
-                }
-            }
-        )
-
-        players_col.update_one(
-
-            {
-                "playerId":
-                    winner_id
-            },
-
-            {
-                "$inc": {
-
-                    "wins":
-                        1,
-
-                    "games":
-                        1
-                },
-
-                "$set": {
-                    "lastSeen":
-                        now()
-                }
-            }
-        )
-
-        players_col.update_one(
-
-            {
-                "playerId":
-                    player_id
-            },
-
-            {
-                "$inc": {
-
-                    "losses":
-                        1,
-
-                    "games":
-                        1
-                },
-
-                "$set": {
-                    "lastSeen":
-                        now()
-                }
-            }
-        )
-
-        final_game = games_col.find_one({
-            "gameId":
-                game_id
-        })
-
-        return jsonify({
-
-            "success": True,
-
-            "message":
-                "You resigned. Opponent wins.",
-
-            "game":
-                serialize_game(
-                    final_game
-                )
-        })
-
-    except Exception as e:
-
+    if not game:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "message": "Game not found."
+        }), 404
+
+    if game.get("status") != "active":
+        return jsonify({
+            "success": False,
+            "message": "Game already ended."
+        }), 400
+
+    opponent = None
+
+    for p in game.get("players", []):
+        if p["playerId"] != player["playerId"]:
+            opponent = p
+            break
+
+    if not opponent:
+        return jsonify({
+            "success": False,
+            "message": "Opponent not found."
+        }), 400
+
+    updated = games_col.find_one_and_update(
+        {
+            "gameId": game_id,
+            "status": "active"
+        },
+        {
+            "$set": {
+                "status": "finished",
+                "winner": opponent["playerId"],
+                "winningLine": None,
+                "result": "resignation",
+                "finishedAt": now_utc(),
+                "updatedAt": now_utc()
+            }
+        },
+        return_document=True
+    )
+
+    if not updated:
+        return jsonify({
+            "success": False,
+            "message": "Game already changed."
+        }), 409
+
+    update_finished_stats(updated)
+
+    return jsonify({
+        "success": True,
+        "game": game_public(updated)
+    })
 
 
 # ============================================================
 # REMATCH
 # ============================================================
 
-@ox_bp.route(
-    "/rematch",
-    methods=["POST"]
-)
+@ox_bp.route("/rematch", methods=["POST"])
 def rematch():
 
-    try:
+    player, error = require_player()
 
-        data = request.get_json(
-            silent=True
-        ) or {}
+    if error:
+        return error
 
-        player_id = data.get(
-            "playerId"
-        )
+    data = request.get_json(silent=True) or {}
 
-        game_id = data.get(
-            "gameId"
-        )
+    old_game_id = clean_string(data.get("gameId"))
 
-        if not player_id or not game_id:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "playerId and gameId are required."
-            }), 400
-
-        old_game = games_col.find_one({
-            "gameId":
-                game_id
-        })
-
-        if not old_game:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Game not found."
-            }), 404
-
-        old_players = old_game.get(
-            "players",
-            []
-        )
-
-        if player_id not in [
-
-            p["playerId"]
-
-            for p in old_players
-        ]:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "You are not part of this game."
-            }), 403
-
-        if old_game.get(
-            "status"
-        ) != "finished":
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Current game is not finished yet."
-            }), 400
-
-        if len(old_players) != 2:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Invalid game players."
-            }), 400
-
-        p1 = old_players[0][
-            "playerId"
-        ]
-
-        p2 = old_players[1][
-            "playerId"
-        ]
-
-        active = games_col.find_one({
-
-            "players.playerId": {
-                "$in": [
-                    p1,
-                    p2
-                ]
-            },
-
-            "status":
-                "playing"
-        })
-
-        if active:
-
-            return jsonify({
-
-                "success": False,
-
-                "error":
-                    "One of the players already has an active game.",
-
-                "game":
-                    serialize_game(
-                        active
-                    )
-            }), 400
-
-        new_game = create_game(
-
-            p1,
-            p2,
-
-            room_id=
-                old_game.get(
-                    "roomId"
-                ),
-
-            group_id=
-                old_game.get(
-                    "groupId"
-                )
-        )
-
-        return jsonify({
-
-            "success": True,
-
-            "message":
-                "Rematch started.",
-
-            "game":
-                serialize_game(
-                    new_game
-                )
-        })
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
-
-# ============================================================
-# PRIVATE ROOM ID
-# ============================================================
-
-def generate_room_id():
-
-    chars = (
-        string.ascii_uppercase
-        +
-        string.digits
+    old_game = find_game_for_player(
+        old_game_id,
+        player["playerId"]
     )
 
-    while True:
+    if not old_game:
+        return jsonify({
+            "success": False,
+            "message": "Game not found."
+        }), 404
 
-        room_id = "".join(
-            random.choice(chars)
-            for _ in range(6)
-        )
+    if old_game.get("status") != "finished":
+        return jsonify({
+            "success": False,
+            "message": "Game is not finished yet."
+        }), 400
 
-        exists = rooms_col.find_one({
-            "roomId":
-                room_id
-        })
+    opponent_data = None
 
-        if not exists:
-            return room_id
+    for p in old_game.get("players", []):
+        if p["playerId"] != player["playerId"]:
+            opponent_data = p
+            break
+
+    if not opponent_data:
+        return jsonify({
+            "success": False,
+            "message": "Opponent not found."
+        }), 400
+
+    opponent = players_col.find_one({
+        "playerId": opponent_data["playerId"]
+    })
+
+    if not opponent:
+        return jsonify({
+            "success": False,
+            "message": "Opponent account no longer exists."
+        }), 404
+
+    if opponent.get("blocked") or opponent.get("suspended"):
+        return jsonify({
+            "success": False,
+            "message": "Opponent is unavailable."
+        }), 400
+
+    existing = games_col.find_one({
+        "rematchOf": old_game_id,
+        "status": "active"
+    })
+
+    if existing:
+        if player_in_game(
+            existing,
+            player["playerId"]
+        ):
+            return jsonify({
+                "success": True,
+                "game": game_public(existing)
+            })
+
+    new_game = make_game(
+        player,
+        opponent
+    )
+
+    games_col.update_one(
+        {
+            "gameId": new_game["gameId"]
+        },
+        {
+            "$set": {
+                "rematchOf": old_game_id
+            }
+        }
+    )
+
+    new_game["rematchOf"] = old_game_id
+
+    return jsonify({
+        "success": True,
+        "game": game_public(new_game)
+    })
 
 
 # ============================================================
-# CREATE ROOM
+# PRIVATE ROOM — CREATE
 # ============================================================
 
-@ox_bp.route(
-    "/room/create",
-    methods=["POST"]
-)
+@ox_bp.route("/room/create", methods=["POST"])
 def create_room():
 
-    try:
+    player, error = require_player()
 
-        data = request.get_json(
-            silent=True
-        ) or {}
+    if error:
+        return error
 
-        player, error_response, status = require_player(
-            data
-        )
+    room_id = generate_room_id()
 
-        if error_response:
-            return error_response, status
+    room = {
+        "roomId": room_id,
+        "hostPlayerId": player["playerId"],
+        "players": [
+            {
+                "playerId": player["playerId"],
+                "name": player["name"],
+                "username": player["username"]
+            }
+        ],
+        "status": "waiting",
+        "gameId": None,
+        "createdAt": now_utc()
+    }
 
-        player_id = player[
-            "playerId"
-        ]
+    rooms_col.insert_one(room)
 
-        requested_room_id = clean_room_id(
-            data.get(
-                "roomId",
-                ""
-            )
-        )
-
-        if requested_room_id:
-
-            existing = rooms_col.find_one({
-                "roomId":
-                    requested_room_id
-            })
-
-            if existing:
-
-                return jsonify({
-                    "success": False,
-                    "error":
-                        "This room ID already exists."
-                }), 409
-
-            room_id = requested_room_id
-
-        else:
-
-            room_id = generate_room_id()
-
-        room = {
-
-            "roomId":
-                room_id,
-
-            "hostPlayerId":
-                player_id,
-
-            "hostName":
-                player["name"],
-
-            "guestPlayerId":
-                None,
-
-            "guestName":
-                None,
-
-            "status":
-                "waiting",
-
-            "gameId":
-                None,
-
-            "createdAt":
-                now(),
-
-            "updatedAt":
-                now()
+    return jsonify({
+        "success": True,
+        "room": {
+            **room,
+            "createdAt": iso_date(room["createdAt"])
         }
+    }), 201
 
-        rooms_col.insert_one(
-            room
-        )
 
-        return jsonify({
+# ============================================================
+# PRIVATE ROOM — GET
+# ============================================================
 
-            "success": True,
+@ox_bp.route("/room/<room_id>", methods=["GET"])
+def get_room(room_id):
 
-            "message":
-                "Room created successfully.",
+    player, error = require_player()
 
-            "room": {
+    if error:
+        return error
 
-                "roomId":
-                    room_id,
+    room = rooms_col.find_one({
+        "roomId": room_id.upper()
+    })
 
-                "hostPlayerId":
-                    player_id,
-
-                "hostName":
-                    player["name"],
-
-                "guestPlayerId":
-                    None,
-
-                "guestName":
-                    None,
-
-                "status":
-                    "waiting",
-
-                "gameId":
-                    None
-            }
-        })
-
-    except Exception as e:
-
+    if not room:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "message": "Room not found."
+        }), 404
+
+    return jsonify({
+        "success": True,
+        "room": {
+            "roomId": room.get("roomId"),
+            "hostPlayerId": room.get("hostPlayerId"),
+            "players": room.get("players", []),
+            "status": room.get("status"),
+            "gameId": room.get("gameId"),
+            "createdAt": iso_date(room.get("createdAt"))
+        }
+    })
 
 
 # ============================================================
-# GET ROOM
+# PRIVATE ROOM — JOIN
 # ============================================================
 
-@ox_bp.route(
-    "/room/<room_id>",
-    methods=["GET"]
-)
-def get_room(
-    room_id
-):
-
-    try:
-
-        room_id = clean_room_id(
-            room_id
-        )
-
-        room = rooms_col.find_one({
-            "roomId":
-                room_id
-        })
-
-        if not room:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Room not found."
-            }), 404
-
-        return jsonify({
-
-            "success": True,
-
-            "room": {
-
-                "roomId":
-                    room["roomId"],
-
-                "hostPlayerId":
-                    room["hostPlayerId"],
-
-                "hostName":
-                    room["hostName"],
-
-                "guestPlayerId":
-                    room.get(
-                        "guestPlayerId"
-                    ),
-
-                "guestName":
-                    room.get(
-                        "guestName"
-                    ),
-
-                "status":
-                    room.get(
-                        "status"
-                    ),
-
-                "gameId":
-                    room.get(
-                        "gameId"
-                    )
-            }
-        })
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
-
-# ============================================================
-# JOIN ROOM
-# ============================================================
-
-@ox_bp.route(
-    "/room/join",
-    methods=["POST"]
-)
+@ox_bp.route("/room/join", methods=["POST"])
 def join_room():
 
-    try:
+    player, error = require_player()
 
-        data = request.get_json(
-            silent=True
-        ) or {}
+    if error:
+        return error
 
-        player, error_response, status = require_player(
-            data
-        )
+    data = request.get_json(silent=True) or {}
 
-        if error_response:
-            return error_response, status
+    room_id = clean_string(
+        data.get("roomId")
+    ).upper()
 
-        player_id = player[
-            "playerId"
-        ]
+    if not room_id:
+        return jsonify({
+            "success": False,
+            "message": "Room ID is required."
+        }), 400
 
-        room_id = clean_room_id(
-            data.get(
-                "roomId",
-                ""
-            )
-        )
+    room = rooms_col.find_one({
+        "roomId": room_id
+    })
 
-        if not room_id:
+    if not room:
+        return jsonify({
+            "success": False,
+            "message": "Room not found."
+        }), 404
 
-            return jsonify({
-                "success": False,
-                "error":
-                    "roomId is required."
-            }), 400
+    for p in room.get("players", []):
+        if p["playerId"] == player["playerId"]:
 
-        room = rooms_col.find_one({
-            "roomId":
-                room_id
-        })
-
-        if not room:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Room not found."
-            }), 404
-
-        # --------------------------------------------
-        # HOST
-        # --------------------------------------------
-
-        if room[
-            "hostPlayerId"
-        ] == player_id:
-
-            game = None
-
-            if room.get(
-                "gameId"
-            ):
-
+            if room.get("gameId"):
                 game = games_col.find_one({
-                    "gameId":
-                        room["gameId"]
+                    "gameId": room["gameId"]
                 })
-
-            return jsonify({
-
-                "success": True,
-
-                "message":
-                    "You are the room host.",
-
-                "room": {
-
-                    "roomId":
-                        room["roomId"],
-
-                    "hostPlayerId":
-                        room["hostPlayerId"],
-
-                    "hostName":
-                        room["hostName"],
-
-                    "guestPlayerId":
-                        room.get(
-                            "guestPlayerId"
-                        ),
-
-                    "guestName":
-                        room.get(
-                            "guestName"
-                        ),
-
-                    "status":
-                        room.get(
-                            "status"
-                        ),
-
-                    "gameId":
-                        room.get(
-                            "gameId"
-                        )
-                },
-
-                "game":
-                    serialize_game(
-                        game
-                    )
-                    if game
-                    else None
-            })
-
-        # --------------------------------------------
-        # ROOM ALREADY HAS GUEST
-        # --------------------------------------------
-
-        if room.get(
-            "guestPlayerId"
-        ):
-
-            if room.get(
-                "guestPlayerId"
-            ) == player_id:
-
-                game = None
-
-                if room.get(
-                    "gameId"
-                ):
-
-                    game = games_col.find_one({
-                        "gameId":
-                            room["gameId"]
-                    })
 
                 return jsonify({
-
                     "success": True,
-
-                    "message":
-                        "You are already in this room.",
-
-                    "room": {
-
-                        "roomId":
-                            room["roomId"],
-
-                        "hostPlayerId":
-                            room["hostPlayerId"],
-
-                        "hostName":
-                            room["hostName"],
-
-                        "guestPlayerId":
-                            room.get(
-                                "guestPlayerId"
-                            ),
-
-                        "guestName":
-                            room.get(
-                                "guestName"
-                            ),
-
-                        "status":
-                            room.get(
-                                "status"
-                            ),
-
-                        "gameId":
-                            room.get(
-                                "gameId"
-                            )
-                    },
-
-                    "game":
-                        serialize_game(
-                            game
-                        )
-                        if game
-                        else None
+                    "room": room,
+                    "game": game_public(game) if game else None
                 })
 
             return jsonify({
-                "success": False,
-                "error":
-                    "Room is already full."
-            }), 409
+                "success": True,
+                "room": room,
+                "game": None
+            })
 
-        # --------------------------------------------
-        # CREATE GAME
-        # --------------------------------------------
+    if len(room.get("players", [])) >= 2:
+        return jsonify({
+            "success": False,
+            "message": "Room is already full."
+        }), 400
 
-        game = create_game(
-
-            room["hostPlayerId"],
-
-            player_id,
-
-            room_id=
-                room_id
-        )
-
-        updated_result = rooms_col.update_one(
-
-            {
-                "roomId":
-                    room_id,
-
-                "guestPlayerId":
-                    None
-            },
-
-            {
-                "$set": {
-
-                    "guestPlayerId":
-                        player_id,
-
-                    "guestName":
-                        player["name"],
-
-                    "status":
-                        "playing",
-
-                    "gameId":
-                        game["gameId"],
-
-                    "updatedAt":
-                        now()
+    updated = rooms_col.find_one_and_update(
+        {
+            "roomId": room_id,
+            "status": "waiting",
+            "players.1": {
+                "$exists": False
+            }
+        },
+        {
+            "$push": {
+                "players": {
+                    "playerId": player["playerId"],
+                    "name": player["name"],
+                    "username": player["username"]
                 }
             }
-        )
-
-        # --------------------------------------------
-        # RACE CONDITION PROTECTION
-        # --------------------------------------------
-
-        if updated_result.modified_count != 1:
-
-            # Another player filled the room first.
-            games_col.delete_one({
-                "gameId":
-                    game["gameId"]
-            })
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Room was just occupied by another player."
-            }), 409
-
-        updated_room = rooms_col.find_one({
-            "roomId":
-                room_id
-        })
-
-        return jsonify({
-
-            "success": True,
-
-            "message":
-                "Joined room. Game started!",
-
-            "room": {
-
-                "roomId":
-                    updated_room["roomId"],
-
-                "hostPlayerId":
-                    updated_room["hostPlayerId"],
-
-                "hostName":
-                    updated_room["hostName"],
-
-                "guestPlayerId":
-                    updated_room.get(
-                        "guestPlayerId"
-                    ),
-
-                "guestName":
-                    updated_room.get(
-                        "guestName"
-                    ),
-
-                "status":
-                    updated_room.get(
-                        "status"
-                    ),
-
-                "gameId":
-                    updated_room.get(
-                        "gameId"
-                    )
-            },
-
-            "game":
-                serialize_game(
-                    game
-                )
-        })
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
-
-# ============================================================
-# LEAVE ROOM
-# ============================================================
-
-@ox_bp.route(
-    "/room/leave",
-    methods=["POST"]
-)
-def leave_room():
-
-    try:
-
-        data = request.get_json(
-            silent=True
-        ) or {}
-
-        player_id = data.get(
-            "playerId"
-        )
-
-        room_id = clean_room_id(
-            data.get(
-                "roomId",
-                ""
-            )
-        )
-
-        if not player_id or not room_id:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "playerId and roomId are required."
-            }), 400
-
-        room = rooms_col.find_one({
-            "roomId":
-                room_id
-        })
-
-        if not room:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Room not found."
-            }), 404
-
-        if room[
-            "hostPlayerId"
-        ] == player_id:
-
-            rooms_col.delete_one({
-                "roomId":
-                    room_id
-            })
-
-            return jsonify({
-
-                "success": True,
-
-                "message":
-                    "Room closed."
-            })
-
-        if room.get(
-            "guestPlayerId"
-        ) == player_id:
-
-            rooms_col.update_one(
-
-                {
-                    "roomId":
-                        room_id
-                },
-
-                {
-                    "$set": {
-
-                        "guestPlayerId":
-                            None,
-
-                        "guestName":
-                            None,
-
-                        "status":
-                            "waiting",
-
-                        "gameId":
-                            None,
-
-                        "updatedAt":
-                            now()
-                    }
-                }
-            )
-
-            return jsonify({
-
-                "success": True,
-
-                "message":
-                    "You left the room."
-            })
-
-        return jsonify({
-
-            "success": False,
-
-            "error":
-                "You are not a member of this room."
-        }), 403
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
-
-# ============================================================
-# GROUP ID
-# ============================================================
-
-def generate_group_id():
-
-    return make_id(
-        "group_"
+        },
+        return_document=True
     )
 
-
-# ============================================================
-# CREATE GROUP
-# ============================================================
-
-@ox_bp.route(
-    "/group/create",
-    methods=["POST"]
-)
-def create_group():
-
-    try:
-
-        data = request.get_json(
-            silent=True
-        ) or {}
-
-        player, error_response, status = require_player(
-            data
-        )
-
-        if error_response:
-            return error_response, status
-
-        name = clean_group_name(
-            data.get(
-                "groupName",
-                ""
-            )
-        )
-
-        if not name:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "groupName is required."
-            }), 400
-
-        if len(name) < 2:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Group name is too short."
-            }), 400
-
-        group_id = generate_group_id()
-
-        group = {
-
-            "groupId":
-                group_id,
-
-            "name":
-                name,
-
-            "nameLower":
-                name.lower(),
-
-            "ownerPlayerId":
-                player["playerId"],
-
-            "ownerName":
-                player["name"],
-
-            "members": [
-
-                {
-
-                    "playerId":
-                        player["playerId"],
-
-                    "name":
-                        player["name"],
-
-                    "joinedAt":
-                        now()
-                }
-            ],
-
-            "createdAt":
-                now(),
-
-            "updatedAt":
-                now()
-        }
-
-        groups_col.insert_one(
-            group
-        )
-
-        return jsonify({
-
-            "success": True,
-
-            "message":
-                "Group created successfully.",
-
-            "group": {
-
-                "groupId":
-                    group_id,
-
-                "name":
-                    name,
-
-                "ownerPlayerId":
-                    player["playerId"],
-
-                "ownerName":
-                    player["name"],
-
-                "members":
-                    group["members"]
-            }
-        })
-
-    except Exception as e:
-
+    if not updated:
         return jsonify({
             "success": False,
-            "error": str(e)
+            "message": "Unable to join room."
+        }), 409
+
+    host = players_col.find_one({
+        "playerId": updated["hostPlayerId"]
+    })
+
+    if not host:
+        return jsonify({
+            "success": False,
+            "message": "Room host not found."
         }), 500
+
+    joined_players = updated["players"]
+
+    second_player = players_col.find_one({
+        "playerId": joined_players[1]["playerId"]
+    })
+
+    game = make_game(
+        host,
+        second_player
+    )
+
+    rooms_col.update_one(
+        {
+            "roomId": room_id
+        },
+        {
+            "$set": {
+                "status": "active",
+                "gameId": game["gameId"]
+            }
+        }
+    )
+
+    return jsonify({
+        "success": True,
+        "room": {
+            **updated,
+            "status": "active",
+            "gameId": game["gameId"],
+            "createdAt": iso_date(updated.get("createdAt"))
+        },
+        "game": game_public(game)
+    })
+
+
+# ============================================================
+# ROOM — LEAVE
+# ============================================================
+
+@ox_bp.route("/room/leave", methods=["POST"])
+def leave_room():
+
+    player, error = require_player()
+
+    if error:
+        return error
+
+    data = request.get_json(silent=True) or {}
+
+    room_id = clean_string(
+        data.get("roomId")
+    ).upper()
+
+    room = rooms_col.find_one({
+        "roomId": room_id
+    })
+
+    if not room:
+        return jsonify({
+            "success": False,
+            "message": "Room not found."
+        }), 404
+
+    if room.get("hostPlayerId") == player["playerId"]:
+        return jsonify({
+            "success": False,
+            "message": "Room owner cannot leave the room."
+        }), 400
+
+    rooms_col.update_one(
+        {
+            "roomId": room_id
+        },
+        {
+            "$pull": {
+                "players": {
+                    "playerId": player["playerId"]
+                }
+            }
+        }
+    )
+
+    return jsonify({
+        "success": True,
+        "message": "Left room."
+    })
+
+
+# ============================================================
+# GROUP CREATE
+# ============================================================
+
+@ox_bp.route("/group/create", methods=["POST"])
+def create_group():
+
+    player, error = require_player()
+
+    if error:
+        return error
+
+    data = request.get_json(silent=True) or {}
+
+    group_name = clean_string(
+        data.get("name")
+    )
+
+    if not group_name:
+        return jsonify({
+            "success": False,
+            "message": "Group name is required."
+        }), 400
+
+    if len(group_name) > MAX_GROUP_NAME_LENGTH:
+        return jsonify({
+            "success": False,
+            "message": "Group name is too long."
+        }), 400
+
+    group_id = generate_group_id()
+
+    group = {
+        "groupId": group_id,
+        "name": group_name,
+        "ownerId": player["playerId"],
+        "members": [
+            {
+                "playerId": player["playerId"],
+                "name": player["name"],
+                "username": player["username"]
+            }
+        ],
+        "createdAt": now_utc()
+    }
+
+    groups_col.insert_one(group)
+
+    return jsonify({
+        "success": True,
+        "group": {
+            **group,
+            "createdAt": iso_date(group["createdAt"])
+        }
+    }), 201
 
 
 # ============================================================
 # LIST GROUPS
 # ============================================================
 
-@ox_bp.route(
-    "/groups",
-    methods=["GET"]
-)
+@ox_bp.route("/groups", methods=["GET"])
 def list_groups():
 
-    try:
+    groups = []
 
-        groups = groups_col.find(
-            {},
-            {
-                "_id": 0,
-                "groupId": 1,
-                "name": 1,
-                "ownerPlayerId": 1,
-                "ownerName": 1,
-                "members": 1,
-                "createdAt": 1
-            }
-        ).sort(
-            "createdAt",
-            DESCENDING
-        ).limit(100)
+    for group in groups_col.find().sort(
+        "createdAt",
+        DESCENDING
+    ):
 
-        result = []
-
-        for group in groups:
-
-            members = group.get(
-                "members",
-                []
-            )
-
-            result.append({
-
-                "groupId":
-                    group["groupId"],
-
-                "name":
-                    group["name"],
-
-                "ownerPlayerId":
-                    group.get(
-                        "ownerPlayerId"
-                    ),
-
-                "ownerName":
-                    group.get(
-                        "ownerName"
-                    ),
-
-                "memberCount":
-                    len(members)
-            })
-
-        return jsonify({
-
-            "success": True,
-
-            "groups":
-                result
+        groups.append({
+            "groupId": group.get("groupId"),
+            "name": group.get("name"),
+            "ownerId": group.get("ownerId"),
+            "members": group.get("members", []),
+            "createdAt": iso_date(group.get("createdAt"))
         })
 
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+    return jsonify({
+        "success": True,
+        "groups": groups
+    })
 
 
 # ============================================================
 # GET GROUP
 # ============================================================
 
-@ox_bp.route(
-    "/group/<group_id>",
-    methods=["GET"]
-)
-def get_group(
-    group_id
-):
+@ox_bp.route("/group/<group_id>", methods=["GET"])
+def get_group(group_id):
 
-    try:
+    group = groups_col.find_one({
+        "groupId": group_id
+    })
 
-        group = groups_col.find_one({
-            "groupId":
-                group_id
-        })
-
-        if not group:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Group not found."
-            }), 404
-
-        return jsonify({
-
-            "success": True,
-
-            "group": {
-
-                "groupId":
-                    group["groupId"],
-
-                "name":
-                    group["name"],
-
-                "ownerPlayerId":
-                    group["ownerPlayerId"],
-
-                "ownerName":
-                    group["ownerName"],
-
-                "members": [
-
-                    {
-
-                        "playerId":
-                            member["playerId"],
-
-                        "name":
-                            member["name"]
-                    }
-
-                    for member in group.get(
-                        "members",
-                        []
-                    )
-                ],
-
-                "memberCount":
-                    len(
-                        group.get(
-                            "members",
-                            []
-                        )
-                    )
-            }
-        })
-
-    except Exception as e:
-
+    if not group:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "message": "Group not found."
+        }), 404
+
+    return jsonify({
+        "success": True,
+        "group": {
+            "groupId": group.get("groupId"),
+            "name": group.get("name"),
+            "ownerId": group.get("ownerId"),
+            "members": group.get("members", []),
+            "createdAt": iso_date(group.get("createdAt"))
+        }
+    })
 
 
 # ============================================================
-# JOIN GROUP
+# GROUP JOIN
 # ============================================================
 
-@ox_bp.route(
-    "/group/join",
-    methods=["POST"]
-)
+@ox_bp.route("/group/join", methods=["POST"])
 def join_group():
 
-    try:
+    player, error = require_player()
 
-        data = request.get_json(
-            silent=True
-        ) or {}
+    if error:
+        return error
 
-        player, error_response, status = require_player(
-            data
-        )
+    data = request.get_json(silent=True) or {}
 
-        if error_response:
-            return error_response, status
+    group_id = clean_string(
+        data.get("groupId")
+    )
 
-        group_id = data.get(
-            "groupId"
-        )
+    group = groups_col.find_one({
+        "groupId": group_id
+    })
 
-        if not group_id:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "groupId is required."
-            }), 400
-
-        group = groups_col.find_one({
-            "groupId":
-                group_id
-        })
-
-        if not group:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Group not found."
-            }), 404
-
-        player_id = player[
-            "playerId"
-        ]
-
-        # Already member.
-        for member in group.get(
-            "members",
-            []
-        ):
-
-            if member[
-                "playerId"
-            ] == player_id:
-
-                return jsonify({
-
-                    "success": True,
-
-                    "message":
-                        "You are already a member.",
-
-                    "group": {
-
-                        "groupId":
-                            group["groupId"],
-
-                        "name":
-                            group["name"],
-
-                        "members":
-                            group.get(
-                                "members",
-                                []
-                            )
-                    }
-                })
-
-        groups_col.update_one(
-
-            {
-                "groupId":
-                    group_id
-            },
-
-            {
-                "$push": {
-
-                    "members": {
-
-                        "playerId":
-                            player_id,
-
-                        "name":
-                            player["name"],
-
-                        "joinedAt":
-                            now()
-                    }
-                },
-
-                "$set": {
-
-                    "updatedAt":
-                        now()
-                }
-            }
-        )
-
-        updated = groups_col.find_one({
-            "groupId":
-                group_id
-        })
-
-        return jsonify({
-
-            "success": True,
-
-            "message":
-                "Joined group.",
-
-            "group": {
-
-                "groupId":
-                    updated["groupId"],
-
-                "name":
-                    updated["name"],
-
-                "members":
-                    updated.get(
-                        "members",
-                        []
-                    )
-            }
-        })
-
-    except Exception as e:
-
+    if not group:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "message": "Group not found."
+        }), 404
+
+    for member in group.get("members", []):
+
+        if member["playerId"] == player["playerId"]:
+
+            return jsonify({
+                "success": True,
+                "message": "Already a member.",
+                "group": group
+            })
+
+    groups_col.update_one(
+        {
+            "groupId": group_id
+        },
+        {
+            "$push": {
+                "members": {
+                    "playerId": player["playerId"],
+                    "name": player["name"],
+                    "username": player["username"]
+                }
+            }
+        }
+    )
+
+    group = groups_col.find_one({
+        "groupId": group_id
+    })
+
+    return jsonify({
+        "success": True,
+        "message": "Joined group.",
+        "group": group
+    })
 
 
 # ============================================================
-# LEAVE GROUP
+# GROUP LEAVE
 # ============================================================
 
-@ox_bp.route(
-    "/group/leave",
-    methods=["POST"]
-)
+@ox_bp.route("/group/leave", methods=["POST"])
 def leave_group():
 
-    try:
+    player, error = require_player()
 
-        data = request.get_json(
-            silent=True
-        ) or {}
+    if error:
+        return error
 
-        player_id = data.get(
-            "playerId"
-        )
+    data = request.get_json(silent=True) or {}
 
-        group_id = data.get(
-            "groupId"
-        )
+    group_id = clean_string(
+        data.get("groupId")
+    )
 
-        if not player_id or not group_id:
+    group = groups_col.find_one({
+        "groupId": group_id
+    })
 
-            return jsonify({
-                "success": False,
-                "error":
-                    "playerId and groupId are required."
-            }), 400
-
-        group = groups_col.find_one({
-            "groupId":
-                group_id
-        })
-
-        if not group:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Group not found."
-            }), 404
-
-        if group[
-            "ownerPlayerId"
-        ] == player_id:
-
-            return jsonify({
-
-                "success": False,
-
-                "error":
-                    "Group owner cannot leave the group."
-            }), 400
-
-        groups_col.update_one(
-
-            {
-                "groupId":
-                    group_id
-            },
-
-            {
-                "$pull": {
-
-                    "members": {
-
-                        "playerId":
-                            player_id
-                    }
-                },
-
-                "$set": {
-
-                    "updatedAt":
-                        now()
-                }
-            }
-        )
-
-        return jsonify({
-
-            "success": True,
-
-            "message":
-                "You left the group."
-        })
-
-    except Exception as e:
-
+    if not group:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "message": "Group not found."
+        }), 404
+
+    if group.get("ownerId") == player["playerId"]:
+        return jsonify({
+            "success": False,
+            "message": "Group owner cannot leave the group."
+        }), 400
+
+    groups_col.update_one(
+        {
+            "groupId": group_id
+        },
+        {
+            "$pull": {
+                "members": {
+                    "playerId": player["playerId"]
+                }
+            }
+        }
+    )
+
+    return jsonify({
+        "success": True,
+        "message": "Left group."
+    })
 
 
 # ============================================================
-# SEND DIRECT GAME REQUEST
+# DIRECT PLAYER REQUEST
 # ============================================================
 
-@ox_bp.route(
-    "/request/send",
-    methods=["POST"]
-)
-def send_game_request():
+@ox_bp.route("/request/send", methods=["POST"])
+def send_request():
 
-    try:
+    player, error = require_player()
 
-        data = request.get_json(
-            silent=True
-        ) or {}
+    if error:
+        return error
 
-        sender, error_response, status = require_player(
-            data
-        )
+    data = request.get_json(silent=True) or {}
 
-        if error_response:
-            return error_response, status
+    receiver_id = clean_string(
+        data.get("receiverId")
+    )
 
-        sender_id = sender[
-            "playerId"
-        ]
+    if not receiver_id:
+        return jsonify({
+            "success": False,
+            "message": "receiverId is required."
+        }), 400
 
-        receiver_id = data.get(
-            "toPlayerId"
-        )
+    if receiver_id == player["playerId"]:
+        return jsonify({
+            "success": False,
+            "message": "You cannot send a request to yourself."
+        }), 400
 
-        if not receiver_id:
+    receiver = players_col.find_one({
+        "playerId": receiver_id
+    })
 
-            return jsonify({
-                "success": False,
-                "error":
-                    "toPlayerId is required."
-            }), 400
+    if not receiver:
+        return jsonify({
+            "success": False,
+            "message": "Player not found."
+        }), 404
 
-        receiver_id = str(
-            receiver_id
-        )
+    existing = requests_col.find_one({
+        "type": "player",
+        "senderId": player["playerId"],
+        "receiverId": receiver_id,
+        "status": "pending"
+    })
 
-        if sender_id == receiver_id:
+    if existing:
+        return jsonify({
+            "success": False,
+            "message": "Request already pending."
+        }), 409
 
-            return jsonify({
-                "success": False,
-                "error":
-                    "You cannot send a game request to yourself."
-            }), 400
+    req = {
+        "requestId": generate_request_id(),
+        "type": "player",
+        "senderId": player["playerId"],
+        "receiverId": receiver_id,
+        "status": "pending",
+        "createdAt": now_utc()
+    }
 
-        receiver = get_player(
-            receiver_id
-        )
+    requests_col.insert_one(req)
 
-        if not receiver:
+    return jsonify({
+        "success": True,
+        "request": {
+            **req,
+            "createdAt": iso_date(req["createdAt"])
+        }
+    }), 201
 
-            return jsonify({
-                "success": False,
-                "error":
-                    "Target player not found."
-            }), 404
 
-        sender_game = games_col.find_one({
+# ============================================================
+# GROUP GAME REQUEST
+# ============================================================
 
-            "players.playerId":
-                sender_id,
+@ox_bp.route("/group/request/send", methods=["POST"])
+def send_group_request():
 
-            "status":
-                "playing"
-        })
+    player, error = require_player()
 
-        if sender_game:
+    if error:
+        return error
 
-            return jsonify({
-                "success": False,
-                "error":
-                    "You already have an active game."
-            }), 400
+    data = request.get_json(silent=True) or {}
 
-        receiver_game = games_col.find_one({
+    group_id = clean_string(
+        data.get("groupId")
+    )
 
-            "players.playerId":
-                receiver_id,
+    group = groups_col.find_one({
+        "groupId": group_id
+    })
 
-            "status":
-                "playing"
-        })
+    if not group:
+        return jsonify({
+            "success": False,
+            "message": "Group not found."
+        }), 404
 
-        if receiver_game:
+    if not any(
+        m["playerId"] == player["playerId"]
+        for m in group.get("members", [])
+    ):
+        return jsonify({
+            "success": False,
+            "message": "You are not a member of this group."
+        }), 403
 
-            return jsonify({
-                "success": False,
-                "error":
-                    "That player is already playing."
-            }), 400
+    requests_created = 0
+
+    for member in group.get("members", []):
+
+        member_id = member["playerId"]
+
+        if member_id == player["playerId"]:
+            continue
 
         existing = requests_col.find_one({
-
-            "fromPlayerId":
-                sender_id,
-
-            "toPlayerId":
-                receiver_id,
-
-            "status":
-                "pending"
+            "type": "player",
+            "senderId": player["playerId"],
+            "receiverId": member_id,
+            "status": "pending"
         })
 
         if existing:
+            continue
 
-            return jsonify({
-
-                "success": True,
-
-                "message":
-                    "Request already sent.",
-
-                "request": {
-
-                    "requestId":
-                        existing["requestId"],
-
-                    "status":
-                        existing["status"]
-                }
-            })
-
-        request_id = make_id(
-            "req_"
-        )
-
-        req = {
-
-            "requestId":
-                request_id,
-
-            "type":
-                "direct",
-
-            "fromPlayerId":
-                sender_id,
-
-            "fromPlayerName":
-                sender["name"],
-
-            "toPlayerId":
-                receiver_id,
-
-            "toPlayerName":
-                receiver["name"],
-
-            "groupId":
-                None,
-
-            "groupName":
-                None,
-
-            "status":
-                "pending",
-
-            "createdAt":
-                now(),
-
-            "updatedAt":
-                now()
-        }
-
-        requests_col.insert_one(
-            req
-        )
-
-        return jsonify({
-
-            "success": True,
-
-            "message":
-                "Game request sent.",
-
-            "request": {
-
-                "requestId":
-                    request_id,
-
-                "fromPlayerId":
-                    sender_id,
-
-                "fromPlayerName":
-                    sender["name"],
-
-                "toPlayerId":
-                    receiver_id,
-
-                "toPlayerName":
-                    receiver["name"],
-
-                "status":
-                    "pending"
-            }
+        requests_col.insert_one({
+            "requestId": generate_request_id(),
+            "type": "player",
+            "senderId": player["playerId"],
+            "receiverId": member_id,
+            "status": "pending",
+            "groupId": group_id,
+            "createdAt": now_utc()
         })
 
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
-
-# ============================================================
-# SEND GROUP GAME REQUEST
-# ============================================================
-
-@ox_bp.route(
-    "/group/request/send",
-    methods=["POST"]
-)
-def send_group_game_request():
-
-    try:
-
-        data = request.get_json(
-            silent=True
-        ) or {}
-
-        sender, error_response, status = require_player(
-            data
-        )
-
-        if error_response:
-            return error_response, status
-
-        sender_id = sender[
-            "playerId"
-        ]
-
-        group_id = data.get(
-            "groupId"
-        )
-
-        target_player_id = data.get(
-            "toPlayerId"
-        )
-
-        if not group_id:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "groupId is required."
-            }), 400
-
-        if not target_player_id:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "toPlayerId is required."
-            }), 400
-
-        group = groups_col.find_one({
-            "groupId":
-                group_id
-        })
-
-        if not group:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Group not found."
-            }), 404
-
-        sender_is_member = any(
-
-            member["playerId"]
-            == sender_id
-
-            for member in group.get(
-                "members",
-                []
-            )
-        )
-
-        if not sender_is_member:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "You are not a member of this group."
-            }), 403
-
-        target_member = None
-
-        for member in group.get(
-            "members",
-            []
-        ):
-
-            if member[
-                "playerId"
-            ] == target_player_id:
-
-                target_member = member
-
-                break
-
-        if not target_member:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Target player is not a member of this group."
-            }), 404
-
-        if sender_id == target_player_id:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "You cannot challenge yourself."
-            }), 400
-
-        sender_game = games_col.find_one({
-
-            "players.playerId":
-                sender_id,
-
-            "status":
-                "playing"
-        })
-
-        if sender_game:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "You already have an active game."
-            }), 400
-
-        target_game = games_col.find_one({
-
-            "players.playerId":
-                target_player_id,
-
-            "status":
-                "playing"
-        })
-
-        if target_game:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "That player is already playing."
-            }), 400
-
-        existing = requests_col.find_one({
-
-            "fromPlayerId":
-                sender_id,
-
-            "toPlayerId":
-                target_player_id,
-
-            "status":
-                "pending"
-        })
-
-        if existing:
-
-            return jsonify({
-
-                "success": True,
-
-                "message":
-                    "Request already sent.",
-
-                "request": {
-
-                    "requestId":
-                        existing["requestId"],
-
-                    "status":
-                        existing["status"]
-                }
-            })
-
-        request_id = make_id(
-            "req_"
-        )
-
-        req = {
-
-            "requestId":
-                request_id,
-
-            "type":
-                "group",
-
-            "fromPlayerId":
-                sender_id,
-
-            "fromPlayerName":
-                sender["name"],
-
-            "toPlayerId":
-                target_player_id,
-
-            "toPlayerName":
-                target_member["name"],
-
-            "groupId":
-                group_id,
-
-            "groupName":
-                group["name"],
-
-            "status":
-                "pending",
-
-            "createdAt":
-                now(),
-
-            "updatedAt":
-                now()
-        }
-
-        requests_col.insert_one(
-            req
-        )
-
-        return jsonify({
-
-            "success": True,
-
-            "message":
-                "Group game request sent.",
-
-            "request": {
-
-                "requestId":
-                    request_id,
-
-                "type":
-                    "group",
-
-                "fromPlayerId":
-                    sender_id,
-
-                "fromPlayerName":
-                    sender["name"],
-
-                "toPlayerId":
-                    target_player_id,
-
-                "toPlayerName":
-                    target_member["name"],
-
-                "groupId":
-                    group_id,
-
-                "groupName":
-                    group["name"],
-
-                "status":
-                    "pending"
-            }
-        })
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+        requests_created += 1
+
+    return jsonify({
+        "success": True,
+        "message": "Group requests sent.",
+        "count": requests_created
+    })
 
 
 # ============================================================
 # RECEIVED REQUESTS
 # ============================================================
 
-@ox_bp.route(
-    "/requests/received",
-    methods=["GET"]
-)
+@ox_bp.route("/requests/received", methods=["GET"])
 def received_requests():
 
-    try:
+    player, error = require_player()
 
-        player_id = request.args.get(
-            "playerId"
-        )
+    if error:
+        return error
 
-        if not player_id:
+    requests = []
 
-            return jsonify({
-                "success": False,
-                "error":
-                    "playerId is required."
-            }), 400
+    for req in requests_col.find({
+        "receiverId": player["playerId"],
+        "status": "pending"
+    }).sort(
+        "createdAt",
+        DESCENDING
+    ):
 
-        requests = requests_col.find({
-
-            "toPlayerId":
-                player_id,
-
-            "status":
-                "pending"
-
-        }).sort(
-            "createdAt",
-            DESCENDING
-        ).limit(100)
-
-        result = []
-
-        for req in requests:
-
-            result.append({
-
-                "requestId":
-                    req["requestId"],
-
-                "type":
-                    req.get(
-                        "type",
-                        "direct"
-                    ),
-
-                "fromPlayerId":
-                    req["fromPlayerId"],
-
-                "fromPlayerName":
-                    req["fromPlayerName"],
-
-                "toPlayerId":
-                    req["toPlayerId"],
-
-                "toPlayerName":
-                    req["toPlayerName"],
-
-                "groupId":
-                    req.get(
-                        "groupId"
-                    ),
-
-                "groupName":
-                    req.get(
-                        "groupName"
-                    ),
-
-                "status":
-                    req["status"],
-
-                "createdAt":
-                    req.get(
-                        "createdAt"
-                    )
-            })
-
-        return jsonify({
-
-            "success": True,
-
-            "requests":
-                result
+        requests.append({
+            **req,
+            "_id": str(req["_id"]),
+            "createdAt": iso_date(req.get("createdAt"))
         })
 
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+    return jsonify({
+        "success": True,
+        "requests": requests
+    })
 
 
 # ============================================================
 # SENT REQUESTS
 # ============================================================
 
-@ox_bp.route(
-    "/requests/sent",
-    methods=["GET"]
-)
+@ox_bp.route("/requests/sent", methods=["GET"])
 def sent_requests():
 
-    try:
+    player, error = require_player()
 
-        player_id = request.args.get(
-            "playerId"
-        )
+    if error:
+        return error
 
-        if not player_id:
+    requests = []
 
-            return jsonify({
-                "success": False,
-                "error":
-                    "playerId is required."
-            }), 400
+    for req in requests_col.find({
+        "senderId": player["playerId"]
+    }).sort(
+        "createdAt",
+        DESCENDING
+    ):
 
-        requests = requests_col.find({
-
-            "fromPlayerId":
-                player_id
-
-        }).sort(
-            "createdAt",
-            DESCENDING
-        ).limit(100)
-
-        result = []
-
-        for req in requests:
-
-            result.append({
-
-                "requestId":
-                    req["requestId"],
-
-                "type":
-                    req.get(
-                        "type",
-                        "direct"
-                    ),
-
-                "fromPlayerId":
-                    req["fromPlayerId"],
-
-                "fromPlayerName":
-                    req["fromPlayerName"],
-
-                "toPlayerId":
-                    req["toPlayerId"],
-
-                "toPlayerName":
-                    req["toPlayerName"],
-
-                "groupId":
-                    req.get(
-                        "groupId"
-                    ),
-
-                "groupName":
-                    req.get(
-                        "groupName"
-                    ),
-
-                "status":
-                    req["status"],
-
-                "createdAt":
-                    req.get(
-                        "createdAt"
-                    )
-            })
-
-        return jsonify({
-
-            "success": True,
-
-            "requests":
-                result
+        requests.append({
+            **req,
+            "_id": str(req["_id"]),
+            "createdAt": iso_date(req.get("createdAt"))
         })
 
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+    return jsonify({
+        "success": True,
+        "requests": requests
+    })
 
 
 # ============================================================
 # ACCEPT REQUEST
 # ============================================================
 
-@ox_bp.route(
-    "/request/accept",
-    methods=["POST"]
-)
+@ox_bp.route("/request/accept", methods=["POST"])
 def accept_request():
 
-    try:
+    player, error = require_player()
 
-        data = request.get_json(
-            silent=True
-        ) or {}
+    if error:
+        return error
 
-        player, error_response, status = require_player(
-            data
-        )
+    data = request.get_json(silent=True) or {}
 
-        if error_response:
-            return error_response, status
+    request_id = clean_string(
+        data.get("requestId")
+    )
 
-        player_id = player[
-            "playerId"
-        ]
+    req = requests_col.find_one({
+        "requestId": request_id,
+        "receiverId": player["playerId"],
+        "status": "pending"
+    })
 
-        request_id = data.get(
-            "requestId"
-        )
-
-        if not request_id:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "requestId is required."
-            }), 400
-
-        req = requests_col.find_one({
-            "requestId":
-                request_id
-        })
-
-        if not req:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Game request not found."
-            }), 404
-
-        if req[
-            "toPlayerId"
-        ] != player_id:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "This request does not belong to you."
-            }), 403
-
-        if req[
-            "status"
-        ] != "pending":
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Request is no longer pending."
-            }), 400
-
-        sender_id = req[
-            "fromPlayerId"
-        ]
-
-        sender_game = games_col.find_one({
-
-            "players.playerId":
-                sender_id,
-
-            "status":
-                "playing"
-        })
-
-        if sender_game:
-
-            requests_col.update_one(
-
-                {
-                    "requestId":
-                        request_id,
-
-                    "status":
-                        "pending"
-                },
-
-                {
-                    "$set": {
-
-                        "status":
-                            "expired",
-
-                        "updatedAt":
-                            now()
-                    }
-                }
-            )
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Requester is already playing another game."
-            }), 409
-
-        receiver_game = games_col.find_one({
-
-            "players.playerId":
-                player_id,
-
-            "status":
-                "playing"
-        })
-
-        if receiver_game:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "You are already playing another game."
-            }), 409
-
-        accepted = requests_col.update_one(
-
-            {
-                "requestId":
-                    request_id,
-
-                "status":
-                    "pending",
-
-                "toPlayerId":
-                    player_id
-            },
-
-            {
-                "$set": {
-
-                    "status":
-                        "accepted",
-
-                    "updatedAt":
-                        now()
-                }
-            }
-        )
-
-        if accepted.modified_count != 1:
-
-            latest = requests_col.find_one({
-                "requestId":
-                    request_id
-            })
-
-            return jsonify({
-
-                "success": False,
-
-                "error":
-                    "Request was already processed.",
-
-                "requestStatus":
-                    latest.get(
-                        "status"
-                    )
-                    if latest
-                    else None
-            }), 409
-
-        game = create_game(
-
-            sender_id,
-
-            player_id,
-
-            group_id=
-                req.get(
-                    "groupId"
-                )
-        )
-
-        requests_col.update_one(
-
-            {
-                "requestId":
-                    request_id
-            },
-
-            {
-                "$set": {
-
-                    "gameId":
-                        game["gameId"],
-
-                    "updatedAt":
-                        now()
-                }
-            }
-        )
-
-        return jsonify({
-
-            "success": True,
-
-            "message":
-                "Request accepted. Game started!",
-
-            "game":
-                serialize_game(
-                    game
-                )
-        })
-
-    except Exception as e:
-
+    if not req:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "message": "Request not found."
+        }), 404
+
+    sender = players_col.find_one({
+        "playerId": req["senderId"]
+    })
+
+    if not sender:
+        return jsonify({
+            "success": False,
+            "message": "Sender not found."
+        }), 404
+
+    if sender.get("blocked") or sender.get("suspended"):
+        return jsonify({
+            "success": False,
+            "message": "Sender is unavailable."
+        }), 400
+
+    requests_col.update_one(
+        {
+            "requestId": request_id,
+            "status": "pending"
+        },
+        {
+            "$set": {
+                "status": "accepted",
+                "respondedAt": now_utc()
+            }
+        }
+    )
+
+    game = make_game(
+        player,
+        sender
+    )
+
+    return jsonify({
+        "success": True,
+        "message": "Request accepted.",
+        "game": game_public(game)
+    })
 
 
 # ============================================================
 # REJECT REQUEST
 # ============================================================
 
-@ox_bp.route(
-    "/request/reject",
-    methods=["POST"]
-)
+@ox_bp.route("/request/reject", methods=["POST"])
 def reject_request():
 
-    try:
+    player, error = require_player()
 
-        data = request.get_json(
-            silent=True
-        ) or {}
+    if error:
+        return error
 
-        player_id = data.get(
-            "playerId"
-        )
+    data = request.get_json(silent=True) or {}
 
-        request_id = data.get(
-            "requestId"
-        )
+    request_id = clean_string(
+        data.get("requestId")
+    )
 
-        if not player_id or not request_id:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "playerId and requestId are required."
-            }), 400
-
-        req = requests_col.find_one({
-            "requestId":
-                request_id
-        })
-
-        if not req:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Request not found."
-            }), 404
-
-        if req[
-            "toPlayerId"
-        ] != player_id:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "You cannot reject this request."
-            }), 403
-
-        result = requests_col.update_one(
-
-            {
-                "requestId":
-                    request_id,
-
-                "status":
-                    "pending"
-            },
-
-            {
-                "$set": {
-
-                    "status":
-                        "rejected",
-
-                    "updatedAt":
-                        now()
-                }
+    updated = requests_col.update_one(
+        {
+            "requestId": request_id,
+            "receiverId": player["playerId"],
+            "status": "pending"
+        },
+        {
+            "$set": {
+                "status": "rejected",
+                "respondedAt": now_utc()
             }
-        )
+        }
+    )
 
-        if result.modified_count == 0:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Request has already been processed."
-            }), 400
-
-        return jsonify({
-
-            "success": True,
-
-            "message":
-                "Game request rejected."
-        })
-
-    except Exception as e:
-
+    if updated.matched_count == 0:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "message": "Request not found."
+        }), 404
+
+    return jsonify({
+        "success": True,
+        "message": "Request rejected."
+    })
 
 
 # ============================================================
 # CANCEL REQUEST
 # ============================================================
 
-@ox_bp.route(
-    "/request/cancel",
-    methods=["POST"]
-)
+@ox_bp.route("/request/cancel", methods=["POST"])
 def cancel_request():
 
-    try:
+    player, error = require_player()
 
-        data = request.get_json(
-            silent=True
-        ) or {}
+    if error:
+        return error
 
-        player_id = data.get(
-            "playerId"
-        )
+    data = request.get_json(silent=True) or {}
 
-        request_id = data.get(
-            "requestId"
-        )
+    request_id = clean_string(
+        data.get("requestId")
+    )
 
-        if not player_id or not request_id:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "playerId and requestId are required."
-            }), 400
-
-        req = requests_col.find_one({
-            "requestId":
-                request_id
-        })
-
-        if not req:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Request not found."
-            }), 404
-
-        if req[
-            "fromPlayerId"
-        ] != player_id:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "You cannot cancel this request."
-            }), 403
-
-        result = requests_col.update_one(
-
-            {
-                "requestId":
-                    request_id,
-
-                "status":
-                    "pending"
-            },
-
-            {
-                "$set": {
-
-                    "status":
-                        "cancelled",
-
-                    "updatedAt":
-                        now()
-                }
+    updated = requests_col.update_one(
+        {
+            "requestId": request_id,
+            "senderId": player["playerId"],
+            "status": "pending"
+        },
+        {
+            "$set": {
+                "status": "cancelled",
+                "respondedAt": now_utc()
             }
-        )
+        }
+    )
 
-        if result.modified_count == 0:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Request has already been processed."
-            }), 400
-
-        return jsonify({
-
-            "success": True,
-
-            "message":
-                "Request cancelled."
-        })
-
-    except Exception as e:
-
+    if updated.matched_count == 0:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "message": "Request not found."
+        }), 404
+
+    return jsonify({
+        "success": True,
+        "message": "Request cancelled."
+    })
 
 
 # ============================================================
 # LEADERBOARD
 # ============================================================
 
-@ox_bp.route(
-    "/leaderboard",
-    methods=["GET"]
-)
+@ox_bp.route("/leaderboard", methods=["GET"])
 def leaderboard():
 
-    try:
-
-        try:
-
-            limit = int(
-                request.args.get(
-                    "limit",
-                    50
-                )
-            )
-
-        except Exception:
-
-            limit = 50
-
-        limit = max(
-            1,
-            min(
-                limit,
-                100
-            )
-        )
-
-        players = players_col.find(
-
-            {},
-
-            {
-                "_id": 0,
-
-                "playerId": 1,
-
-                "name": 1,
-
-                "wins": 1,
-
-                "losses": 1,
-
-                "draws": 1,
-
-                "games": 1,
-
-                "nameLower": 1
-            }
-
-        ).sort(
-
-            [
-                (
-                    "wins",
-                    DESCENDING
-                ),
-
-                (
-                    "games",
-                    DESCENDING
-                ),
-
-                (
-                    "losses",
-                    ASCENDING
-                ),
-
-                (
-                    "nameLower",
-                    ASCENDING
-                )
-            ]
-
-        ).limit(
-            limit
-        )
-
-        result = []
-
-        rank = 1
-
-        for player in players:
-
-            games_played = int(
-                player.get(
-                    "games",
-                    0
-                )
-            )
-
-            wins = int(
-                player.get(
-                    "wins",
-                    0
-                )
-            )
-
-            win_rate = 0
-
-            if games_played > 0:
-
-                win_rate = round(
-
-                    (
-                        wins
-                        /
-                        games_played
-                    )
-                    *
-                    100,
-
-                    2
-                )
-
-            result.append({
-
-                "rank":
-                    rank,
-
-                "playerId":
-                    player["playerId"],
-
-                "name":
-                    player["name"],
-
-                "wins":
-                    wins,
-
-                "losses":
-                    int(
-                        player.get(
-                            "losses",
-                            0
-                        )
-                    ),
-
-                "draws":
-                    int(
-                        player.get(
-                            "draws",
-                            0
-                        )
-                    ),
-
-                "games":
-                    games_played,
-
-                "winRate":
-                    win_rate
-            })
-
-            rank += 1
-
-        return jsonify({
-
-            "success": True,
-
-            "leaderboard":
-                result
-        })
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
-
-# ============================================================
-# PLAYER STATS
-# ============================================================
-
-@ox_bp.route(
-    "/stats/<player_id>",
-    methods=["GET"]
-)
-def player_stats(
-    player_id
-):
-
-    try:
-
-        player = get_player(
-            player_id
-        )
-
-        if not player:
-
-            return jsonify({
-                "success": False,
-                "error":
-                    "Player not found."
-            }), 404
-
-        games_played = int(
-            player.get(
-                "games",
-                0
-            )
-        )
-
-        wins = int(
-            player.get(
-                "wins",
-                0
-            )
-        )
-
-        win_rate = 0
-
-        if games_played:
-
-            win_rate = round(
-
-                (
-                    wins
-                    /
-                    games_played
-                )
-                *
-                100,
-
-                2
-            )
-
-        # --------------------------------------------
-        # RANK
-        # --------------------------------------------
-
-        higher_players = players_col.count_documents({
-
-            "$or": [
-
-                {
-                    "wins": {
-                        "$gt":
-                            wins
-                    }
-                },
-
-                {
-
-                    "wins":
-                        wins,
-
-                    "games": {
-                        "$gt":
-                            games_played
-                    }
-                }
-            ]
-        })
-
-        rank = (
-            higher_players
-            +
-            1
-        )
-
-        return jsonify({
-
-            "success": True,
-
-            "stats": {
-
-                "playerId":
-                    player["playerId"],
-
-                "name":
-                    player["name"],
-
-                "wins":
-                    wins,
-
-                "losses":
-                    int(
-                        player.get(
-                            "losses",
-                            0
-                        )
-                    ),
-
-                "draws":
-                    int(
-                        player.get(
-                            "draws",
-                            0
-                        )
-                    ),
-
-                "games":
-                    games_played,
-
-                "winRate":
-                    win_rate,
-
-                "rank":
-                    rank
+    limit = request.args.get(
+        "limit",
+        default=100,
+        type=int
+    )
+
+    limit = max(
+        1,
+        min(limit, 500)
+    )
+
+    players = list(
+        players_col.find({
+            "blocked": {
+                "$ne": True
             }
         })
+        .sort([
+            ("wins", DESCENDING),
+            ("winRate", DESCENDING)
+        ])
+        .limit(limit)
+    )
 
-    except Exception as e:
+    result = []
 
+    for index, player in enumerate(players, start=1):
+
+        result.append({
+            "rank": index,
+            **sanitize_player(player)
+        })
+
+    return jsonify({
+        "success": True,
+        "leaderboard": result
+    })
+
+
+# ============================================================
+# STATS
+# ============================================================
+
+@ox_bp.route("/stats/<player_id>", methods=["GET"])
+def player_stats(player_id):
+
+    player = players_col.find_one({
+        "playerId": player_id
+    })
+
+    if not player:
         return jsonify({
             "success": False,
-            "error": str(e)
-        }), 500
+            "message": "Player not found."
+        }), 404
+
+    return jsonify({
+        "success": True,
+        "stats": sanitize_player(player)
+    })
 
 
 # ============================================================
-# MY ACTIVE GAME
+# CURRENT ACTIVE GAME
 # ============================================================
 
-@ox_bp.route(
-    "/my-game",
-    methods=["GET"]
-)
+@ox_bp.route("/my-game", methods=["GET"])
 def my_game():
 
-    try:
+    player, error = require_player()
 
-        player_id = request.args.get(
-            "playerId"
-        )
+    if error:
+        return error
 
-        if not player_id:
+    game = games_col.find_one(
+        {
+            "players.playerId": player["playerId"],
+            "status": "active"
+        },
+        sort=[
+            ("updatedAt", DESCENDING)
+        ]
+    )
 
-            return jsonify({
-                "success": False,
-                "error":
-                    "playerId is required."
-            }), 400
-
-        game = games_col.find_one(
-
-            {
-                "players.playerId":
-                    player_id,
-
-                "status":
-                    "playing"
-            },
-
-            sort=[
-                (
-                    "updatedAt",
-                    DESCENDING
-                )
-            ]
-        )
-
-        return jsonify({
-
-            "success": True,
-
-            "game":
-                serialize_game(
-                    game
-                )
-                if game
-                else None
-        })
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+    return jsonify({
+        "success": True,
+        "game": game_public(game) if game else None
+    })
 
 
 # ============================================================
 # GAME HISTORY
 # ============================================================
 
-@ox_bp.route(
-    "/history",
-    methods=["GET"]
-)
-def game_history():
+@ox_bp.route("/history", methods=["GET"])
+def history():
 
-    try:
+    player, error = require_player()
 
-        player_id = request.args.get(
-            "playerId"
-        )
+    if error:
+        return error
 
-        if not player_id:
+    limit = request.args.get(
+        "limit",
+        default=50,
+        type=int
+    )
 
-            return jsonify({
-                "success": False,
-                "error":
-                    "playerId is required."
-            }), 400
+    limit = max(
+        1,
+        min(limit, 200)
+    )
 
-        try:
+    games = games_col.find({
+        "players.playerId": player["playerId"],
+        "status": "finished"
+    }).sort(
+        "finishedAt",
+        DESCENDING
+    ).limit(limit)
 
-            limit = int(
-                request.args.get(
-                    "limit",
-                    30
-                )
+    result = [
+        game_public(game)
+        for game in games
+    ]
+
+    return jsonify({
+        "success": True,
+        "history": result
+    })
+
+
+# ============================================================
+# ADMIN LOGIN
+# ============================================================
+
+@ox_bp.route("/admin/login", methods=["POST"])
+def admin_login():
+
+    if not ADMIN_USERNAME or not ADMIN_PASSWORD:
+        return jsonify({
+            "success": False,
+            "message": (
+                "Admin credentials are not configured "
+                "on the server."
             )
+        }), 500
 
-        except Exception:
+    data = request.get_json(silent=True) or {}
 
-            limit = 30
+    username = clean_string(
+        data.get("username")
+    )
 
-        limit = max(
-            1,
-            min(
-                limit,
-                100
-            )
-        )
+    password = data.get("password", "")
 
-        games = games_col.find({
+    if (
+        username != ADMIN_USERNAME or
+        password != ADMIN_PASSWORD
+    ):
+        return jsonify({
+            "success": False,
+            "message": "Invalid admin credentials."
+        }), 401
 
-            "players.playerId":
-                player_id,
+    token = create_session(
+        "ADMIN",
+        is_admin=True
+    )
 
-            "status":
-                "finished"
+    return jsonify({
+        "success": True,
+        "message": "Admin login successful.",
+        "token": token,
+        "admin": {
+            "username": ADMIN_USERNAME
+        }
+    })
 
-        }).sort(
-            "updatedAt",
-            DESCENDING
-        ).limit(
-            limit
-        )
 
-        result = []
+# ============================================================
+# ADMIN LOGOUT
+# ============================================================
 
-        for game in games:
+@ox_bp.route("/admin/logout", methods=["POST"])
+def admin_logout():
 
-            opponent = get_opponent(
-                game,
-                player_id
-            )
+    session, error = require_admin()
 
-            if game.get(
-                "draw"
-            ):
+    if error:
+        return error
 
-                result_status = "draw"
+    token = get_token()
 
-            elif game.get(
-                "winner"
-            ) == player_id:
+    if token:
+        sessions_col.delete_one({
+            "token": token
+        })
 
-                result_status = "win"
+    return jsonify({
+        "success": True,
+        "message": "Admin logged out."
+    })
 
-            else:
 
-                result_status = "loss"
+# ============================================================
+# ADMIN — ALL USERS
+# ============================================================
 
-            result.append({
+@ox_bp.route("/admin/users", methods=["GET"])
+def admin_users():
 
-                "gameId":
-                    game["gameId"],
+    session, error = require_admin()
 
-                "result":
-                    result_status,
+    if error:
+        return error
 
-                "opponent": (
+    search = clean_string(
+        request.args.get("search")
+    )
 
-                    {
+    query = {}
 
-                        "playerId":
-                            opponent["playerId"],
+    if search:
 
-                        "name":
-                            opponent["name"],
-
-                        "symbol":
-                            opponent["symbol"]
+        query = {
+            "$or": [
+                {
+                    "playerId": {
+                        "$regex": search,
+                        "$options": "i"
                     }
+                },
+                {
+                    "username": {
+                        "$regex": search,
+                        "$options": "i"
+                    }
+                },
+                {
+                    "name": {
+                        "$regex": search,
+                        "$options": "i"
+                    }
+                }
+            ]
+        }
 
-                    if opponent
+    players = players_col.find(
+        query
+    ).sort(
+        "createdAt",
+        DESCENDING
+    )
 
-                    else None
-                ),
+    result = []
 
-                "winner":
-                    game.get(
-                        "winner"
-                    ),
+    for player in players:
 
-                "winnerSymbol":
-                    game.get(
-                        "winnerSymbol"
-                    ),
-
-                "roomId":
-                    game.get(
-                        "roomId"
-                    ),
-
-                "groupId":
-                    game.get(
-                        "groupId"
-                    ),
-
-                "updatedAt":
-                    game.get(
-                        "updatedAt"
-                    )
-            })
-
-        return jsonify({
-
-            "success": True,
-
-            "history":
-                result
-        })
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
-
-# ============================================================
-# HEALTH CHECK
-# ============================================================
-
-@ox_bp.route(
-    "/health",
-    methods=["GET"]
-)
-def ox_health():
-
-    try:
-
-        ox_db.command(
-            "ping"
+        result.append(
+            sanitize_player(player)
         )
 
+    return jsonify({
+        "success": True,
+        "count": len(result),
+        "users": result
+    })
+
+
+# ============================================================
+# ADMIN — SINGLE USER
+# ============================================================
+
+@ox_bp.route("/admin/users/<player_id>", methods=["GET"])
+def admin_get_user(player_id):
+
+    session, error = require_admin()
+
+    if error:
+        return error
+
+    player = players_col.find_one({
+        "playerId": player_id
+    })
+
+    if not player:
         return jsonify({
-
-            "success": True,
-
-            "service":
-                "OX Game",
-
-            "status":
-                "online",
-
-            "database":
-                OX_DB_NAME,
-
-            "board":
-                "5x5",
-
-            "winCondition":
-                "5 consecutive X or O"
-        })
-
-    except Exception as e:
-
-        return jsonify({
-
             "success": False,
+            "message": "Player not found."
+        }), 404
 
-            "service":
-                "OX Game",
+    return jsonify({
+        "success": True,
+        "user": sanitize_player(player)
+    })
 
-            "status":
-                "offline",
 
-            "error":
-                str(e)
-        }), 500
+# ============================================================
+# ADMIN — EDIT WINS / LOSSES / DRAWS
+# ============================================================
+
+@ox_bp.route("/admin/users/<player_id>/stats", methods=["PUT"])
+def admin_edit_stats(player_id):
+
+    session, error = require_admin()
+
+    if error:
+        return error
+
+    data = request.get_json(silent=True) or {}
+
+    player = players_col.find_one({
+        "playerId": player_id
+    })
+
+    if not player:
+        return jsonify({
+            "success": False,
+            "message": "Player not found."
+        }), 404
+
+    update = {}
+
+    for field in [
+        "wins",
+        "losses",
+        "draws"
+    ]:
+
+        if field in data:
+
+            try:
+                value = int(data[field])
+            except Exception:
+                return jsonify({
+                    "success": False,
+                    "message": f"{field} must be a number."
+                }), 400
+
+            if value < 0:
+                return jsonify({
+                    "success": False,
+                    "message": f"{field} cannot be negative."
+                }), 400
+
+            update[field] = value
+
+    if not update:
+        return jsonify({
+            "success": False,
+            "message": "No statistics supplied."
+        }), 400
+
+    if (
+        "wins" in update or
+        "losses" in update or
+        "draws" in update
+    ):
+
+        current_wins = update.get(
+            "wins",
+            int(player.get("wins", 0))
+        )
+
+        current_losses = update.get(
+            "losses",
+            int(player.get("losses", 0))
+        )
+
+        current_draws = update.get(
+            "draws",
+            int(player.get("draws", 0))
+        )
+
+        update["gamesPlayed"] = (
+            current_wins +
+            current_losses +
+            current_draws
+        )
+
+    players_col.update_one(
+        {
+            "playerId": player_id
+        },
+        {
+            "$set": update
+        }
+    )
+
+    updated_player = players_col.find_one({
+        "playerId": player_id
+    })
+
+    return jsonify({
+        "success": True,
+        "message": "Player statistics updated.",
+        "user": sanitize_player(updated_player)
+    })
+
+
+# ============================================================
+# ADMIN — BLOCK
+# ============================================================
+
+@ox_bp.route("/admin/users/<player_id>/block", methods=["POST"])
+def admin_block_user(player_id):
+
+    session, error = require_admin()
+
+    if error:
+        return error
+
+    player = players_col.find_one({
+        "playerId": player_id
+    })
+
+    if not player:
+        return jsonify({
+            "success": False,
+            "message": "Player not found."
+        }), 404
+
+    players_col.update_one(
+        {
+            "playerId": player_id
+        },
+        {
+            "$set": {
+                "blocked": True,
+                "blockedAt": now_utc()
+            }
+        }
+    )
+
+    # Remove from matchmaking
+    queue_col.delete_one({
+        "playerId": player_id
+    })
+
+    # Invalidate sessions
+    sessions_col.delete_many({
+        "playerId": player_id
+    })
+
+    return jsonify({
+        "success": True,
+        "message": "Player blocked successfully."
+    })
+
+
+# ============================================================
+# ADMIN — UNBLOCK
+# ============================================================
+
+@ox_bp.route("/admin/users/<player_id>/unblock", methods=["POST"])
+def admin_unblock_user(player_id):
+
+    session, error = require_admin()
+
+    if error:
+        return error
+
+    player = players_col.find_one({
+        "playerId": player_id
+    })
+
+    if not player:
+        return jsonify({
+            "success": False,
+            "message": "Player not found."
+        }), 404
+
+    players_col.update_one(
+        {
+            "playerId": player_id
+        },
+        {
+            "$set": {
+                "blocked": False
+            },
+            "$unset": {
+                "blockedAt": ""
+            }
+        }
+    )
+
+    return jsonify({
+        "success": True,
+        "message": "Player unblocked successfully."
+    })
+
+
+# ============================================================
+# ADMIN — SUSPEND
+# ============================================================
+
+@ox_bp.route("/admin/users/<player_id>/suspend", methods=["POST"])
+def admin_suspend_user(player_id):
+
+    session, error = require_admin()
+
+    if error:
+        return error
+
+    data = request.get_json(silent=True) or {}
+
+    reason = clean_string(
+        data.get("reason")
+    )
+
+    player = players_col.find_one({
+        "playerId": player_id
+    })
+
+    if not player:
+        return jsonify({
+            "success": False,
+            "message": "Player not found."
+        }), 404
+
+    players_col.update_one(
+        {
+            "playerId": player_id
+        },
+        {
+            "$set": {
+                "suspended": True,
+                "suspensionReason": reason,
+                "suspendedAt": now_utc()
+            }
+        }
+    )
+
+    queue_col.delete_one({
+        "playerId": player_id
+    })
+
+    sessions_col.delete_many({
+        "playerId": player_id
+    })
+
+    return jsonify({
+        "success": True,
+        "message": "Player suspended successfully."
+    })
+
+
+# ============================================================
+# ADMIN — UNSUSPEND
+# ============================================================
+
+@ox_bp.route("/admin/users/<player_id>/unsuspend", methods=["POST"])
+def admin_unsuspend_user(player_id):
+
+    session, error = require_admin()
+
+    if error:
+        return error
+
+    player = players_col.find_one({
+        "playerId": player_id
+    })
+
+    if not player:
+        return jsonify({
+            "success": False,
+            "message": "Player not found."
+        }), 404
+
+    players_col.update_one(
+        {
+            "playerId": player_id
+        },
+        {
+            "$set": {
+                "suspended": False
+            },
+            "$unset": {
+                "suspensionReason": "",
+                "suspendedAt": ""
+            }
+        }
+    )
+
+    return jsonify({
+        "success": True,
+        "message": "Player suspension removed."
+    })
+
+
+# ============================================================
+# ADMIN — DELETE USER
+# ============================================================
+
+@ox_bp.route("/admin/users/<player_id>", methods=["DELETE"])
+def admin_delete_user(player_id):
+
+    session, error = require_admin()
+
+    if error:
+        return error
+
+    player = players_col.find_one({
+        "playerId": player_id
+    })
+
+    if not player:
+        return jsonify({
+            "success": False,
+            "message": "Player not found."
+        }), 404
+
+    players_col.delete_one({
+        "playerId": player_id
+    })
+
+    queue_col.delete_one({
+        "playerId": player_id
+    })
+
+    sessions_col.delete_many({
+        "playerId": player_id
+    })
+
+    return jsonify({
+        "success": True,
+        "message": "Player deleted."
+    })
+
+
+# ============================================================
+# ADMIN — DASHBOARD STATS
+# ============================================================
+
+@ox_bp.route("/admin/dashboard", methods=["GET"])
+def admin_dashboard():
+
+    session, error = require_admin()
+
+    if error:
+        return error
+
+    total_users = players_col.count_documents({})
+
+    active_users = players_col.count_documents({
+        "blocked": {
+            "$ne": True
+        },
+        "suspended": {
+            "$ne": True
+        }
+    })
+
+    blocked_users = players_col.count_documents({
+        "blocked": True
+    })
+
+    suspended_users = players_col.count_documents({
+        "suspended": True
+    })
+
+    active_games = games_col.count_documents({
+        "status": "active"
+    })
+
+    finished_games = games_col.count_documents({
+        "status": "finished"
+    })
+
+    waiting_players = queue_col.count_documents({})
+
+    return jsonify({
+        "success": True,
+        "dashboard": {
+            "totalUsers": total_users,
+            "activeUsers": active_users,
+            "blockedUsers": blocked_users,
+            "suspendedUsers": suspended_users,
+            "activeGames": active_games,
+            "finishedGames": finished_games,
+            "waitingPlayers": waiting_players
+        }
+    })
+
+
+# ============================================================
+# ADMIN — GAME LIST
+# ============================================================
+
+@ox_bp.route("/admin/games", methods=["GET"])
+def admin_games():
+
+    session, error = require_admin()
+
+    if error:
+        return error
+
+    limit = request.args.get(
+        "limit",
+        default=100,
+        type=int
+    )
+
+    limit = max(
+        1,
+        min(limit, 500)
+    )
+
+    games = games_col.find().sort(
+        "createdAt",
+        DESCENDING
+    ).limit(limit)
+
+    result = [
+        game_public(game)
+        for game in games
+    ]
+
+    return jsonify({
+        "success": True,
+        "count": len(result),
+        "games": result
+    })
+
+
+# ============================================================
+# HEALTH
+# ============================================================
+
+@ox_bp.route("/health", methods=["GET"])
+def health():
+
+    mongo_ok = False
+
+    try:
+        ox_client.admin.command("ping")
+        mongo_ok = True
+    except Exception:
+        mongo_ok = False
+
+    return jsonify({
+        "success": True,
+        "service": "OX Game API",
+        "database": OX_DB_NAME,
+        "mongodb": "connected" if mongo_ok else "disconnected",
+        "status": "online" if mongo_ok else "degraded",
+        "timestamp": now_utc().isoformat()
+    })
 
 
 # ============================================================
 # MATCHMAKING CLEANUP
 # ============================================================
 
-@ox_bp.route(
-    "/matchmaking/cleanup",
-    methods=["POST"]
-)
-def cleanup_matchmaking():
+@ox_bp.route("/matchmaking/cleanup", methods=["POST"])
+def matchmaking_cleanup():
 
-    try:
+    session, error = require_admin()
 
-        cutoff = (
-            now()
-            -
-            timedelta(
-                minutes=10
-            )
-        )
+    if error:
+        return error
 
-        result = queue_col.delete_many({
+    cutoff = now_utc() - timedelta(
+        minutes=10
+    )
 
-            "joinedAt": {
+    result = queue_col.delete_many({
+        "joinedAt": {
+            "$lt": cutoff
+        }
+    })
 
-                "$lt":
-                    cutoff
-            }
-        })
-
-        return jsonify({
-
-            "success": True,
-
-            "removed":
-                result.deleted_count
-        })
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+    return jsonify({
+        "success": True,
+        "removed": result.deleted_count
+    })
 
 
 # ============================================================
 # REQUEST CLEANUP
 # ============================================================
 
-@ox_bp.route(
-    "/requests/cleanup",
-    methods=["POST"]
-)
-def cleanup_requests():
+@ox_bp.route("/requests/cleanup", methods=["POST"])
+def requests_cleanup():
 
-    try:
+    session, error = require_admin()
 
-        cutoff = (
-            now()
-            -
-            timedelta(
-                days=7
-            )
-        )
+    if error:
+        return error
 
-        result = requests_col.delete_many({
+    cutoff = now_utc() - timedelta(
+        days=30
+    )
 
-            "status": {
+    result = requests_col.delete_many({
+        "createdAt": {
+            "$lt": cutoff
+        },
+        "status": {
+            "$ne": "pending"
+        }
+    })
 
-                "$in": [
-
-                    "rejected",
-
-                    "cancelled",
-
-                    "expired"
-                ]
-            },
-
-            "updatedAt": {
-
-                "$lt":
-                    cutoff
-            }
-        })
-
-        return jsonify({
-
-            "success": True,
-
-            "removed":
-                result.deleted_count
-        })
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+    return jsonify({
+        "success": True,
+        "removed": result.deleted_count
+    })
 
 
 # ============================================================
-# END OF routes/ox.py
+# END OF OX ROUTES
 # ============================================================

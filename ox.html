@@ -1,1231 +1,925 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>OX Arena — 5×5</title>
+<title>OX Fighter Jets</title>
 
 <style>
-/* =========================================================
-   OX ARENA
-   SINGLE FILE FRONTEND
-   ========================================================= */
-
 *{
     box-sizing:border-box;
     margin:0;
     padding:0;
 }
 
-:root{
-    --navy:#0b1f3a;
-    --navy2:#102d52;
-    --blue:#1769ff;
-    --blue2:#4d8dff;
-    --red:#e10600;
-    --green:#16a34a;
-    --orange:#f59e0b;
-    --white:#ffffff;
-    --bg:#f3f6fb;
-    --card:#ffffff;
-    --text:#102033;
-    --muted:#64748b;
-    --border:#dbe3ef;
-    --shadow:0 15px 40px rgba(11,31,58,.10);
+body{
+    font-family:Inter,Arial,sans-serif;
+    background:
+        radial-gradient(circle at top,#182a4d 0%,#08101f 45%,#04070d 100%);
+    color:#fff;
+    min-height:100vh;
 }
 
-body{
-    font-family:Inter,Arial,Helvetica,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    min-height:100vh;
+button,
+input{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.hidden{
+    display:none !important;
 }
 
 /* =========================================================
    HEADER
-   ========================================================= */
+========================================================= */
 
 header{
-    background:linear-gradient(135deg,var(--navy),#123d70);
-    color:white;
-    padding:16px 22px;
+    height:70px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 25px;
+    background:rgba(5,10,20,.92);
+    border-bottom:1px solid rgba(255,255,255,.1);
     position:sticky;
     top:0;
     z-index:100;
-    box-shadow:0 5px 25px rgba(0,0,0,.15);
-}
-
-.header-inner{
-    max-width:1250px;
-    margin:auto;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:15px;
 }
 
 .logo{
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.logo span{
+    color:#ff304f;
+}
+
+.header-right{
     display:flex;
     align-items:center;
     gap:12px;
 }
 
-.logo-box{
-    width:44px;
-    height:44px;
-    border-radius:12px;
-    background:white;
-    color:var(--navy);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:23px;
-    font-weight:900;
-}
-
-.logo h1{
-    font-size:20px;
-    letter-spacing:.3px;
-}
-
-.logo small{
-    display:block;
-    color:#c8d8ef;
-    font-size:11px;
-    margin-top:2px;
-}
-
-.player-mini{
-    display:none;
-    align-items:center;
-    gap:10px;
-}
-
-.avatar{
-    width:38px;
-    height:38px;
-    border-radius:50%;
-    background:var(--red);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:white;
-    font-weight:900;
-}
-
-.player-mini-info strong{
-    display:block;
+.player-badge{
+    background:#101b31;
+    border:1px solid #273958;
+    padding:8px 14px;
+    border-radius:30px;
     font-size:13px;
 }
 
-.player-mini-info span{
-    display:block;
-    font-size:10px;
-    color:#cbd5e1;
+.logout-btn{
+    background:#ff304f;
+    color:white;
+    border:0;
+    padding:9px 15px;
+    border-radius:9px;
+    font-weight:700;
 }
 
 /* =========================================================
    MAIN
-   ========================================================= */
+========================================================= */
 
-main{
-    max-width:1250px;
-    margin:auto;
-    padding:25px 18px 60px;
+.container{
+    width:min(1200px,94%);
+    margin:30px auto;
 }
-
-.page{
-    display:none;
-}
-
-.page.active{
-    display:block;
-}
-
-/* =========================================================
-   COMMON
-   ========================================================= */
 
 .card{
-    background:var(--card);
-    border:1px solid var(--border);
+    background:rgba(13,23,41,.94);
+    border:1px solid rgba(255,255,255,.08);
     border-radius:18px;
-    box-shadow:var(--shadow);
+    padding:22px;
+    box-shadow:0 15px 45px rgba(0,0,0,.25);
 }
 
-.section-title{
-    font-size:23px;
+.title{
+    font-size:28px;
     font-weight:900;
-    margin-bottom:6px;
-}
-
-.section-subtitle{
-    color:var(--muted);
-    font-size:13px;
-    margin-bottom:20px;
-}
-
-button{
-    border:0;
-    cursor:pointer;
-    font-family:inherit;
-}
-
-.btn{
-    padding:12px 18px;
-    border-radius:11px;
-    font-weight:800;
-    transition:.18s;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-}
-
-.btn:hover{
-    transform:translateY(-1px);
-}
-
-.btn-primary{
-    background:var(--blue);
-    color:white;
-}
-
-.btn-primary:hover{
-    background:#0956dc;
-}
-
-.btn-dark{
-    background:var(--navy);
-    color:white;
-}
-
-.btn-danger{
-    background:var(--red);
-    color:white;
-}
-
-.btn-success{
-    background:var(--green);
-    color:white;
-}
-
-.btn-light{
-    background:#eef3f9;
-    color:var(--navy);
-}
-
-.btn-outline{
-    background:white;
-    color:var(--navy);
-    border:1px solid var(--border);
-}
-
-.btn-small{
-    padding:8px 11px;
-    font-size:12px;
-    border-radius:8px;
-}
-
-input,select{
-    width:100%;
-    padding:13px 14px;
-    border:1px solid var(--border);
-    border-radius:10px;
-    outline:none;
-    font-family:inherit;
-    background:white;
-    color:var(--text);
-}
-
-input:focus,select:focus{
-    border-color:var(--blue);
-    box-shadow:0 0 0 3px rgba(23,105,255,.10);
-}
-
-label{
-    font-size:12px;
-    font-weight:800;
-    margin-bottom:6px;
-    display:block;
-}
-
-/* =========================================================
-   LOGIN / NAME
-   ========================================================= */
-
-#welcomePage{
-    min-height:75vh;
-    display:none;
-    align-items:center;
-    justify-content:center;
-}
-
-#welcomePage.active{
-    display:flex;
-}
-
-.welcome-card{
-    max-width:550px;
-    width:100%;
-    padding:40px;
-    text-align:center;
-}
-
-.big-logo{
-    width:78px;
-    height:78px;
-    border-radius:22px;
-    background:var(--navy);
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    margin:0 auto 20px;
-    font-size:38px;
-    font-weight:900;
-    box-shadow:0 15px 30px rgba(11,31,58,.2);
-}
-
-.welcome-card h2{
-    font-size:31px;
     margin-bottom:8px;
 }
 
-.welcome-card p{
-    color:var(--muted);
+.subtitle{
+    color:#9eabc1;
     font-size:14px;
-    line-height:1.6;
-    margin-bottom:26px;
+    margin-bottom:25px;
 }
 
-.name-wrap{
-    text-align:left;
+/* =========================================================
+   AUTH
+========================================================= */
+
+.auth-wrapper{
+    width:min(460px,94%);
+    margin:70px auto;
 }
 
-.name-wrap input{
-    font-size:16px;
+.auth-tabs{
+    display:flex;
+    background:#080f1d;
+    border-radius:12px;
+    padding:4px;
+    margin-bottom:22px;
 }
 
-.full{
+.auth-tab{
+    width:50%;
+    padding:12px;
+    border:0;
+    border-radius:9px;
+    background:transparent;
+    color:#8e9ab0;
+    font-weight:800;
+}
+
+.auth-tab.active{
+    background:#1769ff;
+    color:#fff;
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+.form-group label{
+    display:block;
+    color:#b9c4d7;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:7px;
+}
+
+.form-group input{
     width:100%;
-    margin-top:12px;
+    padding:13px 14px;
+    background:#080f1d;
+    border:1px solid #263653;
+    color:#fff;
+    border-radius:10px;
+    outline:none;
 }
 
-.note{
-    margin-top:14px;
-    color:var(--muted);
-    font-size:11px;
+.form-group input:focus{
+    border-color:#1769ff;
+}
+
+.primary-btn{
+    width:100%;
+    padding:13px;
+    border:0;
+    border-radius:10px;
+    background:#1769ff;
+    color:white;
+    font-weight:900;
+}
+
+.primary-btn:hover{
+    background:#3280ff;
+}
+
+.auth-message{
+    margin-top:15px;
+    font-size:13px;
+    text-align:center;
+    min-height:20px;
+}
+
+.success{
+    color:#40e58b;
+}
+
+.error{
+    color:#ff5b6e;
 }
 
 /* =========================================================
    DASHBOARD
-   ========================================================= */
+========================================================= */
 
 .dashboard-grid{
     display:grid;
-    grid-template-columns:1.4fr .8fr;
+    grid-template-columns:1.5fr 1fr;
     gap:20px;
 }
 
-.hero{
-    padding:30px;
-    background:linear-gradient(135deg,#0b1f3a,#194e87);
-    color:white;
-    position:relative;
-    overflow:hidden;
+@media(max-width:850px){
+    .dashboard-grid{
+        grid-template-columns:1fr;
+    }
 }
 
-.hero:after{
-    content:"OX";
-    position:absolute;
-    right:-10px;
-    bottom:-45px;
-    font-size:150px;
-    font-weight:1000;
-    color:rgba(255,255,255,.05);
+.action-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-top:20px;
 }
 
-.hero h2{
-    font-size:31px;
-    margin-bottom:8px;
+@media(max-width:500px){
+    .action-grid{
+        grid-template-columns:1fr;
+    }
 }
 
-.hero p{
-    color:#c8d9ef;
-    max-width:650px;
-    line-height:1.6;
-    font-size:14px;
+.action-btn{
+    border:1px solid #293958;
+    background:#0b1528;
+    color:#fff;
+    border-radius:12px;
+    padding:15px;
+    font-weight:800;
+    transition:.2s;
 }
 
-.hero-actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin-top:25px;
-    position:relative;
-    z-index:2;
+.action-btn:hover{
+    border-color:#1769ff;
+    transform:translateY(-1px);
 }
 
-.mode-card{
-    padding:24px;
+.action-btn.red{
+    border-color:#612435;
 }
 
-.mode-card h3{
-    margin-bottom:8px;
+.action-btn.green{
+    border-color:#236242;
 }
 
-.mode-card p{
-    color:var(--muted);
-    font-size:12px;
-    line-height:1.5;
+.action-btn.gold{
+    border-color:#69571f;
 }
+
+/* =========================================================
+   STATS
+========================================================= */
 
 .stats-grid{
     display:grid;
     grid-template-columns:repeat(4,1fr);
     gap:12px;
-    margin-top:20px;
+}
+
+@media(max-width:650px){
+    .stats-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
 }
 
 .stat{
-    background:white;
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:18px;
+    background:#080f1d;
+    border:1px solid #202e48;
+    border-radius:12px;
+    padding:16px;
+    text-align:center;
 }
 
-.stat span{
-    display:block;
-    color:var(--muted);
-    font-size:11px;
-    font-weight:700;
-}
-
-.stat strong{
-    display:block;
-    margin-top:5px;
+.stat-number{
     font-size:25px;
-}
-
-/* =========================================================
-   PLAY PAGE
-   ========================================================= */
-
-.game-layout{
-    display:grid;
-    grid-template-columns:1fr 350px;
-    gap:22px;
-    align-items:start;
-}
-
-.board-card{
-    padding:24px;
-}
-
-.game-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-    margin-bottom:20px;
-}
-
-.game-title h2{
-    font-size:22px;
-}
-
-.game-title p{
-    font-size:12px;
-    color:var(--muted);
-    margin-top:4px;
-}
-
-.game-status{
-    padding:8px 13px;
-    border-radius:20px;
-    background:#eef4ff;
-    color:var(--blue);
-    font-size:11px;
     font-weight:900;
 }
 
+.stat-label{
+    color:#8d9bb2;
+    font-size:12px;
+    margin-top:5px;
+}
+
+/* =========================================================
+   GAME
+========================================================= */
+
+.game-area{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.game-status{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.turn-text{
+    font-size:19px;
+    font-weight:900;
+}
+
+.game-result{
+    margin-top:7px;
+    color:#40e58b;
+    font-weight:800;
+}
+
 .board{
-    width:min(560px,100%);
-    aspect-ratio:1/1;
-    margin:0 auto;
+    width:min(480px,90vw);
+    aspect-ratio:1;
     display:grid;
     grid-template-columns:repeat(5,1fr);
     gap:7px;
     padding:7px;
-    background:var(--navy);
+    background:#273958;
     border-radius:15px;
 }
 
 .cell{
     border:0;
     border-radius:9px;
-    background:white;
-    color:var(--navy);
-    font-size:clamp(28px,7vw,55px);
+    background:#0b1528;
+    color:white;
+    font-size:clamp(30px,8vw,58px);
     font-weight:1000;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    min-width:0;
-    aspect-ratio:1;
     transition:.15s;
 }
 
-.cell:hover:not(.locked){
-    background:#eaf2ff;
-    transform:scale(.97);
+.cell:hover{
+    background:#132441;
 }
 
 .cell.x{
-    color:var(--blue);
+    color:#ff405c;
 }
 
 .cell.o{
-    color:var(--red);
+    color:#4d9aff;
 }
 
-.cell.winner{
-    background:#fff0b8;
-    animation:pulseWinner .8s infinite alternate;
-}
-
-@keyframes pulseWinner{
-    from{transform:scale(1)}
-    to{transform:scale(.94)}
-}
-
-.cell.locked{
-    cursor:not-allowed;
+.cell.win{
+    background:#1f8b58;
+    color:white;
 }
 
 .game-actions{
     display:flex;
-    gap:8px;
-    justify-content:center;
-    margin-top:20px;
     flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+    margin-top:20px;
 }
 
-.players-card{
-    padding:20px;
+.small-btn{
+    border:0;
+    padding:10px 16px;
+    border-radius:9px;
+    color:white;
+    background:#1769ff;
+    font-weight:800;
 }
 
-.players-card h3{
+.small-btn.red{
+    background:#d92f48;
+}
+
+.small-btn.dark{
+    background:#24334d;
+}
+
+/* =========================================================
+   PANELS
+========================================================= */
+
+.panel{
+    margin-top:20px;
+}
+
+.panel h2{
+    font-size:19px;
     margin-bottom:15px;
 }
 
-.player-box{
-    border:1px solid var(--border);
-    border-radius:13px;
-    padding:14px;
-    margin-bottom:10px;
+.input-row{
     display:flex;
-    justify-content:space-between;
-    align-items:center;
+    gap:10px;
 }
 
-.player-box.active{
-    border-color:var(--blue);
-    background:#f2f7ff;
-}
-
-.player-name{
-    font-weight:900;
-    font-size:14px;
-}
-
-.player-symbol{
-    width:38px;
-    height:38px;
+.input-row input{
+    flex:1;
+    background:#080f1d;
+    border:1px solid #293958;
+    color:white;
+    padding:12px;
     border-radius:9px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:1000;
-    font-size:20px;
-    background:#edf2f7;
+    outline:none;
 }
 
-.x-symbol{
-    color:var(--blue);
-}
-
-.o-symbol{
-    color:var(--red);
-}
-
-.turn-box{
-    margin-top:18px;
-    padding:14px;
-    border-radius:12px;
-    background:#f5f8fc;
-    font-size:13px;
-    text-align:center;
-}
-
-.result-box{
-    display:none;
-    margin-top:16px;
-    padding:18px;
-    border-radius:14px;
-    text-align:center;
-}
-
-.result-box.show{
-    display:block;
-}
-
-.result-win{
-    background:#e9f9ef;
-    color:#117534;
-}
-
-.result-loss{
-    background:#fff0f0;
-    color:#b42318;
-}
-
-.result-draw{
-    background:#fff7e6;
-    color:#9a6500;
-}
-
-.result-box h3{
-    font-size:22px;
-    margin-bottom:5px;
-}
-
-.result-box p{
-    font-size:12px;
+.input-row button{
+    border:0;
+    padding:0 17px;
+    background:#1769ff;
+    color:#fff;
+    border-radius:9px;
+    font-weight:800;
 }
 
 /* =========================================================
-   ROOMS
-   ========================================================= */
+   LISTS
+========================================================= */
 
-.two-column{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
-}
-
-.form-card{
-    padding:25px;
-}
-
-.form-card h3{
-    margin-bottom:6px;
-}
-
-.form-card p{
-    color:var(--muted);
-    font-size:12px;
-    margin-bottom:18px;
-}
-
-.form-group{
-    margin-bottom:14px;
-}
-
-.room-code{
-    background:#eef4ff;
-    border:1px dashed var(--blue);
-    padding:18px;
-    border-radius:13px;
-    text-align:center;
-    margin-top:15px;
-}
-
-.room-code span{
-    display:block;
-    color:var(--muted);
-    font-size:10px;
-    margin-bottom:4px;
-}
-
-.room-code strong{
-    font-size:29px;
-    letter-spacing:4px;
-    color:var(--navy);
-}
-
-/* =========================================================
-   GROUPS
-   ========================================================= */
-
-.group-list{
-    margin-top:20px;
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:14px;
-}
-
-.group-item{
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:18px;
-    background:white;
-}
-
-.group-item h4{
-    font-size:16px;
-    margin-bottom:5px;
-}
-
-.group-item p{
-    color:var(--muted);
-    font-size:11px;
-}
-
-.group-actions{
+.list{
     display:flex;
-    gap:7px;
-    margin-top:13px;
+    flex-direction:column;
+    gap:10px;
 }
 
-.members{
-    margin-top:13px;
-    border-top:1px solid var(--border);
-    padding-top:12px;
-}
-
-.member-row{
+.list-item{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    gap:7px;
-    padding:7px 0;
-    font-size:12px;
-}
-
-/* =========================================================
-   REQUESTS
-   ========================================================= */
-
-.requests-list{
-    display:grid;
     gap:12px;
+    background:#080f1d;
+    border:1px solid #202e48;
+    padding:13px;
+    border-radius:11px;
 }
 
-.request{
-    background:white;
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:16px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:15px;
+.list-main{
+    min-width:0;
 }
 
-.request-info strong{
-    font-size:14px;
+.list-name{
+    font-weight:900;
 }
 
-.request-info small{
-    display:block;
-    color:var(--muted);
+.list-meta{
+    color:#8d9bb2;
+    font-size:12px;
     margin-top:4px;
 }
 
-.request-actions{
-    display:flex;
-    gap:7px;
-    flex-shrink:0;
-}
-
-/* =========================================================
-   LEADERBOARD
-   ========================================================= */
-
-.table-wrap{
-    overflow:auto;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    min-width:600px;
-}
-
-th,td{
-    padding:14px 12px;
-    border-bottom:1px solid var(--border);
-    text-align:left;
-    font-size:12px;
-}
-
-th{
-    background:#f7f9fc;
-    color:var(--muted);
-    font-size:10px;
-    text-transform:uppercase;
-    letter-spacing:.5px;
-}
-
 .rank{
-    font-weight:1000;
-    font-size:16px;
-}
-
-.me{
-    background:#eef5ff;
-}
-
-.medal{
     font-size:18px;
-}
-
-/* =========================================================
-   HISTORY
-   ========================================================= */
-
-.history-item{
-    background:white;
-    border:1px solid var(--border);
-    border-radius:13px;
-    padding:15px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-}
-
-.history-list{
-    display:grid;
-    gap:10px;
-}
-
-.result-tag{
-    padding:6px 10px;
-    border-radius:20px;
-    font-size:10px;
     font-weight:900;
-}
-
-.tag-win{
-    background:#e8f8ee;
-    color:#14763b;
-}
-
-.tag-loss{
-    background:#ffeded;
-    color:#b42318;
-}
-
-.tag-draw{
-    background:#fff5df;
-    color:#9a6500;
-}
-
-/* =========================================================
-   NAV
-   ========================================================= */
-
-.nav{
-    display:flex;
-    gap:7px;
-    overflow:auto;
-    margin-bottom:20px;
-    padding-bottom:3px;
-}
-
-.nav button{
-    white-space:nowrap;
-    background:white;
-    border:1px solid var(--border);
-    padding:10px 14px;
-    border-radius:10px;
-    color:var(--muted);
-    font-weight:800;
-    font-size:12px;
-}
-
-.nav button.active{
-    background:var(--navy);
-    color:white;
-    border-color:var(--navy);
-}
-
-/* =========================================================
-   TOAST
-   ========================================================= */
-
-#toastContainer{
-    position:fixed;
-    right:18px;
-    bottom:18px;
-    z-index:9999;
-    display:grid;
-    gap:9px;
-    width:min(360px,calc(100vw - 36px));
-}
-
-.toast{
-    background:var(--navy);
-    color:white;
-    padding:14px 16px;
-    border-radius:12px;
-    box-shadow:0 10px 30px rgba(0,0,0,.2);
-    font-size:12px;
-    animation:toastIn .2s ease;
-}
-
-.toast.success{
-    background:#117a3d;
-}
-
-.toast.error{
-    background:#b42318;
-}
-
-@keyframes toastIn{
-    from{
-        opacity:0;
-        transform:translateY(10px);
-    }
+    color:#ffd34d;
 }
 
 /* =========================================================
    MODAL
-   ========================================================= */
+========================================================= */
 
 .modal{
     position:fixed;
     inset:0;
-    background:rgba(4,15,29,.65);
-    z-index:500;
-    display:none;
+    background:rgba(0,0,0,.72);
+    display:flex;
     align-items:center;
     justify-content:center;
-    padding:18px;
+    z-index:500;
+    padding:20px;
 }
 
-.modal.show{
-    display:flex;
-}
-
-.modal-card{
-    width:min(600px,100%);
+.modal-box{
+    width:min(520px,100%);
+    background:#0d1729;
+    border:1px solid #293958;
+    border-radius:18px;
+    padding:22px;
     max-height:90vh;
     overflow:auto;
-    background:white;
-    border-radius:18px;
-    padding:25px;
 }
 
 .modal-header{
     display:flex;
-    justify-content:space-between;
     align-items:center;
-    margin-bottom:20px;
+    justify-content:space-between;
+    margin-bottom:18px;
 }
 
-.close-btn{
-    width:34px;
-    height:34px;
-    border-radius:9px;
-    background:#eef2f6;
-    font-weight:900;
+.close{
+    border:0;
+    background:#202e48;
+    color:white;
+    width:35px;
+    height:35px;
+    border-radius:50%;
 }
 
 /* =========================================================
-   EMPTY
-   ========================================================= */
-
-.empty{
-    text-align:center;
-    padding:40px 20px;
-    color:var(--muted);
-    font-size:13px;
-}
+   LOADING
+========================================================= */
 
 .loading{
+    position:fixed;
+    inset:0;
+    background:rgba(3,7,14,.78);
+    z-index:1000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.loader-box{
     text-align:center;
-    padding:30px;
-    color:var(--muted);
-    font-size:13px;
+}
+
+.spinner{
+    width:45px;
+    height:45px;
+    border:4px solid #263653;
+    border-top-color:#1769ff;
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+    margin:auto auto 15px;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
 }
 
 /* =========================================================
-   RESPONSIVE
-   ========================================================= */
+   TOAST
+========================================================= */
 
-@media(max-width:900px){
-
-    .dashboard-grid,
-    .game-layout{
-        grid-template-columns:1fr;
-    }
-
-    .two-column{
-        grid-template-columns:1fr;
-    }
-
-    .group-list{
-        grid-template-columns:1fr;
-    }
+.toast{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    background:#101c31;
+    border:1px solid #30415e;
+    color:white;
+    padding:14px 18px;
+    border-radius:10px;
+    z-index:2000;
+    max-width:350px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
 }
 
-@media(max-width:600px){
+.toast.success{
+    border-color:#236242;
+}
 
-    header{
-        padding:12px 14px;
-    }
-
-    main{
-        padding:17px 12px 45px;
-    }
-
-    .welcome-card{
-        padding:27px 20px;
-    }
-
-    .welcome-card h2{
-        font-size:25px;
-    }
-
-    .hero{
-        padding:23px 20px;
-    }
-
-    .hero h2{
-        font-size:25px;
-    }
-
-    .stats-grid{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-    .board-card{
-        padding:14px;
-    }
-
-    .game-top{
-        align-items:flex-start;
-    }
-
-    .game-status{
-        font-size:9px;
-    }
-
-    .player-mini-info{
-        display:none;
-    }
-
-    .request{
-        flex-direction:column;
-        align-items:flex-start;
-    }
-
-    .request-actions{
-        width:100%;
-    }
-
-    .request-actions button{
-        flex:1;
-    }
+.toast.error{
+    border-color:#6b2938;
 }
 </style>
-<script>(function(s){s.dataset.zone='11772998',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 </head>
 
 <body>
 
-<!-- =========================================================
+<!-- ========================================================
      HEADER
-     ========================================================= -->
+========================================================= -->
 
-<header>
-    <div class="header-inner">
+<header id="mainHeader" class="hidden">
 
-        <div class="logo">
-            <div class="logo-box">OX</div>
+    <div class="logo">
+        OX <span>FIGHTER</span> JETS
+    </div>
 
-            <div>
-                <h1>OX Arena</h1>
-                <small>5×5 Multiplayer</small>
-            </div>
+    <div class="header-right">
+
+        <div class="player-badge" id="headerPlayer">
+            Player
         </div>
 
-        <div class="player-mini" id="playerMini">
-            <div class="player-mini-info">
-                <strong id="miniName">Player</strong>
-                <span id="miniStats">0 Wins</span>
-            </div>
-
-            <div class="avatar" id="miniAvatar">P</div>
-        </div>
+        <button class="logout-btn" onclick="logout()">
+            Logout
+        </button>
 
     </div>
+
 </header>
 
 
-<!-- =========================================================
-     MAIN
-     ========================================================= -->
+<!-- ========================================================
+     AUTH SCREEN
+========================================================= -->
 
-<main>
+<section id="authScreen">
 
-    <!-- =====================================================
-         WELCOME
-         ===================================================== -->
+    <div class="auth-wrapper">
 
-    <section id="welcomePage" class="page active">
+        <div class="card">
 
-        <div class="card welcome-card">
+            <div class="title">
+                OX Fighter Jets
+            </div>
 
-            <div class="big-logo">OX</div>
+            <div class="subtitle">
+                5 × 5 multiplayer OX game
+            </div>
 
-            <h2>Welcome to OX Arena</h2>
+            <div class="auth-tabs">
 
-            <p>
-                Enter your name and start playing 5×5 OX
-                against random players, friends, groups or
-                private rooms.
-            </p>
-
-            <div class="name-wrap">
-
-                <label>Your Name</label>
-
-                <input
-                    id="playerNameInput"
-                    type="text"
-                    maxlength="40"
-                    placeholder="Enter your name"
-                    autocomplete="off"
+                <button
+                    id="loginTab"
+                    class="auth-tab active"
+                    onclick="showAuth('login')"
                 >
+                    Login
+                </button>
+
+                <button
+                    id="signupTab"
+                    class="auth-tab"
+                    onclick="showAuth('signup')"
+                >
+                    Signup
+                </button>
 
             </div>
 
-            <button
-                class="btn btn-primary full"
-                onclick="registerPlayer()"
-            >
-                Enter OX Arena
-            </button>
 
-            <div class="note">
-                Your player ID is stored in this browser so
-                you can continue using the same profile.
-            </div>
+            <!-- LOGIN -->
+
+            <form
+                id="loginForm"
+                onsubmit="login(event)"
+            >
+
+                <div class="form-group">
+
+                    <label>
+                        Username
+                    </label>
+
+                    <input
+                        id="loginUsername"
+                        type="text"
+                        maxlength="30"
+                        autocomplete="username"
+                        placeholder="Enter username"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Password
+                    </label>
+
+                    <input
+                        id="loginPassword"
+                        type="password"
+                        maxlength="128"
+                        autocomplete="current-password"
+                        placeholder="Enter password"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    class="primary-btn"
+                    type="submit"
+                >
+                    Login
+                </button>
+
+            </form>
+
+
+            <!-- SIGNUP -->
+
+            <form
+                id="signupForm"
+                class="hidden"
+                onsubmit="signup(event)"
+            >
+
+                <div class="form-group">
+
+                    <label>
+                        Your Name
+                    </label>
+
+                    <input
+                        id="signupName"
+                        type="text"
+                        maxlength="40"
+                        placeholder="Enter your name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Username
+                    </label>
+
+                    <input
+                        id="signupUsername"
+                        type="text"
+                        maxlength="30"
+                        autocomplete="username"
+                        placeholder="Choose a username"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Password
+                    </label>
+
+                    <input
+                        id="signupPassword"
+                        type="password"
+                        maxlength="128"
+                        autocomplete="new-password"
+                        placeholder="Minimum 6 characters"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Confirm Password
+                    </label>
+
+                    <input
+                        id="signupConfirmPassword"
+                        type="password"
+                        maxlength="128"
+                        autocomplete="new-password"
+                        placeholder="Confirm password"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    class="primary-btn"
+                    type="submit"
+                >
+                    Create Account
+                </button>
+
+            </form>
+
+
+            <div
+                id="authMessage"
+                class="auth-message"
+            ></div>
 
         </div>
 
-    </section>
+    </div>
+
+</section>
 
 
-    <!-- =====================================================
-         APP
-         ===================================================== -->
+<!-- ========================================================
+     APP
+========================================================= -->
 
-    <section id="appPage" class="page">
+<section
+    id="appScreen"
+    class="hidden"
+>
 
-        <!-- NAV -->
+    <div class="container">
 
-        <div class="nav">
-
-            <button
-                id="navHome"
-                class="active"
-                onclick="showPage('home')"
-            >
-                🏠 Home
-            </button>
-
-            <button
-                id="navGame"
-                onclick="showPage('game')"
-            >
-                🎮 Game
-            </button>
-
-            <button
-                id="navRooms"
-                onclick="showPage('rooms')"
-            >
-                🚪 Rooms
-            </button>
-
-            <button
-                id="navGroups"
-                onclick="showPage('groups')"
-            >
-                👥 Groups
-            </button>
-
-            <button
-                id="navRequests"
-                onclick="showPage('requests')"
-            >
-                🔔 Requests
-            </button>
-
-            <button
-                id="navLeaderboard"
-                onclick="showPage('leaderboard')"
-            >
-                🏆 Leaderboard
-            </button>
-
-            <button
-                id="navHistory"
-                onclick="showPage('history')"
-            >
-                📜 History
-            </button>
-
-        </div>
+        <div class="dashboard-grid">
 
 
-        <!-- =================================================
-             HOME
-             ================================================= -->
+            <!-- LEFT -->
 
-        <section id="homePage" class="subpage">
+            <div>
 
-            <div class="dashboard-grid">
+                <div class="card">
 
-                <div class="card hero">
+                    <div class="title">
+                        Welcome, <span id="welcomeName"></span>
+                    </div>
 
-                    <h2>Ready for a match?</h2>
+                    <div class="subtitle">
+                        Your OX Fighter Jets profile
+                    </div>
 
-                    <p>
-                        Play 5×5 OX against a random player,
-                        challenge someone directly, join a
-                        private room or play with your group.
-                    </p>
 
-                    <div class="hero-actions">
+                    <div class="stats-grid">
+
+                        <div class="stat">
+
+                            <div
+                                class="stat-number"
+                                id="statWins"
+                            >
+                                0
+                            </div>
+
+                            <div class="stat-label">
+                                Wins
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat">
+
+                            <div
+                                class="stat-number"
+                                id="statLosses"
+                            >
+                                0
+                            </div>
+
+                            <div class="stat-label">
+                                Losses
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat">
+
+                            <div
+                                class="stat-number"
+                                id="statDraws"
+                            >
+                                0
+                            </div>
+
+                            <div class="stat-label">
+                                Draws
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat">
+
+                            <div
+                                class="stat-number"
+                                id="statWinRate"
+                            >
+                                0%
+                            </div>
+
+                            <div class="stat-label">
+                                Win Rate
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="action-grid">
 
                         <button
-                            class="btn btn-primary"
-                            onclick="startRandomMatch()"
+                            class="action-btn green"
+                            onclick="startRandomGame()"
                         >
-                            🎮 Play Random
+                            🎮 Random Match
                         </button>
 
                         <button
-                            class="btn btn-light"
-                            onclick="showPage('rooms')"
+                            class="action-btn"
+                            onclick="openRoomModal()"
                         >
-                            🚪 Create Room
+                            🔐 Private Room
                         </button>
 
                         <button
-                            class="btn btn-light"
-                            onclick="showPage('groups')"
+                            class="action-btn"
+                            onclick="openGroupsModal()"
                         >
                             👥 Groups
+                        </button>
+
+                        <button
+                            class="action-btn gold"
+                            onclick="loadLeaderboard()"
+                        >
+                            🏆 Leaderboard
+                        </button>
+
+                        <button
+                            class="action-btn"
+                            onclick="loadHistory()"
+                        >
+                            📜 Game History
+                        </button>
+
+                        <button
+                            class="action-btn red"
+                            onclick="loadRequests()"
+                        >
+                            ✉ Requests
                         </button>
 
                     </div>
@@ -1233,22 +927,160 @@ th{
                 </div>
 
 
-                <div class="card mode-card">
+                <!-- MATCHMAKING -->
 
-                    <h3>5×5 OX</h3>
+                <div
+                    id="matchCard"
+                    class="card panel hidden"
+                >
 
-                    <p>
-                        Place X or O on the board.
-                        The first player to create five
-                        consecutive symbols horizontally,
-                        vertically or diagonally wins.
-                    </p>
+                    <h2>
+                        Finding Opponent
+                    </h2>
 
-                    <div style="margin-top:18px">
+                    <div
+                        id="matchStatus"
+                        class="subtitle"
+                    >
+                        Searching...
+                    </div>
+
+                    <button
+                        class="small-btn red"
+                        onclick="cancelMatchmaking()"
+                    >
+                        Cancel Search
+                    </button>
+
+                </div>
+
+
+                <!-- GAME -->
+
+                <div
+                    id="gameCard"
+                    class="card panel hidden"
+                >
+
+                    <div class="game-area">
+
+                        <div class="game-status">
+
+                            <div
+                                id="turnText"
+                                class="turn-text"
+                            >
+                                Loading...
+                            </div>
+
+                            <div
+                                id="gameResult"
+                                class="game-result"
+                            ></div>
+
+                        </div>
+
+
+                        <div
+                            id="board"
+                            class="board"
+                        ></div>
+
+
+                        <div class="game-actions">
+
+                            <button
+                                class="small-btn red"
+                                onclick="resignGame()"
+                            >
+                                Resign
+                            </button>
+
+                            <button
+                                id="rematchBtn"
+                                class="small-btn"
+                                onclick="rematchGame()"
+                            >
+                                Rematch
+                            </button>
+
+                            <button
+                                class="small-btn dark"
+                                onclick="closeGame()"
+                            >
+                                Close
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RIGHT -->
+
+            <div>
+
+                <div class="card">
+
+                    <h2>
+                        Player ID
+                    </h2>
+
+                    <div
+                        id="profileId"
+                        style="
+                        margin-top:10px;
+                        background:#080f1d;
+                        border:1px solid #202e48;
+                        padding:13px;
+                        border-radius:10px;
+                        font-family:monospace;
+                        word-break:break-all;
+                        "
+                    >
+                        -
+                    </div>
+
+                    <div
+                        id="profileUsername"
+                        class="subtitle"
+                        style="margin-top:10px;margin-bottom:0"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="card panel">
+
+                    <h2>
+                        Quick Actions
+                    </h2>
+
+                    <div class="list">
 
                         <button
-                            class="btn btn-dark full"
-                            onclick="loadLeaderboard();showPage('leaderboard')"
+                            class="action-btn"
+                            onclick="refreshProfile()"
+                        >
+                            🔄 Refresh Profile
+                        </button>
+
+                        <button
+                            class="action-btn"
+                            onclick="checkActiveGame()"
+                        >
+                            🎯 Find Active Game
+                        </button>
+
+                        <button
+                            class="action-btn"
+                            onclick="loadLeaderboard()"
                         >
                             🏆 View Leaderboard
                         </button>
@@ -1259,734 +1091,108 @@ th{
 
             </div>
 
+        </div>
 
-            <div class="stats-grid">
+    </div>
 
-                <div class="stat">
-                    <span>Games</span>
-                    <strong id="statGames">0</strong>
-                </div>
+</section>
 
-                <div class="stat">
-                    <span>Wins</span>
-                    <strong id="statWins">0</strong>
-                </div>
 
-                <div class="stat">
-                    <span>Losses</span>
-                    <strong id="statLosses">0</strong>
-                </div>
-
-                <div class="stat">
-                    <span>Win Rate</span>
-                    <strong id="statRate">0%</strong>
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             GAME
-             ================================================= -->
-
-        <section id="gamePage" class="subpage" style="display:none">
-
-            <div class="game-layout">
-
-                <div class="card board-card">
-
-                    <div class="game-top">
-
-                        <div class="game-title">
-                            <h2>5×5 OX Match</h2>
-                            <p id="gameIdText">
-                                Waiting for game...
-                            </p>
-                        </div>
-
-                        <div
-                            class="game-status"
-                            id="gameStatus"
-                        >
-                            WAITING
-                        </div>
-
-                    </div>
-
-                    <div
-                        class="board"
-                        id="board"
-                    >
-                    </div>
-
-                    <div class="turn-box" id="turnBox">
-                        Waiting for game...
-                    </div>
-
-                    <div
-                        class="result-box"
-                        id="resultBox"
-                    >
-                        <h3 id="resultTitle"></h3>
-                        <p id="resultMessage"></p>
-
-                        <div class="game-actions">
-
-                            <button
-                                class="btn btn-primary"
-                                id="rematchBtn"
-                                onclick="requestRematch()"
-                                style="display:none"
-                            >
-                                🔄 Rematch
-                            </button>
-
-                            <button
-                                class="btn btn-light"
-                                onclick="showPage('home')"
-                            >
-                                🏠 Home
-                            </button>
-
-                        </div>
-                    </div>
-
-                    <div class="game-actions">
-
-                        <button
-                            class="btn btn-danger btn-small"
-                            id="resignBtn"
-                            onclick="resignGame()"
-                            style="display:none"
-                        >
-                            🏳 Resign
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                <div>
-
-                    <div class="card players-card">
-
-                        <h3>Players</h3>
-
-                        <div id="playersContainer">
-                            <div class="empty">
-                                No active game
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div
-                        class="card players-card"
-                        style="margin-top:15px"
-                    >
-
-                        <h3>Match Info</h3>
-
-                        <div style="font-size:12px;color:#64748b;line-height:1.8">
-
-                            <div>
-                                Board:
-                                <strong>5 × 5</strong>
-                            </div>
-
-                            <div>
-                                Win:
-                                <strong>5 consecutive</strong>
-                            </div>
-
-                            <div>
-                                Directions:
-                                <strong>4</strong>
-                            </div>
-
-                            <div>
-                                Mode:
-                                <strong id="gameModeText">Random</strong>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             ROOMS
-             ================================================= -->
-
-        <section id="roomsPage" class="subpage" style="display:none">
-
-            <div class="section-title">
-                Private Rooms
-            </div>
-
-            <div class="section-subtitle">
-                Create a room and share the room ID with another player.
-            </div>
-
-
-            <div class="two-column">
-
-                <div class="card form-card">
-
-                    <h3>Create Room</h3>
-
-                    <p>
-                        Leave the custom ID empty and the system
-                        will generate a unique room ID automatically.
-                    </p>
-
-                    <div class="form-group">
-
-                        <label>
-                            Custom Room ID (optional)
-                        </label>
-
-                        <input
-                            id="customRoomId"
-                            maxlength="30"
-                            placeholder="Example: IT2OX"
-                        >
-
-                    </div>
-
-                    <button
-                        class="btn btn-primary full"
-                        onclick="createRoom()"
-                    >
-                        🚪 Create Room
-                    </button>
-
-                    <div
-                        id="createdRoomBox"
-                        style="display:none"
-                    >
-
-                        <div class="room-code">
-
-                            <span>Your Room ID</span>
-
-                            <strong id="createdRoomId">
-                                ------ 
-                            </strong>
-
-                        </div>
-
-                        <button
-                            class="btn btn-light full"
-                            onclick="copyRoomId()"
-                        >
-                            📋 Copy Room ID
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                <div class="card form-card">
-
-                    <h3>Join Room</h3>
-
-                    <p>
-                        Enter a room ID shared by another player.
-                    </p>
-
-                    <div class="form-group">
-
-                        <label>Room ID</label>
-
-                        <input
-                            id="joinRoomId"
-                            maxlength="30"
-                            placeholder="Example: A91K2P"
-                            style="text-transform:uppercase"
-                        >
-
-                    </div>
-
-                    <button
-                        class="btn btn-dark full"
-                        onclick="joinRoom()"
-                    >
-                        🚀 Join Room
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <div
-                class="card form-card"
-                style="margin-top:20px"
-            >
-
-                <h3>Check Room</h3>
-
-                <p>
-                    You can check whether a room is waiting,
-                    playing or already occupied.
-                </p>
-
-                <div style="display:flex;gap:10px">
-
-                    <input
-                        id="checkRoomId"
-                        placeholder="Room ID"
-                        style="text-transform:uppercase"
-                    >
-
-                    <button
-                        class="btn btn-primary"
-                        onclick="checkRoom()"
-                    >
-                        Check
-                    </button>
-
-                </div>
-
-                <div id="roomInfo"></div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             GROUPS
-             ================================================= -->
-
-        <section id="groupsPage" class="subpage" style="display:none">
-
-            <div class="section-title">
-                Groups
-            </div>
-
-            <div class="section-subtitle">
-                Create groups such as IT 2 2nd Year, CSE 2,
-                AIML 3, etc. Then challenge any group member.
-            </div>
-
-
-            <div class="two-column">
-
-                <div class="card form-card">
-
-                    <h3>Create Group</h3>
-
-                    <p>
-                        Give your group any name you want.
-                    </p>
-
-                    <div class="form-group">
-
-                        <label>Group Name</label>
-
-                        <input
-                            id="groupNameInput"
-                            maxlength="60"
-                            placeholder="IT 2 2nd Year"
-                        >
-
-                    </div>
-
-                    <button
-                        class="btn btn-primary full"
-                        onclick="createGroup()"
-                    >
-                        ➕ Create Group
-                    </button>
-
-                </div>
-
-
-                <div class="card form-card">
-
-                    <h3>Join Group</h3>
-
-                    <p>
-                        Enter the group ID to join an existing group.
-                    </p>
-
-                    <div class="form-group">
-
-                        <label>Group ID</label>
-
-                        <input
-                            id="joinGroupId"
-                            placeholder="group_..."
-                        >
-
-                    </div>
-
-                    <button
-                        class="btn btn-dark full"
-                        onclick="joinGroup()"
-                    >
-                        👥 Join Group
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <div
-                class="card form-card"
-                style="margin-top:20px"
-            >
-
-                <div style="
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:center;
-                    gap:10px;
-                ">
-
-                    <div>
-                        <h3>Available Groups</h3>
-                        <p style="margin-bottom:0">
-                            Open a group to see members and challenge them.
-                        </p>
-                    </div>
-
-                    <button
-                        class="btn btn-light btn-small"
-                        onclick="loadGroups()"
-                    >
-                        ↻ Refresh
-                    </button>
-
-                </div>
-
-                <div
-                    class="group-list"
-                    id="groupsList"
-                >
-                    <div class="loading">
-                        Loading groups...
-                    </div>
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             REQUESTS
-             ================================================= -->
-
-        <section id="requestsPage" class="subpage" style="display:none">
-
-            <div class="section-title">
-                Game Requests
-            </div>
-
-            <div class="section-subtitle">
-                Accept a challenge to immediately start an OX match.
-            </div>
-
-
-            <div class="card form-card">
-
-                <div style="
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:center;
-                    margin-bottom:15px;
-                ">
-
-                    <h3>Received Requests</h3>
-
-                    <button
-                        class="btn btn-light btn-small"
-                        onclick="loadRequests()"
-                    >
-                        ↻ Refresh
-                    </button>
-
-                </div>
-
-                <div
-                    class="requests-list"
-                    id="requestsList"
-                >
-                    <div class="loading">
-                        Loading requests...
-                    </div>
-                </div>
-
-            </div>
-
-
-            <div
-                class="card form-card"
-                style="margin-top:20px"
-            >
-
-                <h3>Send Direct Challenge</h3>
-
-                <p>
-                    If you know another player's ID, you can send
-                    them a direct game request.
-                </p>
-
-                <div style="display:flex;gap:10px">
-
-                    <input
-                        id="targetPlayerId"
-                        placeholder="Player ID"
-                    >
-
-                    <button
-                        class="btn btn-primary"
-                        onclick="sendDirectRequest()"
-                    >
-                        Challenge
-                    </button>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             LEADERBOARD
-             ================================================= -->
-
-        <section id="leaderboardPage" class="subpage" style="display:none">
-
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-                margin-bottom:18px;
-                gap:10px;
-            ">
-
-                <div>
-
-                    <div class="section-title">
-                        🏆 Leaderboard
-                    </div>
-
-                    <div class="section-subtitle"
-                         style="margin-bottom:0">
-                        Players are ranked primarily by total wins.
-                    </div>
-
-                </div>
-
-                <button
-                    class="btn btn-light"
-                    onclick="loadLeaderboard()"
-                >
-                    ↻ Refresh
-                </button>
-
-            </div>
-
-
-            <div class="card form-card">
-
-                <div class="table-wrap">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-                                <th>Rank</th>
-                                <th>Player</th>
-                                <th>Games</th>
-                                <th>Wins</th>
-                                <th>Losses</th>
-                                <th>Draws</th>
-                                <th>Win Rate</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody id="leaderboardBody">
-
-                            <tr>
-                                <td colspan="7">
-                                    <div class="loading">
-                                        Loading leaderboard...
-                                    </div>
-                                </td>
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             HISTORY
-             ================================================= -->
-
-        <section id="historyPage" class="subpage" style="display:none">
-
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-                margin-bottom:18px;
-            ">
-
-                <div>
-
-                    <div class="section-title">
-                        📜 Game History
-                    </div>
-
-                    <div class="section-subtitle"
-                         style="margin-bottom:0">
-                        Your recent completed matches.
-                    </div>
-
-                </div>
-
-                <button
-                    class="btn btn-light"
-                    onclick="loadHistory()"
-                >
-                    ↻ Refresh
-                </button>
-
-            </div>
-
-
-            <div class="card form-card">
-
-                <div
-                    class="history-list"
-                    id="historyList"
-                >
-                    <div class="loading">
-                        Loading history...
-                    </div>
-                </div>
-
-            </div>
-
-        </section>
-
-    </section>
-
-</main>
-
-
-<!-- =========================================================
-     GROUP MODAL
-     ========================================================= -->
+<!-- ========================================================
+     GENERIC MODAL
+========================================================= -->
 
 <div
-    class="modal"
-    id="groupModal"
+    id="modal"
+    class="modal hidden"
+    onclick="modalBackgroundClick(event)"
 >
 
-    <div class="modal-card">
+    <div
+        id="modalBox"
+        class="modal-box"
+    >
 
         <div class="modal-header">
 
-            <div>
-                <h3 id="modalGroupName">
-                    Group
-                </h3>
-
-                <small
-                    id="modalGroupId"
-                    style="color:#64748b"
-                ></small>
-            </div>
+            <h2 id="modalTitle">
+                Modal
+            </h2>
 
             <button
-                class="close-btn"
-                onclick="closeGroupModal()"
+                class="close"
+                onclick="closeModal()"
             >
                 ×
             </button>
 
         </div>
 
-        <div id="modalMembers"></div>
+        <div id="modalContent"></div>
 
     </div>
 
 </div>
 
 
-<!-- =========================================================
-     TOAST
-     ========================================================= -->
+<!-- ========================================================
+     LOADING
+========================================================= -->
 
-<div id="toastContainer"></div>
+<div
+    id="loading"
+    class="loading hidden"
+>
+
+    <div class="loader-box">
+
+        <div class="spinner"></div>
+
+        <div id="loadingText">
+            Please wait...
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================
+     TOAST
+========================================================= -->
+
+<div
+    id="toast"
+    class="toast hidden"
+></div>
 
 
 <script>
 
 /* =========================================================
-   CONFIG
-   =========================================================
+   CONFIGURATION
+========================================================= */
 
-   IMPORTANT:
-   Change this if your backend URL is different.
+const API_BASE_URL =
+    "https://oxfighterjets.onrender.com";
 
-   Your Render backend:
-   https://oxfighterjets.onrender.com
-
-   ========================================================= */
-
-const API_BASE = "https://oxfighterjets.onrender.com/api/ox";
+const API_PREFIX =
+    `${API_BASE_URL}/api/ox`;
 
 
 /* =========================================================
-   STATE
-   ========================================================= */
+   GLOBAL STATE
+========================================================= */
 
-let playerId =
-    localStorage.getItem("oxPlayerId") || null;
-
-let playerName =
-    localStorage.getItem("oxPlayerName") || null;
-
+let currentPlayer = null;
 let currentGame = null;
-
-let gamePollTimer = null;
-
+let pollingTimer = null;
 let matchmakingTimer = null;
-
-let currentGroup = null;
 
 
 /* =========================================================
    DOM HELPERS
-   ========================================================= */
+========================================================= */
 
 function $(id){
     return document.getElementById(id);
@@ -1994,494 +1200,651 @@ function $(id){
 
 
 /* =========================================================
+   LOADING
+========================================================= */
+
+function showLoading(text="Please wait..."){
+
+    $("loadingText").textContent = text;
+
+    $("loading").classList.remove("hidden");
+}
+
+
+function hideLoading(){
+
+    $("loading").classList.add("hidden");
+}
+
+
+/* =========================================================
    TOAST
-   ========================================================= */
+========================================================= */
 
-function toast(message,type=""){
-    const container = $("toastContainer");
+function showToast(message,type="success"){
 
-    const div = document.createElement("div");
+    const toast = $("toast");
 
-    div.className =
-        "toast" +
-        (type ? " " + type : "");
+    toast.textContent = message;
 
-    div.textContent = message;
-
-    container.appendChild(div);
+    toast.className =
+        "toast " +
+        (type === "error" ? "error" : "success");
 
     setTimeout(()=>{
-        div.remove();
+        toast.classList.add("hidden");
     },3500);
 }
 
 
 /* =========================================================
-   API HELPER
-   ========================================================= */
+   API REQUEST
+========================================================= */
 
-async function api(path,options={}){
+async function apiRequest(
+    endpoint,
+    options={}
+){
 
-    const config = {
-        method: options.method || "GET",
-        headers:{
-            "Content-Type":"application/json",
-            ...(options.headers || {})
-        }
+    const token =
+        localStorage.getItem("oxToken");
+
+    const headers = {
+        "Content-Type":"application/json",
+        ...(options.headers || {})
     };
 
-    if(options.body !== undefined){
-        config.body =
-            typeof options.body === "string"
-            ? options.body
-            : JSON.stringify(options.body);
-    }
-
-    const response =
-        await fetch(API_BASE + path,config);
-
-    let data = {};
-
-    try{
-        data = await response.json();
-    }
-    catch(e){
-        data = {};
-    }
-
-    if(!response.ok || data.success === false){
-
-        throw new Error(
-            data.error ||
-            data.message ||
-            `Request failed (${response.status})`
-        );
-    }
-
-    return data;
-}
-
-
-/* =========================================================
-   INIT
-   ========================================================= */
-
-document.addEventListener("DOMContentLoaded",()=>{
-
-    if(playerId && playerName){
-
-        showApp();
-
-        loadMyStats();
-
-        loadLeaderboard();
-
-        loadGroups();
-
-        loadRequests();
-
-        loadHistory();
-
-        restoreActiveGame();
-
-    }
-    else{
-
-        showWelcome();
-
-    }
-
-});
-
-
-/* =========================================================
-   WELCOME
-   ========================================================= */
-
-function showWelcome(){
-
-    $("welcomePage").classList.add("active");
-
-    $("appPage").classList.remove("active");
-
-}
-
-
-function showApp(){
-
-    $("welcomePage").classList.remove("active");
-
-    $("appPage").classList.add("active");
-
-    $("playerMini").style.display = "flex";
-
-    $("miniName").textContent =
-        playerName;
-
-    $("miniAvatar").textContent =
-        playerName
-        ? playerName.charAt(0).toUpperCase()
-        : "P";
-
-}
-
-
-/* =========================================================
-   REGISTER PLAYER
-   ========================================================= */
-
-async function registerPlayer(){
-
-    const input =
-        $("playerNameInput");
-
-    const name =
-        input.value.trim();
-
-    if(!name){
-
-        toast(
-            "Please enter your name.",
-            "error"
-        );
-
-        input.focus();
-
-        return;
-    }
-
-    if(name.length < 2){
-
-        toast(
-            "Name must contain at least 2 characters.",
-            "error"
-        );
-
-        return;
+    if(token){
+        headers["Authorization"] =
+            `Bearer ${token}`;
     }
 
     try{
 
-        input.disabled = true;
-
-        const data =
-            await api(
-                "/player/register",
+        const response =
+            await fetch(
+                `${API_PREFIX}${endpoint}`,
                 {
-                    method:"POST",
-                    body:{
-                        playerId,
-                        name
-                    }
+                    ...options,
+                    headers
                 }
             );
 
-        playerId =
-            data.player.playerId;
+        let data = {};
 
-        playerName =
-            data.player.name;
+        try{
+            data = await response.json();
+        }catch{
+            data = {};
+        }
 
-        localStorage.setItem(
-            "oxPlayerId",
-            playerId
+        if(response.status === 401){
+
+            if(
+                endpoint !== "/auth/login" &&
+                endpoint !== "/auth/signup"
+            ){
+
+                localStorage.removeItem("oxToken");
+                currentPlayer = null;
+
+                showAuthScreen();
+
+            }
+        }
+
+        if(!response.ok){
+
+            throw new Error(
+                data.message ||
+                `Request failed (${response.status})`
+            );
+        }
+
+        return data;
+
+    }catch(error){
+
+        console.error(
+            "OX API Error:",
+            endpoint,
+            error
         );
 
-        localStorage.setItem(
-            "oxPlayerName",
-            playerName
-        );
-
-        showApp();
-
-        await loadMyStats();
-
-        await loadLeaderboard();
-
-        await loadGroups();
-
-        await loadRequests();
-
-        await loadHistory();
-
-        toast(
-            "Welcome to OX Arena!",
-            "success"
-        );
-
+        throw error;
     }
-    catch(error){
+}
 
-        toast(
+
+/* =========================================================
+   AUTH TABS
+========================================================= */
+
+function showAuth(type){
+
+    const login =
+        type === "login";
+
+    $("loginForm")
+        .classList.toggle(
+            "hidden",
+            !login
+        );
+
+    $("signupForm")
+        .classList.toggle(
+            "hidden",
+            login
+        );
+
+    $("loginTab")
+        .classList.toggle(
+            "active",
+            login
+        );
+
+    $("signupTab")
+        .classList.toggle(
+            "active",
+            !login
+        );
+
+    $("authMessage").textContent = "";
+}
+
+
+/* =========================================================
+   AUTH SCREEN
+========================================================= */
+
+function showAuthScreen(){
+
+    $("authScreen")
+        .classList.remove("hidden");
+
+    $("appScreen")
+        .classList.add("hidden");
+
+    $("mainHeader")
+        .classList.add("hidden");
+
+    $("gameCard")
+        .classList.add("hidden");
+
+    $("matchCard")
+        .classList.add("hidden");
+
+    stopGamePolling();
+    stopMatchmakingPolling();
+}
+
+
+/* =========================================================
+   APP SCREEN
+========================================================= */
+
+function showAppScreen(){
+
+    $("authScreen")
+        .classList.add("hidden");
+
+    $("appScreen")
+        .classList.remove("hidden");
+
+    $("mainHeader")
+        .classList.remove("hidden");
+}
+
+
+/* =========================================================
+   SIGNUP
+========================================================= */
+
+async function signup(event){
+
+    event.preventDefault();
+
+    const name =
+        $("signupName")
+        .value
+        .trim();
+
+    const username =
+        $("signupUsername")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const password =
+        $("signupPassword")
+        .value;
+
+    const confirmPassword =
+        $("signupConfirmPassword")
+        .value;
+
+
+    if(!name){
+
+        setAuthMessage(
+            "Please enter your name.",
+            true
+        );
+
+        return;
+    }
+
+
+    if(!username){
+
+        setAuthMessage(
+            "Please enter a username.",
+            true
+        );
+
+        return;
+    }
+
+
+    if(!/^[a-zA-Z0-9_-]{3,30}$/.test(username)){
+
+        setAuthMessage(
+            "Username must be 3-30 characters and use only letters, numbers, _ or -.",
+            true
+        );
+
+        return;
+    }
+
+
+    if(password.length < 6){
+
+        setAuthMessage(
+            "Password must be at least 6 characters.",
+            true
+        );
+
+        return;
+    }
+
+
+    if(password !== confirmPassword){
+
+        setAuthMessage(
+            "Passwords do not match.",
+            true
+        );
+
+        return;
+    }
+
+
+    try{
+
+        showLoading(
+            "Creating your account..."
+        );
+
+        const data =
+            await apiRequest(
+                "/auth/signup",
+                {
+                    method:"POST",
+                    body:JSON.stringify({
+                        name,
+                        username,
+                        password
+                    })
+                }
+            );
+
+
+        localStorage.setItem(
+            "oxToken",
+            data.token
+        );
+
+
+        currentPlayer =
+            data.player;
+
+
+        hideLoading();
+
+        showToast(
+            "Account created successfully!"
+        );
+
+
+        openDashboard();
+
+    }catch(error){
+
+        hideLoading();
+
+        setAuthMessage(
+            error.message,
+            true
+        );
+    }
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+async function login(event){
+
+    event.preventDefault();
+
+    const username =
+        $("loginUsername")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const password =
+        $("loginPassword")
+        .value;
+
+
+    if(!username || !password){
+
+        setAuthMessage(
+            "Username and password are required.",
+            true
+        );
+
+        return;
+    }
+
+
+    try{
+
+        showLoading(
+            "Logging in..."
+        );
+
+        const data =
+            await apiRequest(
+                "/auth/login",
+                {
+                    method:"POST",
+                    body:JSON.stringify({
+                        username,
+                        password
+                    })
+                }
+            );
+
+
+        localStorage.setItem(
+            "oxToken",
+            data.token
+        );
+
+
+        currentPlayer =
+            data.player;
+
+
+        hideLoading();
+
+        showToast(
+            "Login successful!"
+        );
+
+
+        openDashboard();
+
+    }catch(error){
+
+        hideLoading();
+
+        setAuthMessage(
+            error.message,
+            true
+        );
+    }
+}
+
+
+/* =========================================================
+   AUTH MESSAGE
+========================================================= */
+
+function setAuthMessage(
+    message,
+    isError=false
+){
+
+    const el =
+        $("authMessage");
+
+    el.textContent =
+        message;
+
+    el.className =
+        "auth-message " +
+        (isError ? "error" : "success");
+}
+
+
+/* =========================================================
+   OPEN DASHBOARD
+========================================================= */
+
+function openDashboard(){
+
+    showAppScreen();
+
+    updateProfileUI();
+
+    checkActiveGame();
+
+    loadProfileSilently();
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+function updateProfileUI(){
+
+    if(!currentPlayer){
+        return;
+    }
+
+    $("welcomeName").textContent =
+        currentPlayer.name;
+
+    $("headerPlayer").textContent =
+        `@${currentPlayer.username}`;
+
+    $("profileId").textContent =
+        currentPlayer.playerId;
+
+    $("profileUsername").textContent =
+        `Username: @${currentPlayer.username}`;
+
+    $("statWins").textContent =
+        currentPlayer.wins || 0;
+
+    $("statLosses").textContent =
+        currentPlayer.losses || 0;
+
+    $("statDraws").textContent =
+        currentPlayer.draws || 0;
+
+    $("statWinRate").textContent =
+        `${currentPlayer.winRate || 0}%`;
+}
+
+
+async function loadProfileSilently(){
+
+    try{
+
+        const data =
+            await apiRequest(
+                "/auth/me"
+            );
+
+        currentPlayer =
+            data.player;
+
+        updateProfileUI();
+
+    }catch(error){
+
+        console.error(
+            "Profile error:",
+            error
+        );
+    }
+}
+
+
+async function refreshProfile(){
+
+    try{
+
+        showLoading(
+            "Refreshing profile..."
+        );
+
+        const data =
+            await apiRequest(
+                "/auth/me"
+            );
+
+        currentPlayer =
+            data.player;
+
+        updateProfileUI();
+
+        hideLoading();
+
+        showToast(
+            "Profile refreshed."
+        );
+
+    }catch(error){
+
+        hideLoading();
+
+        showToast(
             error.message,
             "error"
         );
-
     }
-    finally{
-
-        input.disabled = false;
-
-    }
-
 }
 
 
 /* =========================================================
-   NAVIGATION
-   ========================================================= */
+   LOGOUT
+========================================================= */
 
-function showPage(page){
-
-    const pages = [
-        "home",
-        "game",
-        "rooms",
-        "groups",
-        "requests",
-        "leaderboard",
-        "history"
-    ];
-
-    pages.forEach(name=>{
-
-        const element =
-            $(name + "Page");
-
-        if(element){
-
-            element.style.display =
-                name === page
-                ? "block"
-                : "none";
-
-        }
-
-        const nav =
-            $("nav" +
-              name.charAt(0).toUpperCase() +
-              name.slice(1));
-
-        if(nav){
-
-            nav.classList.toggle(
-                "active",
-                name === page
-            );
-
-        }
-
-    });
-
-
-    if(page === "leaderboard"){
-        loadLeaderboard();
-    }
-
-    if(page === "groups"){
-        loadGroups();
-    }
-
-    if(page === "requests"){
-        loadRequests();
-    }
-
-    if(page === "history"){
-        loadHistory();
-    }
-
-}
-
-
-/* =========================================================
-   MY STATS
-   ========================================================= */
-
-async function loadMyStats(){
-
-    if(!playerId) return;
+async function logout(){
 
     try{
 
-        const data =
-            await api(
-                `/stats/${encodeURIComponent(playerId)}`
-            );
-
-        const stats =
-            data.stats;
-
-        $("statGames").textContent =
-            stats.games;
-
-        $("statWins").textContent =
-            stats.wins;
-
-        $("statLosses").textContent =
-            stats.losses;
-
-        $("statRate").textContent =
-            stats.winRate + "%";
-
-        $("miniStats").textContent =
-            `${stats.wins} Wins • Rank #${stats.rank}`;
-
-    }
-    catch(error){
-
-        console.error(
-            "Stats error:",
-            error
+        await apiRequest(
+            "/auth/logout",
+            {
+                method:"POST"
+            }
         );
 
-    }
+    }catch(error){
 
-}
+        console.error(error);
 
+    }finally{
 
-/* =========================================================
-   RESTORE ACTIVE GAME
-   ========================================================= */
-
-async function restoreActiveGame(){
-
-    if(!playerId) return;
-
-    try{
-
-        const data =
-            await api(
-                `/my-game?playerId=${encodeURIComponent(playerId)}`
-            );
-
-        if(data.game){
-
-            currentGame =
-                data.game;
-
-            renderGame(
-                currentGame
-            );
-
-            showPage("game");
-
-            startGamePolling();
-
-        }
-
-    }
-    catch(error){
-
-        console.error(
-            "Restore game error:",
-            error
+        localStorage.removeItem(
+            "oxToken"
         );
 
-    }
+        currentPlayer = null;
 
+        showAuthScreen();
+
+        showToast(
+            "Logged out."
+        );
+    }
 }
 
 
 /* =========================================================
    RANDOM MATCH
-   ========================================================= */
+========================================================= */
 
-async function startRandomMatch(){
+async function startRandomGame(){
 
-    if(!playerId){
+    if(!currentPlayer){
 
-        toast(
-            "Please register first.",
-            "error"
-        );
+        showAuthScreen();
 
         return;
     }
 
-    if(currentGame &&
-       currentGame.status === "playing"){
-
-        renderGame(currentGame);
-
-        showPage("game");
-
-        toast(
-            "You already have an active game.",
-            "error"
-        );
-
-        return;
-    }
 
     try{
 
-        stopMatchmakingPolling();
+        $("matchCard")
+            .classList.remove("hidden");
 
-        toast(
-            "Finding an opponent..."
-        );
+        $("matchStatus")
+            .textContent =
+            "Searching for an opponent...";
+
 
         const data =
-            await api(
+            await apiRequest(
                 "/matchmaking/join",
                 {
-                    method:"POST",
-                    body:{
-                        playerId
-                    }
+                    method:"POST"
                 }
             );
 
+
         if(data.matched && data.game){
 
-            currentGame =
-                data.game;
+            stopMatchmakingPolling();
 
-            $("gameModeText").textContent =
-                "Random";
+            $("matchCard")
+                .classList.add("hidden");
 
-            renderGame(
-                currentGame
-            );
-
-            showPage("game");
-
-            startGamePolling();
-
-            toast(
-                "Opponent found! Game started.",
-                "success"
+            openGame(
+                data.game
             );
 
             return;
         }
 
-        showPage("game");
-
-        renderWaitingGame();
-
-        toast(
-            "Waiting for another player..."
-        );
 
         startMatchmakingPolling();
 
-    }
-    catch(error){
+    }catch(error){
 
-        toast(
+        $("matchCard")
+            .classList.add("hidden");
+
+        showToast(
             error.message,
             "error"
         );
-
     }
-
 }
 
 
 /* =========================================================
    MATCHMAKING POLLING
-   ========================================================= */
+========================================================= */
 
 function startMatchmakingPolling(){
 
@@ -2492,7 +1855,6 @@ function startMatchmakingPolling(){
             checkMatchmaking,
             2500
         );
-
 }
 
 
@@ -2505,433 +1867,303 @@ function stopMatchmakingPolling(){
         );
 
         matchmakingTimer = null;
-
     }
-
 }
 
 
 async function checkMatchmaking(){
 
-    if(!playerId) return;
-
     try{
 
         const data =
-            await api(
-                `/matchmaking/status?playerId=${encodeURIComponent(playerId)}`
+            await apiRequest(
+                "/matchmaking/status"
             );
 
-        if(data.matched &&
-           data.game){
+
+        if(data.game){
 
             stopMatchmakingPolling();
 
-            currentGame =
-                data.game;
+            $("matchCard")
+                .classList.add("hidden");
 
-            renderGame(
-                currentGame
+            openGame(
+                data.game
             );
 
-            showPage("game");
-
-            startGamePolling();
-
-            toast(
-                "Opponent found! Game started.",
-                "success"
-            );
-
+            return;
         }
 
+
+        if(data.waiting){
+
+            $("matchStatus")
+                .textContent =
+                "Waiting for another player...";
+
+        }else{
+
+            $("matchStatus")
+                .textContent =
+                "Searching...";
+        }
+
+    }catch(error){
+
+        stopMatchmakingPolling();
+
+        $("matchCard")
+            .classList.add("hidden");
     }
-    catch(error){
-
-        console.error(
-            "Matchmaking polling:",
-            error
-        );
-
-    }
-
 }
 
 
 /* =========================================================
-   WAITING GAME UI
-   ========================================================= */
+   CANCEL MATCHMAKING
+========================================================= */
 
-function renderWaitingGame(){
+async function cancelMatchmaking(){
 
-    currentGame = null;
+    stopMatchmakingPolling();
 
-    $("gameStatus").textContent =
-        "SEARCHING";
+    try{
 
-    $("gameIdText").textContent =
-        "Searching for opponent...";
+        await apiRequest(
+            "/matchmaking/leave",
+            {
+                method:"POST"
+            }
+        );
 
-    $("board").innerHTML =
-        `
-        <div style="
-            grid-column:1/-1;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            color:white;
-            font-size:15px;
-            text-align:center;
-            padding:40px;
-        ">
-            Finding another player...
-        </div>
-        `;
+        $("matchCard")
+            .classList.add("hidden");
 
-    $("playersContainer").innerHTML =
-        `
-        <div class="empty">
-            Waiting for opponent...
-        </div>
-        `;
+        showToast(
+            "Matchmaking cancelled."
+        );
 
-    $("turnBox").textContent =
-        "Please wait. We are finding an opponent.";
+    }catch(error){
 
-    $("resignBtn").style.display =
-        "none";
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
 
-    $("resultBox").classList.remove(
-        "show"
-    );
 
+/* =========================================================
+   OPEN GAME
+========================================================= */
+
+function openGame(game){
+
+    currentGame = game;
+
+    $("gameCard")
+        .classList.remove("hidden");
+
+    renderGame();
+
+    startGamePolling();
+
+    window.scrollTo({
+        top:$("gameCard").offsetTop - 80,
+        behavior:"smooth"
+    });
 }
 
 
 /* =========================================================
    RENDER GAME
-   ========================================================= */
+========================================================= */
 
-function renderGame(game){
+function renderGame(){
 
-    if(!game) return;
+    if(!currentGame){
 
-    currentGame =
-        game;
+        return;
+    }
 
-    $("gameIdText").textContent =
-        "Game ID: " + game.gameId;
-
-    $("gameStatus").textContent =
-        game.status === "playing"
-        ? "PLAYING"
-        : "FINISHED";
-
-    renderBoard(game);
-
-    renderPlayers(game);
-
-    renderTurn(game);
-
-    renderResult(game);
-
-    $("resignBtn").style.display =
-        game.status === "playing"
-        ? "inline-flex"
-        : "none";
-
-}
-
-
-/* =========================================================
-   RENDER BOARD
-   ========================================================= */
-
-function renderBoard(game){
 
     const board =
         $("board");
 
     board.innerHTML = "";
 
-    const cells =
-        game.board || [];
 
-    for(let row=0; row<5; row++){
+    const myPlayer =
+        currentGame.players
+        .find(
+            p =>
+            p.playerId ===
+            currentPlayer.playerId
+        );
 
-        for(let col=0; col<5; col++){
 
-            const cell =
-                document.createElement("button");
+    for(let r=0;r<5;r++){
 
-            cell.className =
+        for(let c=0;c<5;c++){
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
                 "cell";
 
+
             const value =
-                cells[row] &&
-                cells[row][col]
-                ? cells[row][col]
-                : null;
+                currentGame.board[r][c];
+
 
             if(value){
 
-                cell.textContent =
+                button.textContent =
                     value;
 
-                cell.classList.add(
+                button.classList.add(
                     value.toLowerCase()
                 );
-
             }
 
+
             if(
-                game.winningCells &&
-                game.winningCells.some(
-                    position =>
-                        position[0] === row &&
-                        position[1] === col
+                currentGame.winningLine &&
+                currentGame.winningLine.some(
+                    cell =>
+                    cell[0] === r &&
+                    cell[1] === c
                 )
             ){
 
-                cell.classList.add(
-                    "winner"
+                button.classList.add(
+                    "win"
                 );
-
             }
 
-            const isMyTurn =
-                game.currentTurn ===
-                playerId;
+
+            button.onclick =
+                () => makeMove(r,c);
+
 
             if(
-                game.status !== "playing" ||
-                value ||
-                !isMyTurn
+                currentGame.status !== "active" ||
+                currentGame.currentTurn !==
+                currentPlayer.playerId ||
+                value
             ){
 
-                cell.classList.add(
-                    "locked"
-                );
-
+                button.disabled = true;
             }
 
-            cell.addEventListener(
-                "click",
-                ()=>{
-                    makeMove(row,col)
-                }
+
+            board.appendChild(
+                button
             );
-
-            board.appendChild(cell);
-
         }
-
     }
 
-}
 
-
-/* =========================================================
-   RENDER PLAYERS
-   ========================================================= */
-
-function renderPlayers(game){
-
-    const container =
-        $("playersContainer");
-
-    container.innerHTML = "";
-
-    for(const player of game.players){
-
-        const box =
-            document.createElement("div");
-
-        box.className =
-            "player-box";
-
-        if(
-            game.status === "playing" &&
-            game.currentTurn ===
-            player.playerId
-        ){
-
-            box.classList.add(
-                "active"
-            );
-
-        }
-
-        const name =
-            document.createElement("div");
-
-        name.className =
-            "player-name";
-
-        name.textContent =
-            player.name +
-            (
-                player.playerId === playerId
-                ? " (You)"
-                : ""
-            );
-
-        const symbol =
-            document.createElement("div");
-
-        symbol.className =
-            "player-symbol " +
-            (
-                player.symbol === "X"
-                ? "x-symbol"
-                : "o-symbol"
-            );
-
-        symbol.textContent =
-            player.symbol;
-
-        box.appendChild(name);
-
-        box.appendChild(symbol);
-
-        container.appendChild(box);
-
-    }
-
-}
-
-
-/* =========================================================
-   RENDER TURN
-   ========================================================= */
-
-function renderTurn(game){
-
-    const box =
-        $("turnBox");
-
-    if(game.status !== "playing"){
-
-        box.textContent =
-            "Game finished.";
-
-        return;
-
-    }
-
-    if(game.currentTurn === playerId){
-
-        box.innerHTML =
-            "<strong>Your turn</strong> — choose an empty cell.";
-
-    }
-    else{
-
-        const opponent =
-            game.players.find(
-                p =>
-                    p.playerId ===
-                    game.currentTurn
-            );
-
-        box.innerHTML =
-            `<strong>${escapeHtml(
-                opponent
-                ? opponent.name
-                : "Opponent"
-            )}</strong> is thinking...`;
-
-    }
-
-}
-
-
-/* =========================================================
-   RENDER RESULT
-   ========================================================= */
-
-function renderResult(game){
-
-    const box =
-        $("resultBox");
-
-    if(game.status !== "finished"){
-
-        box.classList.remove(
-            "show"
+    const turnPlayer =
+        currentGame.players
+        .find(
+            p =>
+            p.playerId ===
+            currentGame.currentTurn
         );
 
-        return;
 
-    }
-
-    box.classList.add(
-        "show"
-    );
-
-    const title =
-        $("resultTitle");
-
-    const message =
-        $("resultMessage");
-
-    box.classList.remove(
-        "result-win",
-        "result-loss",
-        "result-draw"
-    );
-
-    if(game.draw){
-
-        box.classList.add(
-            "result-draw"
-        );
-
-        title.textContent =
-            "🤝 Draw";
-
-        message.textContent =
-            "The entire 5×5 board is full.";
-
-    }
-    else if(
-        game.winner === playerId
+    if(
+        currentGame.status === "active"
     ){
 
-        box.classList.add(
-            "result-win"
-        );
+        if(
+            currentGame.currentTurn ===
+            currentPlayer.playerId
+        ){
 
-        title.textContent =
-            "🏆 You Won!";
+            $("turnText").textContent =
+                `Your turn (${myPlayer?.symbol || ""})`;
 
-        message.textContent =
-            `${game.winnerSymbol} created five consecutive cells.`;
+        }else{
 
-    }
-    else{
+            $("turnText").textContent =
+                `${turnPlayer?.name || "Opponent"}'s turn`;
+        }
 
-        box.classList.add(
-            "result-loss"
-        );
+        $("gameResult").textContent = "";
 
-        title.textContent =
-            "❌ You Lost";
+    }else{
 
-        message.textContent =
-            `${game.winnerSymbol || "Opponent"} won the match.`;
-
+        showGameResult();
     }
 
-    $("rematchBtn").style.display =
-        "inline-flex";
 
+    $("rematchBtn")
+        .classList.toggle(
+            "hidden",
+            currentGame.status !== "finished"
+        );
+}
+
+
+/* =========================================================
+   GAME RESULT
+========================================================= */
+
+function showGameResult(){
+
+    if(
+        currentGame.result === "draw"
+    ){
+
+        $("turnText").textContent =
+            "DRAW";
+
+        $("gameResult").textContent =
+            "Board is full.";
+
+        return;
+    }
+
+
+    const winner =
+        currentGame.players
+        .find(
+            p =>
+            p.playerId ===
+            currentGame.winner
+        );
+
+
+    if(
+        currentGame.winner ===
+        currentPlayer.playerId
+    ){
+
+        $("turnText").textContent =
+            "🎉 YOU WON!";
+
+        $("gameResult").textContent =
+            "Congratulations!";
+
+    }else{
+
+        $("turnText").textContent =
+            "GAME OVER";
+
+        $("gameResult").textContent =
+            `${winner?.name || "Opponent"} won.`;
+    }
 }
 
 
 /* =========================================================
    MAKE MOVE
-   ========================================================= */
+========================================================= */
 
 async function makeMove(row,col){
 
@@ -2940,20 +2172,21 @@ async function makeMove(row,col){
         return;
     }
 
+
     if(
-        currentGame.status !==
-        "playing"
+        currentGame.status !== "active"
     ){
 
         return;
     }
 
+
     if(
         currentGame.currentTurn !==
-        playerId
+        currentPlayer.playerId
     ){
 
-        toast(
+        showToast(
             "It is not your turn.",
             "error"
         );
@@ -2961,29 +2194,120 @@ async function makeMove(row,col){
         return;
     }
 
+
+    if(
+        currentGame.board[row][col]
+    ){
+
+        return;
+    }
+
+
     try{
 
         const data =
-            await api(
+            await apiRequest(
                 "/move",
                 {
                     method:"POST",
-                    body:{
-                        playerId,
+                    body:JSON.stringify({
                         gameId:
                             currentGame.gameId,
                         row,
                         col
-                    }
+                    })
                 }
             );
+
 
         currentGame =
             data.game;
 
-        renderGame(
-            currentGame
+        renderGame();
+
+        if(
+            currentGame.status === "finished"
+        ){
+
+            stopGamePolling();
+
+            await refreshProfile();
+        }
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
         );
+
+        await refreshGame();
+    }
+}
+
+
+/* =========================================================
+   GAME POLLING
+========================================================= */
+
+function startGamePolling(){
+
+    stopGamePolling();
+
+    pollingTimer =
+        setInterval(
+            refreshGame,
+            2200
+        );
+}
+
+
+function stopGamePolling(){
+
+    if(pollingTimer){
+
+        clearInterval(
+            pollingTimer
+        );
+
+        pollingTimer = null;
+    }
+}
+
+
+async function refreshGame(){
+
+    if(!currentGame){
+
+        return;
+    }
+
+
+    if(
+        currentGame.status ===
+        "finished"
+    ){
+
+        stopGamePolling();
+
+        return;
+    }
+
+
+    try{
+
+        const data =
+            await apiRequest(
+                `/game/${encodeURIComponent(
+                    currentGame.gameId
+                )}`
+            );
+
+
+        currentGame =
+            data.game;
+
+        renderGame();
 
         if(
             currentGame.status ===
@@ -2992,1635 +2316,1247 @@ async function makeMove(row,col){
 
             stopGamePolling();
 
-            await loadMyStats();
-
-            await loadLeaderboard();
-
-            if(
-                data.result ===
-                "win"
-            ){
-
-                toast(
-                    "🏆 You won!",
-                    "success"
-                );
-
-            }
-            else if(
-                data.result ===
-                "draw"
-            ){
-
-                toast(
-                    "Game draw."
-                );
-
-            }
-
+            await loadProfileSilently();
         }
 
-    }
-    catch(error){
+    }catch(error){
 
-        toast(
-            error.message,
-            "error"
+        console.error(
+            "Game refresh:",
+            error
         );
-
     }
-
 }
 
 
 /* =========================================================
-   GAME POLLING
-   ========================================================= */
+   ACTIVE GAME
+========================================================= */
 
-function startGamePolling(){
-
-    stopGamePolling();
-
-    gamePollTimer =
-        setInterval(
-            pollGame,
-            1800
-        );
-
-}
-
-
-function stopGamePolling(){
-
-    if(gamePollTimer){
-
-        clearInterval(
-            gamePollTimer
-        );
-
-        gamePollTimer = null;
-
-    }
-
-}
-
-
-async function pollGame(){
-
-    if(!currentGame ||
-       !currentGame.gameId){
-
-        return;
-    }
+async function checkActiveGame(){
 
     try{
 
         const data =
-            await api(
-                `/game/${encodeURIComponent(currentGame.gameId)}`
+            await apiRequest(
+                "/my-game"
             );
 
-        const oldStatus =
-            currentGame.status;
 
-        const oldTurn =
-            currentGame.currentTurn;
+        if(data.game){
 
-        currentGame =
-            data.game;
+            openGame(
+                data.game
+            );
 
-        renderGame(
-            currentGame
-        );
-
-        if(
-            oldStatus === "playing" &&
-            currentGame.status === "finished"
-        ){
-
-            stopGamePolling();
-
-            await loadMyStats();
-
-            await loadLeaderboard();
-
+            return true;
         }
 
-        if(
-            oldTurn !==
-            currentGame.currentTurn
-        ){
-
-            // Turn changed.
-        }
-
-    }
-    catch(error){
-
-        console.error(
-            "Game polling:",
-            error
+        showToast(
+            "No active game found.",
+            "error"
         );
 
-    }
+        return false;
 
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+
+        return false;
+    }
 }
 
 
 /* =========================================================
    RESIGN
-   ========================================================= */
+========================================================= */
 
 async function resignGame(){
 
-    if(!currentGame ||
-       currentGame.status !== "playing"){
+    if(!currentGame){
 
         return;
     }
 
+
+    if(
+        currentGame.status !==
+        "active"
+    ){
+
+        return;
+    }
+
+
     const confirmed =
         confirm(
-            "Are you sure you want to resign? Your opponent will win."
+            "Are you sure you want to resign?"
         );
 
-    if(!confirmed) return;
+
+    if(!confirmed){
+
+        return;
+    }
+
 
     try{
 
         const data =
-            await api(
+            await apiRequest(
                 "/game/resign",
                 {
                     method:"POST",
-                    body:{
-                        playerId,
+                    body:JSON.stringify({
                         gameId:
                             currentGame.gameId
-                    }
+                    })
                 }
             );
+
 
         currentGame =
             data.game;
 
-        renderGame(
-            currentGame
-        );
+        renderGame();
 
         stopGamePolling();
 
-        await loadMyStats();
+        await loadProfileSilently();
 
-        await loadLeaderboard();
+    }catch(error){
 
-        toast(
-            "You resigned.",
-            "error"
-        );
-
-    }
-    catch(error){
-
-        toast(
+        showToast(
             error.message,
             "error"
         );
-
     }
-
 }
 
 
 /* =========================================================
    REMATCH
-   ========================================================= */
+========================================================= */
 
-async function requestRematch(){
+async function rematchGame(){
 
-    if(!currentGame ||
-       !currentGame.gameId){
+    if(!currentGame){
 
         return;
     }
 
+
     try{
 
         const data =
-            await api(
+            await apiRequest(
                 "/rematch",
                 {
                     method:"POST",
-                    body:{
-                        playerId,
+                    body:JSON.stringify({
                         gameId:
                             currentGame.gameId
-                    }
+                    })
                 }
             );
 
-        currentGame =
-            data.game;
 
-        $("gameModeText").textContent =
-            "Rematch";
-
-        renderGame(
-            currentGame
+        openGame(
+            data.game
         );
 
-        showPage("game");
+    }catch(error){
 
-        startGamePolling();
-
-        toast(
-            "Rematch started!",
-            "success"
-        );
-
-    }
-    catch(error){
-
-        toast(
+        showToast(
             error.message,
             "error"
         );
-
     }
+}
 
+
+/* =========================================================
+   CLOSE GAME
+========================================================= */
+
+function closeGame(){
+
+    stopGamePolling();
+
+    currentGame = null;
+
+    $("gameCard")
+        .classList.add("hidden");
+}
+
+
+/* =========================================================
+   PRIVATE ROOM MODAL
+========================================================= */
+
+function openRoomModal(){
+
+    openModal(
+        "Private Room",
+        `
+        <div class="panel" style="margin-top:0">
+
+            <button
+                class="primary-btn"
+                onclick="createPrivateRoom()"
+            >
+                Create New Room
+            </button>
+
+            <div
+                style="
+                text-align:center;
+                color:#8290a8;
+                margin:15px 0;
+                "
+            >
+                OR
+            </div>
+
+            <div class="input-row">
+
+                <input
+                    id="joinRoomId"
+                    placeholder="Enter Room ID"
+                >
+
+                <button
+                    onclick="joinPrivateRoom()"
+                >
+                    Join
+                </button>
+
+            </div>
+
+        </div>
+        `
+    );
 }
 
 
 /* =========================================================
    CREATE ROOM
-   ========================================================= */
+========================================================= */
 
-async function createRoom(){
+async function createPrivateRoom(){
 
     try{
 
-        const roomId =
-            $("customRoomId")
-            .value
-            .trim()
-            .toUpperCase();
+        showLoading(
+            "Creating room..."
+        );
 
         const data =
-            await api(
+            await apiRequest(
                 "/room/create",
                 {
-                    method:"POST",
-                    body:{
-                        playerId,
-                        roomId
-                    }
+                    method:"POST"
                 }
             );
+
+        hideLoading();
 
         const room =
             data.room;
 
-        $("createdRoomBox").style.display =
-            "block";
+        openModal(
+            "Room Created",
+            `
+            <div style="text-align:center">
 
-        $("createdRoomId").textContent =
-            room.roomId;
+                <div
+                    style="
+                    color:#8d9bb2;
+                    margin-bottom:8px
+                    "
+                >
+                    Share this Room ID
+                </div>
 
-        $("customRoomId").value = "";
+                <div
+                    style="
+                    font-size:32px;
+                    font-weight:1000;
+                    letter-spacing:3px;
+                    margin:15px 0;
+                    "
+                >
+                    ${escapeHtml(room.roomId)}
+                </div>
 
-        toast(
-            "Room created successfully.",
-            "success"
+                <button
+                    class="primary-btn"
+                    onclick="
+                        navigator.clipboard.writeText(
+                            '${escapeJs(room.roomId)}'
+                        );
+                        showToast('Room ID copied!');
+                    "
+                >
+                    Copy Room ID
+                </button>
+
+                <div
+                    style="
+                    margin-top:15px;
+                    color:#8d9bb2;
+                    font-size:13px
+                    "
+                >
+                    Wait for another player to join.
+                </div>
+
+            </div>
+            `
         );
 
-    }
-    catch(error){
 
-        toast(
+        pollRoom(
+            room.roomId
+        );
+
+    }catch(error){
+
+        hideLoading();
+
+        showToast(
             error.message,
             "error"
         );
-
     }
-
-}
-
-
-/* =========================================================
-   COPY ROOM ID
-   ========================================================= */
-
-async function copyRoomId(){
-
-    const roomId =
-        $("createdRoomId")
-        .textContent
-        .trim();
-
-    if(!roomId) return;
-
-    try{
-
-        await navigator.clipboard.writeText(
-            roomId
-        );
-
-        toast(
-            "Room ID copied!",
-            "success"
-        );
-
-    }
-    catch(error){
-
-        toast(
-            "Could not copy room ID.",
-            "error"
-        );
-
-    }
-
 }
 
 
 /* =========================================================
    JOIN ROOM
-   ========================================================= */
+========================================================= */
 
-async function joinRoom(){
+async function joinPrivateRoom(){
 
     const roomId =
         $("joinRoomId")
-        .value
-        .trim()
-        .toUpperCase();
+        ?.value
+        .trim();
 
     if(!roomId){
 
-        toast(
-            "Enter a room ID.",
+        showToast(
+            "Enter a Room ID.",
             "error"
         );
 
         return;
     }
 
+
     try{
 
+        showLoading(
+            "Joining room..."
+        );
+
         const data =
-            await api(
+            await apiRequest(
                 "/room/join",
                 {
                     method:"POST",
-                    body:{
-                        playerId,
+                    body:JSON.stringify({
                         roomId
-                    }
+                    })
                 }
             );
+
+        hideLoading();
+
+        closeModal();
 
         if(data.game){
 
-            currentGame =
-                data.game;
-
-            $("gameModeText").textContent =
-                "Private Room";
-
-            renderGame(
-                currentGame
+            openGame(
+                data.game
             );
 
-            showPage("game");
+        }else{
 
-            startGamePolling();
-
-            toast(
-                "Room joined. Game started!",
-                "success"
+            showToast(
+                "Joined room. Waiting for opponent..."
             );
 
-        }
-        else{
-
-            toast(
-                "Joined room. Waiting for another player..."
-            );
-
+            pollRoom(roomId);
         }
 
-    }
-    catch(error){
+    }catch(error){
 
-        toast(
+        hideLoading();
+
+        showToast(
             error.message,
             "error"
         );
-
     }
-
 }
 
 
 /* =========================================================
-   CHECK ROOM
-   ========================================================= */
+   ROOM POLLING
+========================================================= */
 
-async function checkRoom(){
+let roomPollTimer = null;
 
-    const roomId =
-        $("checkRoomId")
-        .value
-        .trim()
-        .toUpperCase();
 
-    if(!roomId){
+function pollRoom(roomId){
 
-        toast(
-            "Enter a room ID.",
-            "error"
+    if(roomPollTimer){
+
+        clearInterval(
+            roomPollTimer
         );
-
-        return;
     }
 
-    try{
 
-        const data =
-            await api(
-                `/room/${encodeURIComponent(roomId)}`
-            );
+    roomPollTimer =
+        setInterval(
+            async ()=>{
 
-        const room =
-            data.room;
+                try{
 
-        $("roomInfo").innerHTML =
-            `
-            <div class="room-code">
-                <span>Status</span>
-                <strong style="
-                    font-size:20px;
-                    letter-spacing:1px;
-                ">
-                    ${escapeHtml(room.status)}
-                </strong>
-                <div style="
-                    margin-top:8px;
-                    color:#64748b;
-                    font-size:11px;
-                ">
-                    Host:
-                    ${escapeHtml(room.hostName)}
-                    ${
-                        room.guestName
-                        ? " • Guest: " +
-                          escapeHtml(room.guestName)
-                        : ""
+                    const data =
+                        await apiRequest(
+                            `/room/${encodeURIComponent(
+                                roomId
+                            )}`
+                        );
+
+
+                    if(data.room?.gameId){
+
+                        clearInterval(
+                            roomPollTimer
+                        );
+
+                        const gameData =
+                            await apiRequest(
+                                `/game/${encodeURIComponent(
+                                    data.room.gameId
+                                )}`
+                            );
+
+                        openGame(
+                            gameData.game
+                        );
                     }
-                </div>
-            </div>
-            `;
 
-    }
-    catch(error){
+                }catch(error){
 
-        $("roomInfo").innerHTML = "";
-
-        toast(
-            error.message,
-            "error"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   CREATE GROUP
-   ========================================================= */
-
-async function createGroup(){
-
-    const name =
-        $("groupNameInput")
-        .value
-        .trim();
-
-    if(!name){
-
-        toast(
-            "Enter a group name.",
-            "error"
-        );
-
-        return;
-    }
-
-    try{
-
-        const data =
-            await api(
-                "/group/create",
-                {
-                    method:"POST",
-                    body:{
-                        playerId,
-                        groupName:name
-                    }
+                    console.error(
+                        "Room polling:",
+                        error
+                    );
                 }
-            );
 
-        $("groupNameInput").value = "";
-
-        toast(
-            `Group "${data.group.name}" created.`,
-            "success"
+            },
+            2500
         );
-
-        await loadGroups();
-
-    }
-    catch(error){
-
-        toast(
-            error.message,
-            "error"
-        );
-
-    }
-
 }
 
 
 /* =========================================================
-   LOAD GROUPS
-   ========================================================= */
+   GROUPS MODAL
+========================================================= */
 
-async function loadGroups(){
-
-    if(!playerId) return;
-
-    const container =
-        $("groupsList");
-
-    if(!container) return;
-
-    container.innerHTML =
-        `<div class="loading">
-            Loading groups...
-        </div>`;
+async function openGroupsModal(){
 
     try{
 
         const data =
-            await api("/groups");
+            await apiRequest(
+                "/groups"
+            );
+
+
+        let html = `
+
+        <button
+            class="primary-btn"
+            onclick="createGroup()"
+        >
+            + Create Group
+        </button>
+
+        <div
+            class="list"
+            style="margin-top:15px"
+        >
+        `;
+
 
         if(
             !data.groups ||
             data.groups.length === 0
         ){
 
-            container.innerHTML =
-                `
-                <div class="empty"
-                     style="grid-column:1/-1">
-                    No groups created yet.
+            html += `
+                <div
+                    style="
+                    color:#8d9bb2;
+                    text-align:center;
+                    padding:20px
+                    "
+                >
+                    No groups available.
                 </div>
-                `;
-
-            return;
-        }
-
-        container.innerHTML = "";
-
-        for(const group of data.groups){
-
-            const item =
-                document.createElement("div");
-
-            item.className =
-                "group-item";
-
-            item.innerHTML =
-                `
-                <h4>
-                    ${escapeHtml(group.name)}
-                </h4>
-
-                <p>
-                    ${group.memberCount} members
-                    • Owner:
-                    ${escapeHtml(group.ownerName || "Unknown")}
-                </p>
-
-                <div class="group-actions">
-
-                    <button
-                        class="btn btn-primary btn-small"
-                        onclick="openGroup('${escapeJs(group.groupId)}')"
-                    >
-                        View Members
-                    </button>
-
-                    <button
-                        class="btn btn-light btn-small"
-                        onclick="joinGroupById('${escapeJs(group.groupId)}')"
-                    >
-                        Join
-                    </button>
-
-                </div>
-                `;
-
-            container.appendChild(item);
-
-        }
-
-    }
-    catch(error){
-
-        container.innerHTML =
-            `
-            <div class="empty"
-                 style="grid-column:1/-1">
-                Could not load groups.
-            </div>
             `;
 
-        console.error(
-            "Groups:",
-            error
-        );
+        }else{
 
-    }
+            data.groups.forEach(
+                group => {
 
-}
+                    html += `
 
+                    <div class="list-item">
 
-/* =========================================================
-   JOIN GROUP BY ID
-   ========================================================= */
+                        <div class="list-main">
 
-async function joinGroupById(groupId){
+                            <div class="list-name">
+                                ${escapeHtml(
+                                    group.name
+                                )}
+                            </div>
 
-    try{
+                            <div class="list-meta">
+                                ${group.members.length}
+                                member(s)
+                                • ${escapeHtml(
+                                    group.groupId
+                                )}
+                            </div>
 
-        const data =
-            await api(
-                "/group/join",
-                {
-                    method:"POST",
-                    body:{
-                        playerId,
-                        groupId
-                    }
-                }
-            );
+                        </div>
 
-        toast(
-            "Joined group successfully.",
-            "success"
-        );
+                        <button
+                            class="small-btn"
+                            onclick="
+                                joinGroup(
+                                    '${escapeJs(
+                                        group.groupId
+                                    )}'
+                                )
+                            "
+                        >
+                            Join
+                        </button>
 
-        openGroup(groupId);
+                    </div>
 
-        await loadGroups();
-
-    }
-    catch(error){
-
-        toast(
-            error.message,
-            "error"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   JOIN GROUP INPUT
-   ========================================================= */
-
-async function joinGroup(){
-
-    const groupId =
-        $("joinGroupId")
-        .value
-        .trim();
-
-    if(!groupId){
-
-        toast(
-            "Enter a group ID.",
-            "error"
-        );
-
-        return;
-    }
-
-    await joinGroupById(
-        groupId
-    );
-
-    $("joinGroupId").value = "";
-
-}
-
-
-/* =========================================================
-   OPEN GROUP
-   ========================================================= */
-
-async function openGroup(groupId){
-
-    try{
-
-        const data =
-            await api(
-                `/group/${encodeURIComponent(groupId)}`
-            );
-
-        currentGroup =
-            data.group;
-
-        $("modalGroupName").textContent =
-            currentGroup.name;
-
-        $("modalGroupId").textContent =
-            "Group ID: " +
-            currentGroup.groupId;
-
-        const members =
-            $("modalMembers");
-
-        members.innerHTML = "";
-
-        if(
-            !currentGroup.members ||
-            currentGroup.members.length === 0
-        ){
-
-            members.innerHTML =
-                `<div class="empty">
-                    No members.
-                </div>`;
-
-        }
-        else{
-
-            for(const member of currentGroup.members){
-
-                const row =
-                    document.createElement("div");
-
-                row.className =
-                    "member-row";
-
-                const name =
-                    document.createElement("span");
-
-                name.innerHTML =
-                    `
-                    <strong>
-                        ${escapeHtml(member.name)}
-                    </strong>
-                    ${
-                        member.playerId === playerId
-                        ? " (You)"
-                        : ""
-                    }
                     `;
-
-                row.appendChild(name);
-
-                if(
-                    member.playerId !==
-                    playerId
-                ){
-
-                    const button =
-                        document.createElement("button");
-
-                    button.className =
-                        "btn btn-primary btn-small";
-
-                    button.textContent =
-                        "🎮 Challenge";
-
-                    button.onclick =
-                        ()=>{
-                            challengeGroupMember(
-                                currentGroup.groupId,
-                                member.playerId
-                            );
-                        };
-
-                    row.appendChild(
-                        button
-                    );
-
                 }
-
-                members.appendChild(
-                    row
-                );
-
-            }
-
+            );
         }
 
-        $("groupModal")
-            .classList.add("show");
 
-    }
-    catch(error){
-
-        toast(
-            error.message,
-            "error"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   CLOSE GROUP MODAL
-   ========================================================= */
-
-function closeGroupModal(){
-
-    $("groupModal")
-        .classList.remove("show");
-
-}
-
-
-/* =========================================================
-   CHALLENGE GROUP MEMBER
-   ========================================================= */
-
-async function challengeGroupMember(
-    groupId,
-    targetPlayerId
-){
-
-    try{
-
-        await api(
-            "/group/request/send",
-            {
-                method:"POST",
-                body:{
-                    playerId,
-                    groupId,
-                    toPlayerId:
-                        targetPlayerId
-                }
-            }
-        );
-
-        toast(
-            "Game request sent!",
-            "success"
-        );
-
-        closeGroupModal();
-
-    }
-    catch(error){
-
-        toast(
-            error.message,
-            "error"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   DIRECT REQUEST
-   ========================================================= */
-
-async function sendDirectRequest(){
-
-    const target =
-        $("targetPlayerId")
-        .value
-        .trim();
-
-    if(!target){
-
-        toast(
-            "Enter target Player ID.",
-            "error"
-        );
-
-        return;
-    }
-
-    try{
-
-        await api(
-            "/request/send",
-            {
-                method:"POST",
-                body:{
-                    playerId,
-                    toPlayerId:
-                        target
-                }
-            }
-        );
-
-        $("targetPlayerId").value = "";
-
-        toast(
-            "Game request sent!",
-            "success"
-        );
-
-    }
-    catch(error){
-
-        toast(
-            error.message,
-            "error"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   LOAD REQUESTS
-   ========================================================= */
-
-async function loadRequests(){
-
-    if(!playerId) return;
-
-    const container =
-        $("requestsList");
-
-    if(!container) return;
-
-    container.innerHTML =
-        `
-        <div class="loading">
-            Loading requests...
+        html += `
         </div>
         `;
 
-    try{
 
-        const data =
-            await api(
-                `/requests/received?playerId=${encodeURIComponent(playerId)}`
-            );
-
-        if(
-            !data.requests ||
-            data.requests.length === 0
-        ){
-
-            container.innerHTML =
-                `
-                <div class="empty">
-                    No pending game requests.
-                </div>
-                `;
-
-            return;
-        }
-
-        container.innerHTML = "";
-
-        for(const req of data.requests){
-
-            const item =
-                document.createElement("div");
-
-            item.className =
-                "request";
-
-            const groupText =
-                req.groupName
-                ? `Group: ${escapeHtml(req.groupName)}`
-                : "Direct challenge";
-
-            item.innerHTML =
-                `
-                <div class="request-info">
-
-                    <strong>
-                        ${escapeHtml(req.fromPlayerName)}
-                    </strong>
-
-                    <small>
-                        ${groupText}
-                    </small>
-
-                </div>
-
-                <div class="request-actions">
-
-                    <button
-                        class="btn btn-success btn-small"
-                        onclick="acceptRequest('${escapeJs(req.requestId)}')"
-                    >
-                        ✓ Accept
-                    </button>
-
-                    <button
-                        class="btn btn-danger btn-small"
-                        onclick="rejectRequest('${escapeJs(req.requestId)}')"
-                    >
-                        ✕ Reject
-                    </button>
-
-                </div>
-                `;
-
-            container.appendChild(
-                item
-            );
-
-        }
-
-    }
-    catch(error){
-
-        container.innerHTML =
-            `
-            <div class="empty">
-                Could not load requests.
-            </div>
-            `;
-
-    }
-
-}
-
-
-/* =========================================================
-   ACCEPT REQUEST
-   ========================================================= */
-
-async function acceptRequest(requestId){
-
-    try{
-
-        const data =
-            await api(
-                "/request/accept",
-                {
-                    method:"POST",
-                    body:{
-                        playerId,
-                        requestId
-                    }
-                }
-            );
-
-        currentGame =
-            data.game;
-
-        $("gameModeText").textContent =
-            "Challenge";
-
-        renderGame(
-            currentGame
+        openModal(
+            "Groups",
+            html
         );
 
-        showPage("game");
+    }catch(error){
 
-        startGamePolling();
-
-        await loadRequests();
-
-        toast(
-            "Challenge accepted. Game started!",
-            "success"
-        );
-
-    }
-    catch(error){
-
-        toast(
+        showToast(
             error.message,
             "error"
         );
-
-        await loadRequests();
-
     }
-
 }
 
 
 /* =========================================================
-   REJECT REQUEST
-   ========================================================= */
+   CREATE GROUP
+========================================================= */
 
-async function rejectRequest(requestId){
+async function createGroup(){
+
+    const name =
+        prompt(
+            "Enter group name:"
+        );
+
+    if(!name){
+
+        return;
+    }
+
 
     try{
 
-        await api(
-            "/request/reject",
+        const data =
+            await apiRequest(
+                "/group/create",
+                {
+                    method:"POST",
+                    body:JSON.stringify({
+                        name
+                    })
+                }
+            );
+
+
+        showToast(
+            "Group created successfully!"
+        );
+
+
+        openGroupsModal();
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   JOIN GROUP
+========================================================= */
+
+async function joinGroup(groupId){
+
+    try{
+
+        await apiRequest(
+            "/group/join",
             {
                 method:"POST",
-                body:{
-                    playerId,
-                    requestId
-                }
+                body:JSON.stringify({
+                    groupId
+                })
             }
         );
 
-        await loadRequests();
 
-        toast(
-            "Request rejected."
+        showToast(
+            "Joined group!"
         );
 
-    }
-    catch(error){
 
-        toast(
+    }catch(error){
+
+        showToast(
             error.message,
             "error"
         );
-
     }
-
 }
 
 
 /* =========================================================
    LEADERBOARD
-   ========================================================= */
+========================================================= */
 
 async function loadLeaderboard(){
-
-    const body =
-        $("leaderboardBody");
-
-    if(!body) return;
-
-    body.innerHTML =
-        `
-        <tr>
-            <td colspan="7">
-                <div class="loading">
-                    Loading leaderboard...
-                </div>
-            </td>
-        </tr>
-        `;
 
     try{
 
         const data =
-            await api(
-                "/leaderboard?limit=100"
+            await apiRequest(
+                "/leaderboard"
             );
+
+
+        let html = `
+            <div class="list">
+        `;
+
 
         if(
             !data.leaderboard ||
             data.leaderboard.length === 0
         ){
 
-            body.innerHTML =
-                `
-                <tr>
-                    <td colspan="7">
-                        <div class="empty">
-                            No players yet.
-                        </div>
-                    </td>
-                </tr>
-                `;
-
-            return;
-        }
-
-        body.innerHTML = "";
-
-        data.leaderboard.forEach(
-            player=>{
-            
-                const tr =
-                    document.createElement("tr");
-
-                if(
-                    player.playerId ===
-                    playerId
-                ){
-
-                    tr.classList.add(
-                        "me"
-                    );
-
-                }
-
-                let rankDisplay =
-                    player.rank;
-
-                if(player.rank === 1)
-                    rankDisplay = "🥇";
-
-                else if(player.rank === 2)
-                    rankDisplay = "🥈";
-
-                else if(player.rank === 3)
-                    rankDisplay = "🥉";
-
-                tr.innerHTML =
-                    `
-                    <td class="rank">
-                        ${rankDisplay}
-                    </td>
-
-                    <td>
-                        <strong>
-                            ${escapeHtml(player.name)}
-                        </strong>
-
-                        ${
-                            player.playerId === playerId
-                            ? "<small style='color:#1769ff'> (You)</small>"
-                            : ""
-                        }
-                    </td>
-
-                    <td>
-                        ${player.games}
-                    </td>
-
-                    <td>
-                        <strong>
-                            ${player.wins}
-                        </strong>
-                    </td>
-
-                    <td>
-                        ${player.losses}
-                    </td>
-
-                    <td>
-                        ${player.draws}
-                    </td>
-
-                    <td>
-                        ${player.winRate}%
-                    </td>
-                    `;
-
-                body.appendChild(
-                    tr
-                );
-
-            }
-        );
-
-    }
-    catch(error){
-
-        body.innerHTML =
-            `
-            <tr>
-                <td colspan="7">
-                    <div class="empty">
-                        Could not load leaderboard.
-                    </div>
-                </td>
-            </tr>
+            html += `
+                <div
+                    style="
+                    text-align:center;
+                    color:#8d9bb2;
+                    padding:20px
+                    "
+                >
+                    No players yet.
+                </div>
             `;
 
-        console.error(
-            "Leaderboard:",
-            error
+        }else{
+
+            data.leaderboard.forEach(
+                player => {
+
+                    html += `
+
+                    <div class="list-item">
+
+                        <div
+                            style="
+                            display:flex;
+                            align-items:center;
+                            gap:12px
+                            "
+                        >
+
+                            <div class="rank">
+                                #${player.rank}
+                            </div>
+
+                            <div class="list-main">
+
+                                <div class="list-name">
+                                    ${escapeHtml(
+                                        player.name
+                                    )}
+                                </div>
+
+                                <div class="list-meta">
+                                    @${escapeHtml(
+                                        player.username
+                                    )}
+                                    •
+                                    ${player.wins}W /
+                                    ${player.losses}L /
+                                    ${player.draws}D
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            style="
+                            font-weight:900
+                            "
+                        >
+                            ${player.winRate}%
+                        </div>
+
+                    </div>
+
+                    `;
+                }
+            );
+        }
+
+
+        html += `
+            </div>
+        `;
+
+
+        openModal(
+            "🏆 Leaderboard",
+            html
         );
 
-    }
+    }catch(error){
 
+        showToast(
+            error.message,
+            "error"
+        );
+    }
 }
 
 
 /* =========================================================
-   HISTORY
-   ========================================================= */
+   GAME HISTORY
+========================================================= */
 
 async function loadHistory(){
-
-    const container =
-        $("historyList");
-
-    if(!container ||
-       !playerId) return;
-
-    container.innerHTML =
-        `
-        <div class="loading">
-            Loading history...
-        </div>
-        `;
 
     try{
 
         const data =
-            await api(
-                `/history?playerId=${encodeURIComponent(playerId)}&limit=50`
+            await apiRequest(
+                "/history"
             );
+
+
+        let html = `
+            <div class="list">
+        `;
+
 
         if(
             !data.history ||
             data.history.length === 0
         ){
 
-            container.innerHTML =
-                `
-                <div class="empty">
-                    No completed games yet.
+            html += `
+                <div
+                    style="
+                    text-align:center;
+                    color:#8d9bb2;
+                    padding:20px
+                    "
+                >
+                    No games played yet.
                 </div>
-                `;
+            `;
 
-            return;
-        }
+        }else{
 
-        container.innerHTML = "";
+            data.history.forEach(
+                game => {
 
-        data.history.forEach(
-            game=>{
+                    let result =
+                        "DRAW";
 
-                const item =
-                    document.createElement("div");
+                    if(
+                        game.winner ===
+                        currentPlayer.playerId
+                    ){
 
-                item.className =
-                    "history-item";
+                        result = "WIN";
 
-                let tagClass =
-                    "tag-draw";
+                    }else if(
+                        game.winner
+                    ){
 
-                let text =
-                    "DRAW";
+                        result = "LOSS";
+                    }
 
-                if(game.result === "win"){
 
-                    tagClass =
-                        "tag-win";
+                    html += `
 
-                    text =
-                        "WIN";
+                    <div class="list-item">
 
-                }
-                else if(game.result === "loss"){
+                        <div class="list-main">
 
-                    tagClass =
-                        "tag-loss";
+                            <div class="list-name">
+                                ${result}
+                            </div>
 
-                    text =
-                        "LOSS";
+                            <div class="list-meta">
+                                Game:
+                                ${escapeHtml(
+                                    game.gameId
+                                )}
+                            </div>
 
-                }
+                        </div>
 
-                const opponent =
-                    game.opponent
-                    ? escapeHtml(
-                        game.opponent.name
-                    )
-                    : "Unknown";
-
-                item.innerHTML =
-                    `
-                    <div>
-
-                        <strong>
-                            vs ${opponent}
-                        </strong>
-
-                        <div style="
-                            margin-top:4px;
-                            color:#64748b;
-                            font-size:10px;
-                        ">
-                            ${
-                                game.opponent
-                                ? "Your symbol: " +
-                                  escapeHtml(
-                                      game.opponent.symbol === "X"
-                                      ? "O"
-                                      : "X"
-                                  )
-                                : ""
-                            }
+                        <div
+                            style="
+                            font-size:12px;
+                            color:#8d9bb2
+                            "
+                        >
+                            ${game.result || ""}
                         </div>
 
                     </div>
 
-                    <span
-                        class="result-tag ${tagClass}"
-                    >
-                        ${text}
-                    </span>
                     `;
+                }
+            );
+        }
 
-                container.appendChild(
-                    item
-                );
 
-            }
+        html += `
+            </div>
+        `;
+
+
+        openModal(
+            "📜 Game History",
+            html
         );
 
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
     }
-    catch(error){
-
-        container.innerHTML =
-            `
-            <div class="empty">
-                Could not load history.
-            </div>
-            `;
-
-    }
-
 }
 
 
 /* =========================================================
-   ESCAPE HELPERS
-   ========================================================= */
+   REQUESTS
+========================================================= */
+
+async function loadRequests(){
+
+    try{
+
+        const data =
+            await apiRequest(
+                "/requests/received"
+            );
+
+
+        let html = `
+            <div class="list">
+        `;
+
+
+        if(
+            !data.requests ||
+            data.requests.length === 0
+        ){
+
+            html += `
+                <div
+                    style="
+                    text-align:center;
+                    color:#8d9bb2;
+                    padding:20px
+                    "
+                >
+                    No pending requests.
+                </div>
+            `;
+
+        }else{
+
+            for(
+                const req
+                of data.requests
+            ){
+
+                let senderName =
+                    req.senderId;
+
+
+                try{
+
+                    const sender =
+                        await apiRequest(
+                            `/player/${encodeURIComponent(
+                                req.senderId
+                            )}`
+                        );
+
+                    senderName =
+                        sender.player?.name ||
+                        req.senderId;
+
+                }catch{}
+
+
+                html += `
+
+                <div class="list-item">
+
+                    <div class="list-main">
+
+                        <div class="list-name">
+                            ${escapeHtml(
+                                senderName
+                            )}
+                        </div>
+
+                        <div class="list-meta">
+                            wants to play with you
+                        </div>
+
+                    </div>
+
+                    <div
+                        style="
+                        display:flex;
+                        gap:6px
+                        "
+                    >
+
+                        <button
+                            class="small-btn"
+                            onclick="
+                                acceptRequest(
+                                    '${escapeJs(
+                                        req.requestId
+                                    )}'
+                                )
+                            "
+                        >
+                            Accept
+                        </button>
+
+                        <button
+                            class="small-btn red"
+                            onclick="
+                                rejectRequest(
+                                    '${escapeJs(
+                                        req.requestId
+                                    )}'
+                                )
+                            "
+                        >
+                            Reject
+                        </button>
+
+                    </div>
+
+                </div>
+
+                `;
+            }
+        }
+
+
+        html += `
+            </div>
+        `;
+
+
+        openModal(
+            "✉ Requests",
+            html
+        );
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   ACCEPT REQUEST
+========================================================= */
+
+async function acceptRequest(requestId){
+
+    try{
+
+        const data =
+            await apiRequest(
+                "/request/accept",
+                {
+                    method:"POST",
+                    body:JSON.stringify({
+                        requestId
+                    })
+                }
+            );
+
+
+        closeModal();
+
+        openGame(
+            data.game
+        );
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   REJECT REQUEST
+========================================================= */
+
+async function rejectRequest(requestId){
+
+    try{
+
+        await apiRequest(
+            "/request/reject",
+            {
+                method:"POST",
+                body:JSON.stringify({
+                    requestId
+                })
+            }
+        );
+
+
+        showToast(
+            "Request rejected."
+        );
+
+
+        loadRequests();
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function openModal(
+    title,
+    content
+){
+
+    $("modalTitle")
+        .textContent = title;
+
+    $("modalContent")
+        .innerHTML = content;
+
+    $("modal")
+        .classList.remove("hidden");
+}
+
+
+function closeModal(){
+
+    $("modal")
+        .classList.add("hidden");
+}
+
+
+function modalBackgroundClick(event){
+
+    if(
+        event.target ===
+        $("modal")
+    ){
+
+        closeModal();
+    }
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
 
 function escapeHtml(value){
 
-    if(value === null ||
-       value === undefined){
-
-        return "";
-
-    }
-
-    return String(value)
+    return String(value ?? "")
         .replaceAll("&","&amp;")
         .replaceAll("<","&lt;")
         .replaceAll(">","&gt;")
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#039;");
-
 }
 
 
 function escapeJs(value){
 
-    if(value === null ||
-       value === undefined){
-
-        return "";
-
-    }
-
-    return String(value)
+    return String(value ?? "")
         .replaceAll("\\","\\\\")
-        .replaceAll("'","\\'")
-        .replaceAll("\n","\\n")
-        .replaceAll("\r","\\r");
-
+        .replaceAll("'","\\'");
 }
 
 
 /* =========================================================
-   PAGE VISIBILITY SAFETY
-   ========================================================= */
+   AUTO LOGIN / SESSION RESTORE
+========================================================= */
 
-window.addEventListener(
-    "beforeunload",
-    ()=>{
-        /*
-         * We intentionally don't leave the matchmaking queue here
-         * because browser unload can cancel network requests.
-         *
-         * The backend also provides:
-         * /matchmaking/cleanup
-         */
+async function restoreSession(){
+
+    const token =
+        localStorage.getItem(
+            "oxToken"
+        );
+
+
+    if(!token){
+
+        showAuthScreen();
+
+        return;
     }
-);
 
 
-/* =========================================================
-   AUTO REFRESH REQUESTS
-   ========================================================= */
+    try{
 
-setInterval(
-    ()=>{
-        if(
-            playerId &&
-            $("appPage").classList.contains("active")
-        ){
+        showLoading(
+            "Restoring session..."
+        );
 
-            loadRequests();
-
-        }
-    },
-    5000
-);
-
-
-/* =========================================================
-   AUTO REFRESH STATS
-   ========================================================= */
-
-setInterval(
-    ()=>{
-        if(playerId){
-
-            loadMyStats();
-
-        }
-    },
-    15000
-);
-
-
-/* =========================================================
-   CLOSE MODAL WHEN CLICKING OUTSIDE
-   ========================================================= */
-
-$("groupModal").addEventListener(
-    "click",
-    function(event){
-
-        if(event.target === this){
-
-            closeGroupModal();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   ENTER KEY SUPPORT
-   ========================================================= */
-
-$("playerNameInput").addEventListener(
-    "keydown",
-    function(event){
-
-        if(event.key === "Enter"){
-
-            registerPlayer();
-
-        }
-
-    }
-);
-
-
-$("joinRoomId").addEventListener(
-    "keydown",
-    function(event){
-
-        if(event.key === "Enter"){
-
-            joinRoom();
-
-        }
-
-    }
-);
-
-
-$("customRoomId").addEventListener(
-    "input",
-    function(){
-
-        this.value =
-            this.value
-            .toUpperCase()
-            .replace(
-                /[^A-Z0-9_-]/g,
-                ""
+        const data =
+            await apiRequest(
+                "/auth/me"
             );
 
+
+        currentPlayer =
+            data.player;
+
+        hideLoading();
+
+        openDashboard();
+
+    }catch(error){
+
+        hideLoading();
+
+        localStorage.removeItem(
+            "oxToken"
+        );
+
+        showAuthScreen();
+    }
+}
+
+
+/* =========================================================
+   KEYBOARD SUPPORT
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if(
+            event.key === "Escape"
+        ){
+
+            closeModal();
+        }
     }
 );
 
 
 /* =========================================================
-   END
-   ========================================================= */
+   PAGE START
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        restoreSession();
+
+    }
+);
 
 </script>
 
 </body>
 </html>
-```
