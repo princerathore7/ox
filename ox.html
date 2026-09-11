@@ -1,13 +1,15 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
 <title>OX Fighter Jets</title>
 
-```html
 <style>
+
 *{
     box-sizing:border-box;
     margin:0;
@@ -25,8 +27,12 @@
 
     --red:#ff1744;
     --red2:#ff003c;
+
     --blue:#00aaff;
     --blue2:#006eff;
+
+    --green:#40ffac;
+    --gold:#ffd54a;
 
     --line:rgba(255,255,255,.10);
 
@@ -39,6 +45,10 @@
         0 0 8px rgba(0,170,255,.8),
         0 0 20px rgba(0,170,255,.5),
         0 0 45px rgba(0,170,255,.25);
+
+    --green-glow:
+        0 0 8px rgba(64,255,172,.8),
+        0 0 20px rgba(64,255,172,.4);
 
     --white-glow:
         0 0 8px rgba(255,255,255,.5),
@@ -80,15 +90,22 @@ body{
     background-attachment:fixed;
 
     color:var(--white);
+
     min-height:100vh;
 
     overflow-x:hidden;
 }
 
+body.game-open{
+    overflow:hidden;
+}
+
 body::before{
     content:"";
+
     position:fixed;
     inset:0;
+
     pointer-events:none;
 
     background:
@@ -127,6 +144,7 @@ button{
     display:none !important;
 }
 
+
 /* =========================================================
    HEADER
 ========================================================= */
@@ -157,6 +175,7 @@ header{
 
     position:sticky;
     top:0;
+
     z-index:100;
 
     backdrop-filter:blur(18px);
@@ -197,28 +216,27 @@ header{
     border:1px solid rgba(255,255,255,.14);
 
     padding:9px 15px;
+
     border-radius:30px;
 
     font-size:13px;
     font-weight:700;
-
-    box-shadow:
-        inset 0 0 15px rgba(255,255,255,.03),
-        0 0 15px rgba(255,255,255,.04);
 }
 
 .logout-btn{
-    background:linear-gradient(
-        135deg,
-        #ff1744,
-        #b9002b
-    );
+    background:
+        linear-gradient(
+            135deg,
+            #ff1744,
+            #b9002b
+        );
 
     color:white;
 
     border:1px solid rgba(255,100,120,.5);
 
     padding:9px 16px;
+
     border-radius:9px;
 
     font-weight:800;
@@ -237,12 +255,14 @@ header{
         0 0 30px rgba(255,23,68,.4);
 }
 
+
 /* =========================================================
    MAIN
 ========================================================= */
 
 .container{
     width:min(1250px,94%);
+
     margin:32px auto;
 }
 
@@ -267,6 +287,7 @@ header{
     backdrop-filter:blur(15px);
 
     position:relative;
+
     overflow:hidden;
 }
 
@@ -290,25 +311,23 @@ header{
             var(--blue),
             transparent
         );
-
-    box-shadow:
-        0 0 10px rgba(255,255,255,.4);
 }
 
 .title{
     font-size:29px;
     font-weight:1000;
-    margin-bottom:8px;
 
-    text-shadow:
-        0 0 10px rgba(255,255,255,.25);
+    margin-bottom:8px;
 }
 
 .subtitle{
     color:#9baabd;
+
     font-size:14px;
+
     margin-bottom:25px;
 }
+
 
 /* =========================================================
    AUTH
@@ -316,6 +335,7 @@ header{
 
 .auth-wrapper{
     width:min(460px,94%);
+
     margin:70px auto;
 }
 
@@ -345,6 +365,7 @@ header{
     padding:12px;
 
     border:0;
+
     border-radius:9px;
 
     background:transparent;
@@ -352,8 +373,6 @@ header{
     color:#78869a;
 
     font-weight:900;
-
-    transition:.2s;
 }
 
 .auth-tab.active{
@@ -400,11 +419,6 @@ header{
     border-radius:10px;
 
     outline:none;
-
-    transition:.2s;
-
-    box-shadow:
-        inset 0 0 15px rgba(0,0,0,.5);
 }
 
 .form-group input:focus{
@@ -451,24 +465,22 @@ header{
 
 .auth-message{
     margin-top:15px;
+
     font-size:13px;
+
     text-align:center;
+
     min-height:20px;
 }
 
 .success{
     color:#48ffad;
-
-    text-shadow:
-        0 0 8px rgba(72,255,173,.5);
 }
 
 .error{
     color:#ff4967;
-
-    text-shadow:
-        0 0 8px rgba(255,73,103,.45);
 }
+
 
 /* =========================================================
    DASHBOARD
@@ -476,27 +488,36 @@ header{
 
 .dashboard-grid{
     display:grid;
+
     grid-template-columns:1.5fr 1fr;
+
     gap:20px;
 }
 
 @media(max-width:850px){
+
     .dashboard-grid{
         grid-template-columns:1fr;
     }
+
 }
 
 .action-grid{
     display:grid;
+
     grid-template-columns:repeat(2,1fr);
+
     gap:12px;
+
     margin-top:20px;
 }
 
 @media(max-width:500px){
+
     .action-grid{
         grid-template-columns:1fr;
     }
+
 }
 
 .action-btn{
@@ -518,9 +539,6 @@ header{
     font-weight:900;
 
     transition:.2s;
-
-    box-shadow:
-        inset 0 0 20px rgba(255,255,255,.015);
 }
 
 .action-btn:hover{
@@ -529,8 +547,7 @@ header{
     transform:translateY(-2px);
 
     box-shadow:
-        0 0 10px rgba(0,170,255,.45),
-        inset 0 0 15px rgba(0,170,255,.05);
+        0 0 10px rgba(0,170,255,.45);
 }
 
 .action-btn.red{
@@ -539,9 +556,6 @@ header{
 
 .action-btn.red:hover{
     border-color:var(--red);
-
-    box-shadow:
-        0 0 12px rgba(255,23,68,.55);
 }
 
 .action-btn.green{
@@ -552,20 +566,25 @@ header{
     border-color:#69571f;
 }
 
+
 /* =========================================================
    STATS
 ========================================================= */
 
 .stats-grid{
     display:grid;
+
     grid-template-columns:repeat(4,1fr);
+
     gap:12px;
 }
 
 @media(max-width:650px){
+
     .stats-grid{
         grid-template-columns:repeat(2,1fr);
     }
+
 }
 
 .stat{
@@ -578,69 +597,268 @@ header{
     padding:16px;
 
     text-align:center;
-
-    box-shadow:
-        inset 0 0 20px rgba(255,255,255,.015);
 }
 
 .stat-number{
     font-size:25px;
-    font-weight:1000;
 
-    text-shadow:
-        0 0 10px rgba(255,255,255,.35);
+    font-weight:1000;
 }
 
 .stat-label{
     color:#8d9bb2;
+
     font-size:12px;
+
     margin-top:5px;
 }
 
+
 /* =========================================================
-   GAME
+   GAME FULL SCREEN
 ========================================================= */
 
-.game-area{
+#gameScreen{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:800;
+
+    background:
+        radial-gradient(
+            circle at 15% 15%,
+            rgba(255,23,68,.13),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 85% 15%,
+            rgba(0,170,255,.16),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #030508,
+            #020408 55%,
+            #07101b
+        );
+
+    overflow:auto;
+
+    padding:20px;
+
+}
+
+.game-screen-inner{
+
+    width:min(1050px,100%);
+
+    min-height:100%;
+
+    margin:auto;
+
     display:flex;
+
     flex-direction:column;
+
+}
+
+.game-topbar{
+
+    display:flex;
+
     align-items:center;
 
-    width:100%;
+    justify-content:space-between;
+
+    gap:15px;
+
+    margin-bottom:20px;
+
 }
 
-.game-status{
-    text-align:center;
-    margin-bottom:22px;
-}
+.game-brand{
 
-.turn-text{
     font-size:20px;
+
     font-weight:1000;
+
+    letter-spacing:1px;
+}
+
+.game-brand span{
+    color:var(--red);
+}
+
+.game-menu-btn{
+
+    border:1px solid rgba(255,255,255,.18);
+
+    background:
+        linear-gradient(
+            135deg,
+            #162338,
+            #070c14
+        );
 
     color:#fff;
 
-    text-shadow:
-        0 0 8px rgba(255,255,255,.4);
+    padding:10px 16px;
+
+    border-radius:9px;
+
+    font-weight:900;
+}
+
+.game-menu-btn:hover{
+
+    border-color:var(--blue);
+
+    box-shadow:
+        0 0 12px rgba(0,170,255,.35);
+
+}
+
+.game-card{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(12,19,30,.97),
+            rgba(2,5,9,.98)
+        );
+
+    border:1px solid rgba(255,255,255,.10);
+
+    border-radius:24px;
+
+    padding:24px;
+
+    box-shadow:
+        0 25px 80px rgba(0,0,0,.65),
+        0 0 40px rgba(0,170,255,.06);
+
+}
+
+.game-players{
+
+    width:min(680px,94vw);
+
+    display:grid;
+
+    grid-template-columns:1fr auto 1fr;
+
+    gap:15px;
+
+    align-items:center;
+
+    margin-bottom:18px;
+
+}
+
+.player-box{
+
+    padding:12px 15px;
+
+    border:1px solid #26364e;
+
+    border-radius:12px;
+
+    background:#050a12;
+
+}
+
+.player-box.me{
+
+    border-color:rgba(255,23,68,.5);
+
+    box-shadow:
+        0 0 15px rgba(255,23,68,.08);
+
+}
+
+.player-box.opponent{
+
+    border-color:rgba(0,170,255,.5);
+
+    box-shadow:
+        0 0 15px rgba(0,170,255,.08);
+
+}
+
+.player-name{
+
+    font-weight:1000;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+.player-symbol{
+
+    font-size:12px;
+
+    color:#8d9bb2;
+
+    margin-top:4px;
+
+}
+
+.vs{
+
+    font-weight:1000;
+
+    color:#7e8da4;
+
+}
+
+.game-status{
+
+    text-align:center;
+
+    margin-bottom:16px;
+
+}
+
+.turn-text{
+
+    font-size:20px;
+
+    font-weight:1000;
+
 }
 
 .game-result{
-    margin-top:8px;
 
-    color:#40ffac;
+    margin-top:7px;
+
+    color:var(--green);
 
     font-weight:900;
-
-    text-shadow:
-        0 0 8px rgba(64,255,172,.7),
-        0 0 20px rgba(64,255,172,.25);
 }
 
+
 /* =========================================================
-   10 x 10 NEON BOARD
+   BOARD
 ========================================================= */
 
 .board{
+
     width:min(680px,94vw);
 
     aspect-ratio:1 / 1;
@@ -667,15 +885,11 @@ header{
     box-shadow:
         0 0 8px rgba(255,255,255,.12),
         0 0 25px rgba(0,170,255,.18),
-        0 0 45px rgba(255,23,68,.10),
-        inset 0 0 25px rgba(255,255,255,.04);
+        0 0 45px rgba(255,23,68,.10);
 }
 
-/* =========================================================
-   10 x 10 CELLS
-========================================================= */
-
 .cell{
+
     width:100%;
     height:100%;
 
@@ -699,11 +913,7 @@ header{
 
     font-weight:1000;
 
-    transition:
-        transform .12s,
-        background .15s,
-        box-shadow .15s,
-        border-color .15s;
+    transition:.12s;
 
     box-shadow:
         inset 0 0 8px rgba(255,255,255,.025);
@@ -722,20 +932,14 @@ header{
 
     border-color:rgba(255,255,255,.35);
 
-    box-shadow:
-        0 0 8px rgba(255,255,255,.18),
-        inset 0 0 10px rgba(0,170,255,.08);
 }
 
 .cell:disabled{
     cursor:default;
 }
 
-/* =========================================================
-   X — NEON RED
-========================================================= */
-
 .cell.x{
+
     color:#ff1744;
 
     text-shadow:
@@ -745,16 +949,10 @@ header{
 
     border-color:rgba(255,23,68,.45);
 
-    box-shadow:
-        inset 0 0 10px rgba(255,23,68,.08),
-        0 0 7px rgba(255,23,68,.25);
 }
 
-/* =========================================================
-   O — NEON BLUE
-========================================================= */
-
 .cell.o{
+
     color:#00aaff;
 
     text-shadow:
@@ -764,16 +962,10 @@ header{
 
     border-color:rgba(0,170,255,.45);
 
-    box-shadow:
-        inset 0 0 10px rgba(0,170,255,.08),
-        0 0 7px rgba(0,170,255,.25);
 }
 
-/* =========================================================
-   WINNING CELLS
-========================================================= */
-
 .cell.win{
+
     background:
         linear-gradient(
             135deg,
@@ -788,13 +980,6 @@ header{
     animation:
         winningPulse .75s infinite alternate;
 
-    box-shadow:
-        0 0 10px #fff,
-        0 0 25px rgba(255,255,255,.8),
-        0 0 45px rgba(0,170,255,.5),
-        0 0 60px rgba(255,23,68,.35);
-
-    text-shadow:none;
 }
 
 @keyframes winningPulse{
@@ -815,23 +1000,30 @@ header{
             0 0 30px rgba(255,255,255,.9),
             0 0 50px rgba(0,170,255,.45);
     }
+
 }
+
 
 /* =========================================================
    GAME ACTIONS
 ========================================================= */
 
 .game-actions{
+
     display:flex;
+
     flex-wrap:wrap;
+
     justify-content:center;
 
     gap:10px;
 
-    margin-top:22px;
+    margin-top:20px;
+
 }
 
 .small-btn{
+
     border:1px solid rgba(255,255,255,.15);
 
     padding:10px 17px;
@@ -849,21 +1041,18 @@ header{
 
     font-weight:900;
 
-    box-shadow:
-        0 0 8px rgba(0,170,255,.4);
-
     transition:.2s;
+
 }
 
 .small-btn:hover{
+
     transform:translateY(-2px);
 
-    box-shadow:
-        0 0 12px rgba(0,170,255,.8),
-        0 0 25px rgba(0,170,255,.3);
 }
 
 .small-btn.red{
+
     background:
         linear-gradient(
             135deg,
@@ -871,24 +1060,40 @@ header{
             #b9002b
         );
 
-    box-shadow:
-        0 0 8px rgba(255,23,68,.45);
-}
-
-.small-btn.red:hover{
-    box-shadow:
-        0 0 12px rgba(255,23,68,.85),
-        0 0 25px rgba(255,23,68,.3);
 }
 
 .small-btn.dark{
+
     background:
         linear-gradient(
             135deg,
             #182438,
             #080e18
         );
+
 }
+
+.small-btn.green{
+
+    background:
+        linear-gradient(
+            135deg,
+            #13a86d,
+            #006c45
+        );
+
+}
+
+.small-btn:disabled{
+
+    opacity:.45;
+
+    cursor:not-allowed;
+
+    transform:none;
+
+}
+
 
 /* =========================================================
    PANELS
@@ -900,15 +1105,20 @@ header{
 
 .panel h2{
     font-size:19px;
+
     margin-bottom:15px;
 }
 
 .input-row{
+
     display:flex;
+
     gap:10px;
+
 }
 
 .input-row input{
+
     flex:1;
 
     background:#03070d;
@@ -922,16 +1132,11 @@ header{
     border-radius:9px;
 
     outline:none;
-}
 
-.input-row input:focus{
-    border-color:var(--blue);
-
-    box-shadow:
-        0 0 10px rgba(0,170,255,.3);
 }
 
 .input-row button{
+
     border:1px solid rgba(0,170,255,.4);
 
     padding:0 17px;
@@ -948,22 +1153,32 @@ header{
     border-radius:9px;
 
     font-weight:900;
+
 }
+
 
 /* =========================================================
    LISTS
 ========================================================= */
 
 .list{
+
     display:flex;
+
     flex-direction:column;
+
     gap:10px;
+
 }
 
 .list-item{
+
     display:flex;
+
     justify-content:space-between;
+
     align-items:center;
+
     gap:12px;
 
     background:
@@ -979,16 +1194,6 @@ header{
 
     border-radius:11px;
 
-    transition:.2s;
-}
-
-.list-item:hover{
-    border-color:rgba(255,255,255,.25);
-
-    transform:translateX(2px);
-
-    box-shadow:
-        0 0 12px rgba(0,170,255,.08);
 }
 
 .list-main{
@@ -1000,26 +1205,99 @@ header{
 }
 
 .list-meta{
+
     color:#8d9bb2;
+
     font-size:12px;
+
     margin-top:4px;
+
 }
 
 .rank{
-    font-size:18px;
-    font-weight:1000;
-    color:#fff;
 
-    text-shadow:
-        0 0 8px rgba(255,255,255,.5);
+    font-size:18px;
+
+    font-weight:1000;
+
 }
+
+
+/* =========================================================
+   GROUP MEMBER
+========================================================= */
+
+.member-row{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:12px;
+
+    background:#050a12;
+
+    border:1px solid #1d2b40;
+
+    padding:12px;
+
+    border-radius:10px;
+
+}
+
+.member-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    min-width:0;
+
+}
+
+.online-dot{
+
+    width:9px;
+
+    height:9px;
+
+    min-width:9px;
+
+    border-radius:50%;
+
+    background:#687589;
+
+}
+
+.online-dot.online{
+
+    background:#40ffac;
+
+    box-shadow:
+        0 0 8px rgba(64,255,172,.8);
+}
+
+.online-text{
+
+    font-size:11px;
+
+    color:#7f8da1;
+
+}
+
 
 /* =========================================================
    MODAL
 ========================================================= */
 
 .modal{
+
     position:fixed;
+
     inset:0;
 
     background:
@@ -1032,17 +1310,20 @@ header{
     display:flex;
 
     align-items:center;
+
     justify-content:center;
 
-    z-index:500;
+    z-index:900;
 
     padding:20px;
 
     backdrop-filter:blur(8px);
+
 }
 
 .modal-box{
-    width:min(520px,100%);
+
+    width:min(560px,100%);
 
     background:
         linear-gradient(
@@ -1062,20 +1343,25 @@ header{
     overflow:auto;
 
     box-shadow:
-        0 0 15px rgba(255,255,255,.08),
         0 0 40px rgba(0,170,255,.12),
         0 25px 80px rgba(0,0,0,.8);
+
 }
 
 .modal-header{
+
     display:flex;
+
     align-items:center;
+
     justify-content:space-between;
 
     margin-bottom:18px;
+
 }
 
 .close{
+
     border:1px solid rgba(255,255,255,.15);
 
     background:#101c2d;
@@ -1083,28 +1369,118 @@ header{
     color:white;
 
     width:35px;
+
     height:35px;
 
     border-radius:50%;
 
-    transition:.2s;
 }
 
 .close:hover{
+
     background:var(--red);
 
-    border-color:var(--red);
-
-    box-shadow:
-        0 0 12px rgba(255,23,68,.6);
 }
+
+
+/* =========================================================
+   RESULT POPUP
+========================================================= */
+
+.result-modal .modal-box{
+
+    width:min(430px,100%);
+
+    text-align:center;
+
+}
+
+.result-icon{
+
+    font-size:65px;
+
+    margin:10px 0 5px;
+
+    animation:resultPop .45s ease;
+
+}
+
+.result-title{
+
+    font-size:30px;
+
+    font-weight:1000;
+
+    margin:5px 0 8px;
+
+}
+
+.result-subtitle{
+
+    color:#91a0b5;
+
+    margin-bottom:20px;
+
+}
+
+@keyframes resultPop{
+
+    from{
+
+        transform:scale(.3);
+
+        opacity:0;
+
+    }
+
+    to{
+
+        transform:scale(1);
+
+        opacity:1;
+
+    }
+
+}
+
+
+/* =========================================================
+   ROOM WAITING
+========================================================= */
+
+.room-code{
+
+    font-size:32px;
+
+    font-weight:1000;
+
+    letter-spacing:4px;
+
+    text-align:center;
+
+    margin:18px 0;
+
+}
+
+.room-name-display{
+
+    text-align:center;
+
+    color:#9baabd;
+
+    margin-bottom:10px;
+
+}
+
 
 /* =========================================================
    LOADING
 ========================================================= */
 
 .loading{
+
     position:fixed;
+
     inset:0;
 
     background:
@@ -1114,27 +1490,33 @@ header{
             rgba(0,0,0,.92)
         );
 
-    z-index:1000;
+    z-index:2000;
 
     display:flex;
 
     align-items:center;
+
     justify-content:center;
 
     backdrop-filter:blur(8px);
+
 }
 
 .loader-box{
+
     text-align:center;
+
 }
 
 .spinner{
+
     width:50px;
     height:50px;
 
     border:3px solid #263653;
 
     border-top-color:var(--blue);
+
     border-right-color:var(--red);
 
     border-radius:50%;
@@ -1143,22 +1525,23 @@ header{
 
     margin:auto auto 15px;
 
-    box-shadow:
-        0 0 12px rgba(0,170,255,.5),
-        0 0 20px rgba(255,23,68,.25);
 }
 
 @keyframes spin{
+
     to{
         transform:rotate(360deg);
     }
+
 }
+
 
 /* =========================================================
    TOAST
 ========================================================= */
 
 .toast{
+
     position:fixed;
 
     right:20px;
@@ -1179,63 +1562,109 @@ header{
 
     border-radius:10px;
 
-    z-index:2000;
+    z-index:3000;
 
     max-width:350px;
 
-    box-shadow:
-        0 0 15px rgba(0,0,0,.6),
-        0 0 20px rgba(0,170,255,.08);
 }
 
 .toast.success{
+
     border-color:#236242;
 
-    box-shadow:
-        0 0 12px rgba(64,255,172,.2);
 }
 
 .toast.error{
+
     border-color:#6b2938;
 
-    box-shadow:
-        0 0 12px rgba(255,23,68,.2);
 }
 
+
 /* =========================================================
-   MOBILE — 10 x 10 BOARD
+   MOBILE
 ========================================================= */
 
 @media(max-width:600px){
 
     header{
+
         height:64px;
+
         padding:0 14px;
+
     }
 
     .logo{
+
         font-size:18px;
+
     }
 
     .player-badge{
+
         display:none;
+
     }
 
     .container{
+
         width:96%;
+
         margin:20px auto;
+
     }
 
     .card{
+
         padding:17px;
+
         border-radius:16px;
+
     }
 
     .title{
+
         font-size:24px;
+
+    }
+
+    #gameScreen{
+
+        padding:10px;
+
+    }
+
+    .game-card{
+
+        padding:12px;
+
+        border-radius:16px;
+
+    }
+
+    .game-players{
+
+        width:100%;
+
+        gap:7px;
+
+    }
+
+    .player-box{
+
+        padding:9px;
+
+    }
+
+    .player-name{
+
+        font-size:12px;
+
     }
 
     .board{
+
         width:min(96vw,560px);
 
         gap:3px;
@@ -1243,80 +1672,77 @@ header{
         padding:5px;
 
         border-radius:12px;
+
     }
 
     .cell{
+
         border-radius:4px;
 
         font-size:
+
             clamp(
                 14px,
                 6vw,
                 28px
             );
+
     }
 
     .game-actions{
+
         width:100%;
+
     }
 
     .small-btn{
+
         flex:1;
-        min-width:110px;
+
+        min-width:100px;
+
     }
 
 }
 
-/* =========================================================
-   VERY SMALL MOBILE
-========================================================= */
-
-@media(max-width:380px){
-
-    .board{
-        width:98vw;
-        gap:2px;
-        padding:4px;
-    }
-
-    .cell{
-        font-size:14px;
-        border-radius:3px;
-    }
-
-    .game-actions{
-        gap:6px;
-    }
-
-    .small-btn{
-        padding:9px 10px;
-        font-size:12px;
-    }
-}
 </style>
-```
 
 </head>
 
+
 <body>
 
-<!-- ========================================================
+
+<!-- =========================================================
      HEADER
 ========================================================= -->
 
-<header id="mainHeader" class="hidden">
+<header
+    id="mainHeader"
+    class="hidden"
+>
 
     <div class="logo">
-        OX <span>FIGHTER</span> JETS
+
+        OX
+        <span>FIGHTER</span>
+        JETS
+
     </div>
 
     <div class="header-right">
 
-        <div class="player-badge" id="headerPlayer">
+        <div
+            class="player-badge"
+            id="headerPlayer"
+        >
             Player
         </div>
 
-        <button class="logout-btn" onclick="logout()">
+        <button
+            class="logout-btn"
+            onclick="logout()"
+        >
             Logout
         </button>
 
@@ -1325,8 +1751,8 @@ header{
 </header>
 
 
-<!-- ========================================================
-     AUTH SCREEN
+<!-- =========================================================
+     AUTH
 ========================================================= -->
 
 <section id="authScreen">
@@ -1340,7 +1766,7 @@ header{
             </div>
 
             <div class="subtitle">
-                5 × 5 multiplayer OX game
+                10 × 10 multiplayer OX • 5 in a row to win
             </div>
 
             <div class="auth-tabs">
@@ -1388,7 +1814,6 @@ header{
 
                 </div>
 
-
                 <div class="form-group">
 
                     <label>
@@ -1405,7 +1830,6 @@ header{
                     >
 
                 </div>
-
 
                 <button
                     class="primary-btn"
@@ -1441,7 +1865,6 @@ header{
 
                 </div>
 
-
                 <div class="form-group">
 
                     <label>
@@ -1458,7 +1881,6 @@ header{
                     >
 
                 </div>
-
 
                 <div class="form-group">
 
@@ -1477,7 +1899,6 @@ header{
 
                 </div>
 
-
                 <div class="form-group">
 
                     <label>
@@ -1495,7 +1916,6 @@ header{
 
                 </div>
 
-
                 <button
                     class="primary-btn"
                     type="submit"
@@ -1504,7 +1924,6 @@ header{
                 </button>
 
             </form>
-
 
             <div
                 id="authMessage"
@@ -1518,8 +1937,8 @@ header{
 </section>
 
 
-<!-- ========================================================
-     APP
+<!-- =========================================================
+     DASHBOARD
 ========================================================= -->
 
 <section
@@ -1531,21 +1950,20 @@ header{
 
         <div class="dashboard-grid">
 
-
-            <!-- LEFT -->
-
             <div>
 
                 <div class="card">
 
                     <div class="title">
-                        Welcome, <span id="welcomeName"></span>
+
+                        Welcome,
+                        <span id="welcomeName"></span>
+
                     </div>
 
                     <div class="subtitle">
                         Your OX Fighter Jets profile
                     </div>
-
 
                     <div class="stats-grid">
 
@@ -1564,7 +1982,6 @@ header{
 
                         </div>
 
-
                         <div class="stat">
 
                             <div
@@ -1580,7 +1997,6 @@ header{
 
                         </div>
 
-
                         <div class="stat">
 
                             <div
@@ -1595,7 +2011,6 @@ header{
                             </div>
 
                         </div>
-
 
                         <div class="stat">
 
@@ -1636,6 +2051,13 @@ header{
                             onclick="openGroupsModal()"
                         >
                             👥 Groups
+                        </button>
+
+                        <button
+                            class="action-btn"
+                            onclick="openMyGroups()"
+                        >
+                            ⭐ My Groups
                         </button>
 
                         <button
@@ -1691,69 +2113,6 @@ header{
 
                 </div>
 
-
-                <!-- GAME -->
-
-                <div
-                    id="gameCard"
-                    class="card panel hidden"
-                >
-
-                    <div class="game-area">
-
-                        <div class="game-status">
-
-                            <div
-                                id="turnText"
-                                class="turn-text"
-                            >
-                                Loading...
-                            </div>
-
-                            <div
-                                id="gameResult"
-                                class="game-result"
-                            ></div>
-
-                        </div>
-
-
-                        <div
-                            id="board"
-                            class="board"
-                        ></div>
-
-
-                        <div class="game-actions">
-
-                            <button
-                                class="small-btn red"
-                                onclick="resignGame()"
-                            >
-                                Resign
-                            </button>
-
-                            <button
-                                id="rematchBtn"
-                                class="small-btn"
-                                onclick="rematchGame()"
-                            >
-                                Rematch
-                            </button>
-
-                            <button
-                                class="small-btn dark"
-                                onclick="closeGame()"
-                            >
-                                Close
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
             </div>
 
 
@@ -1785,7 +2144,10 @@ header{
                     <div
                         id="profileUsername"
                         class="subtitle"
-                        style="margin-top:10px;margin-bottom:0"
+                        style="
+                        margin-top:10px;
+                        margin-bottom:0
+                        "
                     >
                         -
                     </div>
@@ -1817,6 +2179,13 @@ header{
 
                         <button
                             class="action-btn"
+                            onclick="openMyGroups()"
+                        >
+                            ⭐ My Groups
+                        </button>
+
+                        <button
+                            class="action-btn"
                             onclick="loadLeaderboard()"
                         >
                             🏆 View Leaderboard
@@ -1835,7 +2204,147 @@ header{
 </section>
 
 
-<!-- ========================================================
+<!-- =========================================================
+     FULL SCREEN GAME
+========================================================= -->
+
+<section
+    id="gameScreen"
+    class="hidden"
+>
+
+    <div class="game-screen-inner">
+
+        <div class="game-topbar">
+
+            <div class="game-brand">
+
+                OX
+                <span>FIGHTER</span>
+                JETS
+
+            </div>
+
+            <button
+                class="game-menu-btn"
+                onclick="openGameMenu()"
+            >
+                ☰ Menu
+            </button>
+
+        </div>
+
+
+        <div class="game-card">
+
+            <div class="game-players">
+
+                <div
+                    id="myPlayerBox"
+                    class="player-box me"
+                >
+
+                    <div
+                        id="myGameName"
+                        class="player-name"
+                    >
+                        You
+                    </div>
+
+                    <div
+                        id="myGameSymbol"
+                        class="player-symbol"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+                <div class="vs">
+                    VS
+                </div>
+
+                <div
+                    id="opponentPlayerBox"
+                    class="player-box opponent"
+                >
+
+                    <div
+                        id="opponentGameName"
+                        class="player-name"
+                    >
+                        Opponent
+                    </div>
+
+                    <div
+                        id="opponentGameSymbol"
+                        class="player-symbol"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="game-status">
+
+                <div
+                    id="turnText"
+                    class="turn-text"
+                >
+                    Loading...
+                </div>
+
+                <div
+                    id="gameResult"
+                    class="game-result"
+                ></div>
+
+            </div>
+
+
+            <div
+                id="board"
+                class="board"
+            ></div>
+
+
+            <div class="game-actions">
+
+                <button
+                    class="small-btn red"
+                    onclick="resignGame()"
+                >
+                    ⚠ Resign
+                </button>
+
+                <button
+                    id="rematchBtn"
+                    class="small-btn green hidden"
+                    onclick="rematchGame()"
+                >
+                    🔄 Rematch
+                </button>
+
+                <button
+                    class="small-btn dark"
+                    onclick="openGameMenu()"
+                >
+                    ☰ Menu
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
      GENERIC MODAL
 ========================================================= -->
 
@@ -1872,7 +2381,65 @@ header{
 </div>
 
 
-<!-- ========================================================
+<!-- =========================================================
+     RESULT MODAL
+========================================================= -->
+
+<div
+    id="resultModal"
+    class="modal result-modal hidden"
+>
+
+    <div class="modal-box">
+
+        <div
+            id="resultIcon"
+            class="result-icon"
+        >
+            🎉
+        </div>
+
+        <div
+            id="resultTitle"
+            class="result-title"
+        >
+            YOU WON!
+        </div>
+
+        <div
+            id="resultSubtitle"
+            class="result-subtitle"
+        >
+            Congratulations!
+        </div>
+
+        <div
+            class="game-actions"
+        >
+
+            <button
+                id="resultRematchBtn"
+                class="small-btn green"
+                onclick="rematchFromResult()"
+            >
+                🔄 Rematch
+            </button>
+
+            <button
+                class="small-btn dark"
+                onclick="closeResultToMenu()"
+            >
+                ☰ Menu
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
      LOADING
 ========================================================= -->
 
@@ -1894,7 +2461,7 @@ header{
 </div>
 
 
-<!-- ========================================================
+<!-- =========================================================
      TOAST
 ========================================================= -->
 
@@ -1905,6 +2472,7 @@ header{
 
 
 <script>
+
 
 /* =========================================================
    CONFIGURATION
@@ -1922,17 +2490,26 @@ const API_PREFIX =
 ========================================================= */
 
 let currentPlayer = null;
+
 let currentGame = null;
+
 let pollingTimer = null;
+
 let matchmakingTimer = null;
+
+let roomPollTimer = null;
+
+let resultShownForGame = null;
 
 
 /* =========================================================
-   DOM HELPERS
+   DOM
 ========================================================= */
 
 function $(id){
+
     return document.getElementById(id);
+
 }
 
 
@@ -1945,12 +2522,14 @@ function showLoading(text="Please wait..."){
     $("loadingText").textContent = text;
 
     $("loading").classList.remove("hidden");
+
 }
 
 
 function hideLoading(){
 
     $("loading").classList.add("hidden");
+
 }
 
 
@@ -1958,24 +2537,37 @@ function hideLoading(){
    TOAST
 ========================================================= */
 
-function showToast(message,type="success"){
+function showToast(
+    message,
+    type="success"
+){
 
-    const toast = $("toast");
+    const toast =
+        $("toast");
 
-    toast.textContent = message;
+    toast.textContent =
+        message;
 
     toast.className =
         "toast " +
-        (type === "error" ? "error" : "success");
+        (
+            type === "error"
+            ? "error"
+            : "success"
+        );
 
-    setTimeout(()=>{
-        toast.classList.add("hidden");
-    },3500);
+    setTimeout(
+        ()=>{
+            toast.classList.add("hidden");
+        },
+        3500
+    );
+
 }
 
 
 /* =========================================================
-   API REQUEST
+   API
 ========================================================= */
 
 async function apiRequest(
@@ -1987,13 +2579,19 @@ async function apiRequest(
         localStorage.getItem("oxToken");
 
     const headers = {
-        "Content-Type":"application/json",
+
+        "Content-Type":
+            "application/json",
+
         ...(options.headers || {})
+
     };
 
     if(token){
+
         headers["Authorization"] =
             `Bearer ${token}`;
+
     }
 
     try{
@@ -2007,13 +2605,20 @@ async function apiRequest(
                 }
             );
 
+
         let data = {};
 
         try{
-            data = await response.json();
+
+            data =
+                await response.json();
+
         }catch{
+
             data = {};
+
         }
+
 
         if(response.status === 401){
 
@@ -2022,34 +2627,46 @@ async function apiRequest(
                 endpoint !== "/auth/signup"
             ){
 
-                localStorage.removeItem("oxToken");
+                localStorage.removeItem(
+                    "oxToken"
+                );
+
                 currentPlayer = null;
+
+                closeGameInterface();
 
                 showAuthScreen();
 
             }
+
         }
+
 
         if(!response.ok){
 
             throw new Error(
                 data.message ||
+                data.error ||
                 `Request failed (${response.status})`
             );
+
         }
+
 
         return data;
 
     }catch(error){
 
         console.error(
-            "OX API Error:",
+            "OX API:",
             endpoint,
             error
         );
 
         throw error;
+
     }
+
 }
 
 
@@ -2087,6 +2704,7 @@ function showAuth(type){
         );
 
     $("authMessage").textContent = "";
+
 }
 
 
@@ -2095,6 +2713,8 @@ function showAuth(type){
 ========================================================= */
 
 function showAuthScreen(){
+
+    closeGameInterface();
 
     $("authScreen")
         .classList.remove("hidden");
@@ -2105,14 +2725,13 @@ function showAuthScreen(){
     $("mainHeader")
         .classList.add("hidden");
 
-    $("gameCard")
-        .classList.add("hidden");
-
     $("matchCard")
         .classList.add("hidden");
 
     stopGamePolling();
+
     stopMatchmakingPolling();
+
 }
 
 
@@ -2130,6 +2749,33 @@ function showAppScreen(){
 
     $("mainHeader")
         .classList.remove("hidden");
+
+}
+
+
+/* =========================================================
+   AUTH MESSAGE
+========================================================= */
+
+function setAuthMessage(
+    message,
+    isError=false
+){
+
+    const el =
+        $("authMessage");
+
+    el.textContent =
+        message;
+
+    el.className =
+        "auth-message " +
+        (
+            isError
+            ? "error"
+            : "success"
+        );
+
 }
 
 
@@ -2169,21 +2815,13 @@ async function signup(event){
         );
 
         return;
+
     }
 
 
-    if(!username){
-
-        setAuthMessage(
-            "Please enter a username.",
-            true
-        );
-
-        return;
-    }
-
-
-    if(!/^[a-zA-Z0-9_-]{3,30}$/.test(username)){
+    if(
+        !/^[a-zA-Z0-9_-]{3,30}$/.test(username)
+    ){
 
         setAuthMessage(
             "Username must be 3-30 characters and use only letters, numbers, _ or -.",
@@ -2191,6 +2829,7 @@ async function signup(event){
         );
 
         return;
+
     }
 
 
@@ -2202,6 +2841,7 @@ async function signup(event){
         );
 
         return;
+
     }
 
 
@@ -2213,6 +2853,7 @@ async function signup(event){
         );
 
         return;
+
     }
 
 
@@ -2222,16 +2863,19 @@ async function signup(event){
             "Creating your account..."
         );
 
+
         const data =
             await apiRequest(
                 "/auth/signup",
                 {
                     method:"POST",
-                    body:JSON.stringify({
-                        name,
-                        username,
-                        password
-                    })
+
+                    body:
+                        JSON.stringify({
+                            name,
+                            username,
+                            password
+                        })
                 }
             );
 
@@ -2252,8 +2896,8 @@ async function signup(event){
             "Account created successfully!"
         );
 
-
         openDashboard();
+
 
     }catch(error){
 
@@ -2263,7 +2907,9 @@ async function signup(event){
             error.message,
             true
         );
+
     }
+
 }
 
 
@@ -2294,6 +2940,7 @@ async function login(event){
         );
 
         return;
+
     }
 
 
@@ -2303,15 +2950,18 @@ async function login(event){
             "Logging in..."
         );
 
+
         const data =
             await apiRequest(
                 "/auth/login",
                 {
                     method:"POST",
-                    body:JSON.stringify({
-                        username,
-                        password
-                    })
+
+                    body:
+                        JSON.stringify({
+                            username,
+                            password
+                        })
                 }
             );
 
@@ -2332,8 +2982,8 @@ async function login(event){
             "Login successful!"
         );
 
-
         openDashboard();
+
 
     }catch(error){
 
@@ -2343,44 +2993,28 @@ async function login(event){
             error.message,
             true
         );
+
     }
+
 }
 
 
 /* =========================================================
-   AUTH MESSAGE
-========================================================= */
-
-function setAuthMessage(
-    message,
-    isError=false
-){
-
-    const el =
-        $("authMessage");
-
-    el.textContent =
-        message;
-
-    el.className =
-        "auth-message " +
-        (isError ? "error" : "success");
-}
-
-
-/* =========================================================
-   OPEN DASHBOARD
+   DASHBOARD
 ========================================================= */
 
 function openDashboard(){
+
+    closeGameInterface();
 
     showAppScreen();
 
     updateProfileUI();
 
-    checkActiveGame();
-
     loadProfileSilently();
+
+    checkActiveGame(true);
+
 }
 
 
@@ -2391,32 +3025,43 @@ function openDashboard(){
 function updateProfileUI(){
 
     if(!currentPlayer){
+
         return;
+
     }
 
+
     $("welcomeName").textContent =
-        currentPlayer.name;
+        currentPlayer.name || "Player";
+
 
     $("headerPlayer").textContent =
-        `@${currentPlayer.username}`;
+        `@${currentPlayer.username || ""}`;
+
 
     $("profileId").textContent =
-        currentPlayer.playerId;
+        currentPlayer.playerId || "-";
+
 
     $("profileUsername").textContent =
-        `Username: @${currentPlayer.username}`;
+        `Username: @${currentPlayer.username || ""}`;
+
 
     $("statWins").textContent =
         currentPlayer.wins || 0;
 
+
     $("statLosses").textContent =
         currentPlayer.losses || 0;
+
 
     $("statDraws").textContent =
         currentPlayer.draws || 0;
 
+
     $("statWinRate").textContent =
         `${currentPlayer.winRate || 0}%`;
+
 }
 
 
@@ -2437,10 +3082,12 @@ async function loadProfileSilently(){
     }catch(error){
 
         console.error(
-            "Profile error:",
+            "Profile:",
             error
         );
+
     }
+
 }
 
 
@@ -2476,7 +3123,9 @@ async function refreshProfile(){
             error.message,
             "error"
         );
+
     }
+
 }
 
 
@@ -2507,12 +3156,20 @@ async function logout(){
 
         currentPlayer = null;
 
+        stopGamePolling();
+
+        stopMatchmakingPolling();
+
+        closeGameInterface();
+
         showAuthScreen();
 
         showToast(
             "Logged out."
         );
+
     }
+
 }
 
 
@@ -2527,6 +3184,7 @@ async function startRandomGame(){
         showAuthScreen();
 
         return;
+
     }
 
 
@@ -2549,7 +3207,10 @@ async function startRandomGame(){
             );
 
 
-        if(data.matched && data.game){
+        if(
+            data.matched &&
+            data.game
+        ){
 
             stopMatchmakingPolling();
 
@@ -2561,10 +3222,12 @@ async function startRandomGame(){
             );
 
             return;
+
         }
 
 
         startMatchmakingPolling();
+
 
     }catch(error){
 
@@ -2575,7 +3238,9 @@ async function startRandomGame(){
             error.message,
             "error"
         );
+
     }
+
 }
 
 
@@ -2592,6 +3257,7 @@ function startMatchmakingPolling(){
             checkMatchmaking,
             2500
         );
+
 }
 
 
@@ -2604,7 +3270,9 @@ function stopMatchmakingPolling(){
         );
 
         matchmakingTimer = null;
+
     }
+
 }
 
 
@@ -2630,6 +3298,7 @@ async function checkMatchmaking(){
             );
 
             return;
+
         }
 
 
@@ -2644,6 +3313,7 @@ async function checkMatchmaking(){
             $("matchStatus")
                 .textContent =
                 "Searching...";
+
         }
 
     }catch(error){
@@ -2652,7 +3322,9 @@ async function checkMatchmaking(){
 
         $("matchCard")
             .classList.add("hidden");
+
     }
+
 }
 
 
@@ -2686,149 +3358,336 @@ async function cancelMatchmaking(){
             error.message,
             "error"
         );
+
     }
+
 }
 
 
 /* =========================================================
-   OPEN GAME
+   OPEN GAME FULL SCREEN
 ========================================================= */
 
 function openGame(game){
 
-    currentGame = game;
+    if(!game){
 
-    $("gameCard")
+        showToast(
+            "Game data not found.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    currentGame =
+        game;
+
+
+    resultShownForGame = null;
+
+
+    stopMatchmakingPolling();
+
+    $("matchCard")
+        .classList.add("hidden");
+
+
+    $("appScreen")
+        .classList.add("hidden");
+
+    $("mainHeader")
+        .classList.add("hidden");
+
+
+    $("gameScreen")
         .classList.remove("hidden");
+
+
+    document.body.classList.add(
+        "game-open"
+    );
+
 
     renderGame();
 
     startGamePolling();
 
-    window.scrollTo({
-        top:$("gameCard").offsetTop - 80,
-        behavior:"smooth"
-    });
 }
 
+
 /* =========================================================
-   RENDER GAME — 10 x 10 BOARD
-   WIN = 5 CONSECUTIVE X/O
+   CLOSE GAME INTERFACE
+========================================================= */
+
+function closeGameInterface(){
+
+    stopGamePolling();
+
+    stopRoomPolling();
+
+    currentGame = null;
+
+    $("gameScreen")
+        .classList.add("hidden");
+
+    document.body.classList.remove(
+        "game-open"
+    );
+
+}
+
+
+/* =========================================================
+   GAME MENU
+========================================================= */
+
+function openGameMenu(){
+
+    openModal(
+        "🎮 Game Menu",
+        `
+        <div class="list">
+
+            <button
+                class="action-btn"
+                onclick="
+                    closeModal();
+                    refreshGame();
+                "
+            >
+                🔄 Refresh Game
+            </button>
+
+            <button
+                class="action-btn"
+                onclick="
+                    closeModal();
+                    openMyGroups();
+                "
+            >
+                ⭐ My Groups
+            </button>
+
+            <button
+                class="action-btn"
+                onclick="
+                    closeModal();
+                    loadRequests();
+                "
+            >
+                ✉ Requests
+            </button>
+
+            <button
+                class="action-btn"
+                onclick="
+                    closeModal();
+                    loadLeaderboard();
+                "
+            >
+                🏆 Leaderboard
+            </button>
+
+            <button
+                class="action-btn red"
+                onclick="leaveGameToDashboard()"
+            >
+                ← Back to Menu
+            </button>
+
+        </div>
+        `
+    );
+
+}
+
+
+function leaveGameToDashboard(){
+
+    closeModal();
+
+    closeGameInterface();
+
+    showAppScreen();
+
+    $("mainHeader")
+        .classList.remove("hidden");
+
+    loadProfileSilently();
+
+}
+
+
+/* =========================================================
+   RENDER GAME
 ========================================================= */
 
 function renderGame(){
 
     if(!currentGame){
+
         return;
+
     }
 
-    const board = $("board");
+
+    const board =
+        $("board");
+
 
     board.innerHTML = "";
 
+
+    const players =
+        currentGame.players || [];
+
+
     const myPlayer =
-        currentGame.players.find(
+        players.find(
             p =>
-                p.playerId === currentPlayer.playerId
+                String(p.playerId) ===
+                String(currentPlayer.playerId)
         );
 
 
-    /* =====================================================
-       10 x 10 BOARD
-    ===================================================== */
+    const opponent =
+        players.find(
+            p =>
+                String(p.playerId) !==
+                String(currentPlayer.playerId)
+        );
 
-    for(let r = 0; r < 10; r++){
 
-        for(let c = 0; c < 10; c++){
+    $("myGameName").textContent =
+        myPlayer?.name ||
+        currentPlayer.name ||
+        "You";
+
+
+    $("myGameSymbol").textContent =
+        myPlayer?.symbol
+        ? `Symbol: ${myPlayer.symbol}`
+        : "";
+
+
+    $("opponentGameName").textContent =
+        opponent?.name ||
+        "Opponent";
+
+
+    $("opponentGameSymbol").textContent =
+        opponent?.symbol
+        ? `Symbol: ${opponent.symbol}`
+        : "";
+
+
+    /*
+       CURRENT GAME IS 10 x 10
+    */
+
+    for(
+        let r = 0;
+        r < 10;
+        r++
+    ){
+
+        for(
+            let c = 0;
+            c < 10;
+            c++
+        ){
 
             const button =
-                document.createElement("button");
+                document.createElement(
+                    "button"
+                );
 
-            button.className = "cell";
+
+            button.className =
+                "cell";
 
 
             const value =
-                currentGame.board[r]?.[c] || "";
+                currentGame.board?.[r]?.[c] || "";
 
-
-            /* =================================================
-               CELL VALUE
-            ================================================= */
 
             if(value){
 
-                button.textContent = value;
+                button.textContent =
+                    value;
 
                 button.classList.add(
                     value.toLowerCase()
                 );
+
             }
 
-
-            /* =================================================
-               WINNING LINE
-            ================================================= */
 
             if(
                 currentGame.winningLine &&
                 currentGame.winningLine.some(
                     cell =>
-                        cell[0] === r &&
-                        cell[1] === c
+                        Number(cell[0]) === r &&
+                        Number(cell[1]) === c
                 )
             ){
 
-                button.classList.add("win");
+                button.classList.add(
+                    "win"
+                );
+
             }
 
 
-            /* =================================================
-               MOVE
-            ================================================= */
-
             button.onclick =
-                () => makeMove(r, c);
+                () =>
+                    makeMove(r,c);
 
-
-            /* =================================================
-               DISABLE CONDITIONS
-            ================================================= */
 
             if(
-                currentGame.status !== "active" ||
+                currentGame.status !==
+                    "active" ||
+
                 currentGame.currentTurn !==
                     currentPlayer.playerId ||
+
                 value
             ){
 
-                button.disabled = true;
+                button.disabled =
+                    true;
+
             }
 
 
-            board.appendChild(button);
+            board.appendChild(
+                button
+            );
+
         }
+
     }
 
 
-    /* =====================================================
-       TURN TEXT
-    ===================================================== */
-
     const turnPlayer =
-        currentGame.players.find(
+        players.find(
             p =>
-                p.playerId ===
-                currentGame.currentTurn
+                String(p.playerId) ===
+                String(currentGame.currentTurn)
         );
 
 
     if(
-        currentGame.status === "active"
+        currentGame.status ===
+        "active"
     ){
 
         if(
-            currentGame.currentTurn ===
-            currentPlayer.playerId
+            String(currentGame.currentTurn) ===
+            String(currentPlayer.playerId)
         ){
 
             $("turnText").textContent =
@@ -2838,26 +3697,28 @@ function renderGame(){
 
             $("turnText").textContent =
                 `${turnPlayer?.name || "Opponent"}'s turn`;
+
         }
 
-        $("gameResult").textContent = "";
+        $("gameResult").textContent =
+            "";
 
     }else{
 
         showGameResult();
+
     }
 
-
-    /* =====================================================
-       REMATCH BUTTON
-    ===================================================== */
 
     $("rematchBtn")
         .classList.toggle(
             "hidden",
-            currentGame.status !== "finished"
+            currentGame.status !==
+                "finished"
         );
+
 }
+
 
 /* =========================================================
    GAME RESULT
@@ -2865,48 +3726,152 @@ function renderGame(){
 
 function showGameResult(){
 
-    if(
-        currentGame.result === "draw"
-    ){
-
-        $("turnText").textContent =
-            "DRAW";
-
-        $("gameResult").textContent =
-            "Board is full.";
+    if(!currentGame){
 
         return;
+
     }
 
 
-    const winner =
-        currentGame.players
-        .find(
-            p =>
-            p.playerId ===
-            currentGame.winner
-        );
+    if(
+        resultShownForGame ===
+        currentGame.gameId
+    ){
+
+        return;
+
+    }
+
+
+    let title = "";
+
+    let subtitle = "";
+
+    let icon = "🎮";
 
 
     if(
-        currentGame.winner ===
-        currentPlayer.playerId
+        currentGame.result ===
+        "draw"
     ){
 
-        $("turnText").textContent =
-            "🎉 YOU WON!";
+        title =
+            "DRAW";
 
-        $("gameResult").textContent =
-            "Congratulations!";
+        subtitle =
+            "The board is full. Nobody won.";
+
+        icon =
+            "🤝";
+
+    }else if(
+        String(currentGame.winner) ===
+        String(currentPlayer.playerId)
+    ){
+
+        title =
+            "YOU WON!";
+
+        subtitle =
+            "🔥 Excellent move! Congratulations!";
+
+        icon =
+            "🏆";
 
     }else{
 
-        $("turnText").textContent =
+        const winner =
+            (currentGame.players || [])
+            .find(
+                p =>
+                    String(p.playerId) ===
+                    String(currentGame.winner)
+            );
+
+
+        title =
             "GAME OVER";
 
-        $("gameResult").textContent =
-            `${winner?.name || "Opponent"} won.`;
+        subtitle =
+            `${winner?.name || "Opponent"} won this match.`;
+
+        icon =
+            "💥";
+
     }
+
+
+    $("turnText").textContent =
+        title;
+
+
+    $("gameResult").textContent =
+        subtitle;
+
+
+    resultShownForGame =
+        currentGame.gameId;
+
+
+    $("resultIcon").textContent =
+        icon;
+
+    $("resultTitle").textContent =
+        title;
+
+    $("resultSubtitle").textContent =
+        subtitle;
+
+
+    $("resultRematchBtn")
+        .classList.toggle(
+            "hidden",
+            currentGame.result ===
+                "draw"
+                ? false
+                : false
+        );
+
+
+    stopGamePolling();
+
+
+    setTimeout(
+        ()=>{
+            $("resultModal")
+                .classList.remove("hidden");
+        },
+        350
+    );
+
+}
+
+
+/* =========================================================
+   CLOSE RESULT
+========================================================= */
+
+function closeResultToMenu(){
+
+    $("resultModal")
+        .classList.add("hidden");
+
+    leaveGameToDashboard();
+
+}
+
+
+/* =========================================================
+   REMATCH FROM RESULT
+========================================================= */
+
+async function rematchFromResult(){
+
+    $("resultModal")
+        .classList.add("hidden");
+
+    await rematchGame();
+
 }
 
 
@@ -2914,25 +3879,31 @@ function showGameResult(){
    MAKE MOVE
 ========================================================= */
 
-async function makeMove(row,col){
+async function makeMove(
+    row,
+    col
+){
 
     if(!currentGame){
 
         return;
+
     }
 
 
     if(
-        currentGame.status !== "active"
+        currentGame.status !==
+        "active"
     ){
 
         return;
+
     }
 
 
     if(
-        currentGame.currentTurn !==
-        currentPlayer.playerId
+        String(currentGame.currentTurn) !==
+        String(currentPlayer.playerId)
     ){
 
         showToast(
@@ -2941,14 +3912,16 @@ async function makeMove(row,col){
         );
 
         return;
+
     }
 
 
     if(
-        currentGame.board[row][col]
+        currentGame.board?.[row]?.[col]
     ){
 
         return;
+
     }
 
 
@@ -2959,12 +3932,15 @@ async function makeMove(row,col){
                 "/move",
                 {
                     method:"POST",
-                    body:JSON.stringify({
-                        gameId:
-                            currentGame.gameId,
-                        row,
-                        col
-                    })
+
+                    body:
+                        JSON.stringify({
+                            gameId:
+                                currentGame.gameId,
+
+                            row,
+                            col
+                        })
                 }
             );
 
@@ -2972,15 +3948,21 @@ async function makeMove(row,col){
         currentGame =
             data.game;
 
+
         renderGame();
 
+
         if(
-            currentGame.status === "finished"
+            currentGame.status ===
+            "finished"
         ){
 
             stopGamePolling();
 
-            await refreshProfile();
+            await loadProfileSilently();
+
+            showGameResult();
+
         }
 
     }catch(error){
@@ -2991,7 +3973,9 @@ async function makeMove(row,col){
         );
 
         await refreshGame();
+
     }
+
 }
 
 
@@ -3006,8 +3990,9 @@ function startGamePolling(){
     pollingTimer =
         setInterval(
             refreshGame,
-            2200
+            1800
         );
+
 }
 
 
@@ -3020,7 +4005,9 @@ function stopGamePolling(){
         );
 
         pollingTimer = null;
+
     }
+
 }
 
 
@@ -3029,6 +4016,7 @@ async function refreshGame(){
     if(!currentGame){
 
         return;
+
     }
 
 
@@ -3040,6 +4028,7 @@ async function refreshGame(){
         stopGamePolling();
 
         return;
+
     }
 
 
@@ -3053,19 +4042,27 @@ async function refreshGame(){
             );
 
 
-        currentGame =
-            data.game;
+        if(data.game){
 
-        renderGame();
+            currentGame =
+                data.game;
 
-        if(
-            currentGame.status ===
-            "finished"
-        ){
+            renderGame();
 
-            stopGamePolling();
 
-            await loadProfileSilently();
+            if(
+                currentGame.status ===
+                "finished"
+            ){
+
+                stopGamePolling();
+
+                await loadProfileSilently();
+
+                showGameResult();
+
+            }
+
         }
 
     }catch(error){
@@ -3074,7 +4071,9 @@ async function refreshGame(){
             "Game refresh:",
             error
         );
+
     }
+
 }
 
 
@@ -3082,7 +4081,9 @@ async function refreshGame(){
    ACTIVE GAME
 ========================================================= */
 
-async function checkActiveGame(){
+async function checkActiveGame(
+    silent=false
+){
 
     try{
 
@@ -3099,24 +4100,37 @@ async function checkActiveGame(){
             );
 
             return true;
+
         }
 
-        showToast(
-            "No active game found.",
-            "error"
-        );
+
+        if(!silent){
+
+            showToast(
+                "No active game found.",
+                "error"
+            );
+
+        }
+
 
         return false;
 
     }catch(error){
 
-        showToast(
-            error.message,
-            "error"
-        );
+        if(!silent){
+
+            showToast(
+                error.message,
+                "error"
+            );
+
+        }
 
         return false;
+
     }
+
 }
 
 
@@ -3129,6 +4143,7 @@ async function resignGame(){
     if(!currentGame){
 
         return;
+
     }
 
 
@@ -3138,18 +4153,18 @@ async function resignGame(){
     ){
 
         return;
+
     }
 
 
-    const confirmed =
-        confirm(
+    if(
+        !confirm(
             "Are you sure you want to resign?"
-        );
-
-
-    if(!confirmed){
+        )
+    ){
 
         return;
+
     }
 
 
@@ -3160,10 +4175,12 @@ async function resignGame(){
                 "/game/resign",
                 {
                     method:"POST",
-                    body:JSON.stringify({
-                        gameId:
-                            currentGame.gameId
-                    })
+
+                    body:
+                        JSON.stringify({
+                            gameId:
+                                currentGame.gameId
+                        })
                 }
             );
 
@@ -3171,11 +4188,15 @@ async function resignGame(){
         currentGame =
             data.game;
 
+
         renderGame();
 
         stopGamePolling();
 
         await loadProfileSilently();
+
+        showGameResult();
+
 
     }catch(error){
 
@@ -3183,7 +4204,9 @@ async function resignGame(){
             error.message,
             "error"
         );
+
     }
+
 }
 
 
@@ -3196,50 +4219,61 @@ async function rematchGame(){
     if(!currentGame){
 
         return;
+
     }
 
 
     try{
+
+        showLoading(
+            "Creating rematch..."
+        );
+
 
         const data =
             await apiRequest(
                 "/rematch",
                 {
                     method:"POST",
-                    body:JSON.stringify({
-                        gameId:
-                            currentGame.gameId
-                    })
+
+                    body:
+                        JSON.stringify({
+                            gameId:
+                                currentGame.gameId
+                        })
                 }
             );
 
 
-        openGame(
-            data.game
-        );
+        hideLoading();
+
+
+        if(data.game){
+
+            resultShownForGame =
+                null;
+
+            openGame(
+                data.game
+            );
+
+            showToast(
+                "Rematch started!"
+            );
+
+        }
 
     }catch(error){
+
+        hideLoading();
 
         showToast(
             error.message,
             "error"
         );
+
     }
-}
 
-
-/* =========================================================
-   CLOSE GAME
-========================================================= */
-
-function closeGame(){
-
-    stopGamePolling();
-
-    currentGame = null;
-
-    $("gameCard")
-        .classList.add("hidden");
 }
 
 
@@ -3250,16 +4284,34 @@ function closeGame(){
 function openRoomModal(){
 
     openModal(
-        "Private Room",
+        "🔐 Private Room",
         `
+
         <div class="panel" style="margin-top:0">
+
+            <div class="form-group">
+
+                <label>
+                    Room Name
+                </label>
+
+                <input
+                    id="roomNameInput"
+                    type="text"
+                    maxlength="50"
+                    placeholder="Example: Vikas Battle Room"
+                >
+
+            </div>
+
 
             <button
                 class="primary-btn"
                 onclick="createPrivateRoom()"
             >
-                Create New Room
+                🚀 Create New Room
             </button>
+
 
             <div
                 style="
@@ -3270,6 +4322,7 @@ function openRoomModal(){
             >
                 OR
             </div>
+
 
             <div class="input-row">
 
@@ -3287,8 +4340,10 @@ function openRoomModal(){
             </div>
 
         </div>
+
         `
     );
+
 }
 
 
@@ -3298,61 +4353,142 @@ function openRoomModal(){
 
 async function createPrivateRoom(){
 
+    const roomName =
+        $("roomNameInput")
+        ?.value
+        .trim();
+
+
+    if(!roomName){
+
+        showToast(
+            "Please enter a room name.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(roomName.length < 2){
+
+        showToast(
+            "Room name must be at least 2 characters.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
     try{
 
         showLoading(
-            "Creating room..."
+            "Creating private room..."
         );
+
 
         const data =
             await apiRequest(
                 "/room/create",
                 {
-                    method:"POST"
+                    method:"POST",
+
+                    body:
+                        JSON.stringify({
+
+                            name:
+                                roomName,
+
+                            roomName:
+                                roomName
+
+                        })
                 }
             );
 
+
         hideLoading();
+
 
         const room =
             data.room;
 
+
+        if(!room){
+
+            throw new Error(
+                "Room was not created."
+            );
+
+        }
+
+
         openModal(
-            "Room Created",
+            "🔐 Room Created",
             `
+
             <div style="text-align:center">
 
                 <div
                     style="
                     color:#8d9bb2;
-                    margin-bottom:8px
+                    margin-bottom:5px
+                    "
+                >
+                    Room Name
+                </div>
+
+                <div
+                    class="room-name-display"
+                    style="
+                    font-size:21px;
+                    font-weight:1000;
+                    color:#fff;
+                    "
+                >
+                    ${escapeHtml(
+                        room.name ||
+                        room.roomName ||
+                        roomName
+                    )}
+                </div>
+
+
+                <div
+                    style="
+                    color:#8d9bb2;
+                    margin-top:15px;
                     "
                 >
                     Share this Room ID
                 </div>
 
-                <div
-                    style="
-                    font-size:32px;
-                    font-weight:1000;
-                    letter-spacing:3px;
-                    margin:15px 0;
-                    "
-                >
-                    ${escapeHtml(room.roomId)}
+
+                <div class="room-code">
+
+                    ${escapeHtml(
+                        room.roomId
+                    )}
+
                 </div>
+
 
                 <button
                     class="primary-btn"
                     onclick="
-                        navigator.clipboard.writeText(
-                            '${escapeJs(room.roomId)}'
-                        );
-                        showToast('Room ID copied!');
+                        copyRoomId(
+                            '${escapeJs(
+                                room.roomId
+                            )}'
+                        )
                     "
                 >
-                    Copy Room ID
+                    📋 Copy Room ID
                 </button>
+
 
                 <div
                     style="
@@ -3361,10 +4497,20 @@ async function createPrivateRoom(){
                     font-size:13px
                     "
                 >
-                    Wait for another player to join.
+                    Waiting for another player to join...
                 </div>
 
+
+                <button
+                    class="small-btn red"
+                    style="margin-top:18px"
+                    onclick="cancelPrivateRoom()"
+                >
+                    Cancel Room
+                </button>
+
             </div>
+
             `
         );
 
@@ -3372,6 +4518,7 @@ async function createPrivateRoom(){
         pollRoom(
             room.roomId
         );
+
 
     }catch(error){
 
@@ -3381,7 +4528,37 @@ async function createPrivateRoom(){
             error.message,
             "error"
         );
+
     }
+
+}
+
+
+/* =========================================================
+   COPY ROOM ID
+========================================================= */
+
+async function copyRoomId(roomId){
+
+    try{
+
+        await navigator.clipboard.writeText(
+            roomId
+        );
+
+        showToast(
+            "Room ID copied!"
+        );
+
+    }catch{
+
+        showToast(
+            "Copy failed. Room ID: " + roomId,
+            "error"
+        );
+
+    }
+
 }
 
 
@@ -3396,6 +4573,7 @@ async function joinPrivateRoom(){
         ?.value
         .trim();
 
+
     if(!roomId){
 
         showToast(
@@ -3404,6 +4582,7 @@ async function joinPrivateRoom(){
         );
 
         return;
+
     }
 
 
@@ -3413,20 +4592,25 @@ async function joinPrivateRoom(){
             "Joining room..."
         );
 
+
         const data =
             await apiRequest(
                 "/room/join",
                 {
                     method:"POST",
-                    body:JSON.stringify({
-                        roomId
-                    })
+
+                    body:
+                        JSON.stringify({
+                            roomId
+                        })
                 }
             );
+
 
         hideLoading();
 
         closeModal();
+
 
         if(data.game){
 
@@ -3440,7 +4624,10 @@ async function joinPrivateRoom(){
                 "Joined room. Waiting for opponent..."
             );
 
-            pollRoom(roomId);
+            pollRoom(
+                roomId
+            );
+
         }
 
     }catch(error){
@@ -3451,7 +4638,9 @@ async function joinPrivateRoom(){
             error.message,
             "error"
         );
+
     }
+
 }
 
 
@@ -3459,17 +4648,9 @@ async function joinPrivateRoom(){
    ROOM POLLING
 ========================================================= */
 
-let roomPollTimer = null;
-
-
 function pollRoom(roomId){
 
-    if(roomPollTimer){
-
-        clearInterval(
-            roomPollTimer
-        );
-    }
+    stopRoomPolling();
 
 
     roomPollTimer =
@@ -3486,11 +4667,14 @@ function pollRoom(roomId){
                         );
 
 
-                    if(data.room?.gameId){
+                    if(
+                        data.room?.gameId
+                    ){
 
-                        clearInterval(
-                            roomPollTimer
-                        );
+                        stopRoomPolling();
+
+                        closeModal();
+
 
                         const gameData =
                             await apiRequest(
@@ -3499,9 +4683,15 @@ function pollRoom(roomId){
                                 )}`
                             );
 
-                        openGame(
-                            gameData.game
-                        );
+
+                        if(gameData.game){
+
+                            openGame(
+                                gameData.game
+                            );
+
+                        }
+
                     }
 
                 }catch(error){
@@ -3510,16 +4700,88 @@ function pollRoom(roomId){
                         "Room polling:",
                         error
                     );
+
                 }
 
             },
-            2500
+            2000
         );
+
+}
+
+
+function stopRoomPolling(){
+
+    if(roomPollTimer){
+
+        clearInterval(
+            roomPollTimer
+        );
+
+        roomPollTimer = null;
+
+    }
+
 }
 
 
 /* =========================================================
-   GROUPS MODAL
+   CANCEL PRIVATE ROOM
+========================================================= */
+
+async function cancelPrivateRoom(){
+
+    stopRoomPolling();
+
+    closeModal();
+
+    /*
+       If backend provides /room/leave,
+       attempt to leave using room id.
+    */
+
+    const roomId =
+        window.currentCreatedRoomId ||
+        null;
+
+
+    if(roomId){
+
+        try{
+
+            await apiRequest(
+                "/room/leave",
+                {
+                    method:"POST",
+
+                    body:
+                        JSON.stringify({
+                            roomId
+                        })
+                }
+            );
+
+        }catch(error){
+
+            console.error(
+                "Room leave:",
+                error
+            );
+
+        }
+
+    }
+
+
+    showToast(
+        "Room closed."
+    );
+
+}
+
+
+/* =========================================================
+   GROUPS
 ========================================================= */
 
 async function openGroupsModal(){
@@ -3534,17 +4796,18 @@ async function openGroupsModal(){
 
         let html = `
 
-        <button
-            class="primary-btn"
-            onclick="createGroup()"
-        >
-            + Create Group
-        </button>
+            <button
+                class="primary-btn"
+                onclick="createGroup()"
+            >
+                + Create Group
+            </button>
 
-        <div
-            class="list"
-            style="margin-top:15px"
-        >
+            <div
+                class="list"
+                style="margin-top:15px"
+            >
+
         `;
 
 
@@ -3554,6 +4817,7 @@ async function openGroupsModal(){
         ){
 
             html += `
+
                 <div
                     style="
                     color:#8d9bb2;
@@ -3563,6 +4827,7 @@ async function openGroupsModal(){
                 >
                     No groups available.
                 </div>
+
             `;
 
         }else{
@@ -3572,56 +4837,72 @@ async function openGroupsModal(){
 
                     html += `
 
-                    <div class="list-item">
+                        <div class="list-item">
 
-                        <div class="list-main">
+                            <div class="list-main">
 
-                            <div class="list-name">
-                                ${escapeHtml(
-                                    group.name
-                                )}
+                                <div class="list-name">
+
+                                    ${escapeHtml(
+                                        group.name ||
+                                        "Unnamed Group"
+                                    )}
+
+                                </div>
+
+                                <div class="list-meta">
+
+                                    ${
+                                        Array.isArray(group.members)
+                                        ? group.members.length
+                                        : 0
+                                    }
+                                    member(s)
+
+                                    •
+
+                                    ${escapeHtml(
+                                        group.groupId ||
+                                        ""
+                                    )}
+
+                                </div>
+
                             </div>
 
-                            <div class="list-meta">
-                                ${group.members.length}
-                                member(s)
-                                • ${escapeHtml(
-                                    group.groupId
-                                )}
-                            </div>
+                            <button
+                                class="small-btn"
+                                onclick="
+                                    joinGroup(
+                                        '${escapeJs(
+                                            group.groupId
+                                        )}'
+                                    )
+                                "
+                            >
+                                Join
+                            </button>
 
                         </div>
 
-                        <button
-                            class="small-btn"
-                            onclick="
-                                joinGroup(
-                                    '${escapeJs(
-                                        group.groupId
-                                    )}'
-                                )
-                            "
-                        >
-                            Join
-                        </button>
-
-                    </div>
-
                     `;
+
                 }
             );
+
         }
 
 
         html += `
-        </div>
+            </div>
         `;
 
 
         openModal(
-            "Groups",
+            "👥 Groups",
             html
         );
+
 
     }catch(error){
 
@@ -3629,7 +4910,9 @@ async function openGroupsModal(){
             error.message,
             "error"
         );
+
     }
+
 }
 
 
@@ -3644,24 +4927,28 @@ async function createGroup(){
             "Enter group name:"
         );
 
+
     if(!name){
 
         return;
+
     }
 
 
     try{
 
-        const data =
-            await apiRequest(
-                "/group/create",
-                {
-                    method:"POST",
-                    body:JSON.stringify({
-                        name
+        await apiRequest(
+            "/group/create",
+            {
+                method:"POST",
+
+                body:
+                    JSON.stringify({
+                        name:
+                            name.trim()
                     })
-                }
-            );
+            }
+        );
 
 
         showToast(
@@ -3669,7 +4956,8 @@ async function createGroup(){
         );
 
 
-        openGroupsModal();
+        openMyGroups();
+
 
     }catch(error){
 
@@ -3677,7 +4965,9 @@ async function createGroup(){
             error.message,
             "error"
         );
+
     }
+
 }
 
 
@@ -3693,15 +4983,540 @@ async function joinGroup(groupId){
             "/group/join",
             {
                 method:"POST",
-                body:JSON.stringify({
-                    groupId
-                })
+
+                body:
+                    JSON.stringify({
+                        groupId
+                    })
             }
         );
 
 
         showToast(
-            "Joined group!"
+            "Joined group successfully!"
+        );
+
+
+        openMyGroups();
+
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   MY GROUPS
+========================================================= */
+
+async function openMyGroups(){
+
+    try{
+
+        showLoading(
+            "Loading your groups..."
+        );
+
+
+        const data =
+            await apiRequest(
+                "/groups"
+            );
+
+
+        hideLoading();
+
+
+        const allGroups =
+            data.groups || [];
+
+
+        const myGroups =
+            allGroups.filter(
+                group =>
+                    Array.isArray(group.members) &&
+                    group.members.some(
+                        member =>
+                            String(
+                                typeof member === "string"
+                                ? member
+                                : member.playerId
+                            ) ===
+                            String(
+                                currentPlayer.playerId
+                            )
+                    )
+            );
+
+
+        let html = `
+
+            <div
+                style="
+                color:#8d9bb2;
+                font-size:13px;
+                margin-bottom:15px;
+                "
+            >
+                Your joined groups and their members.
+            </div>
+
+        `;
+
+
+        if(myGroups.length === 0){
+
+            html += `
+
+                <div
+                    style="
+                    text-align:center;
+                    padding:25px;
+                    color:#8d9bb2;
+                    "
+                >
+                    <div style="font-size:40px">
+                        👥
+                    </div>
+
+                    <div style="margin-top:10px">
+                        You have not joined any group yet.
+                    </div>
+
+                    <button
+                        class="small-btn"
+                        style="margin-top:15px"
+                        onclick="openGroupsModal()"
+                    >
+                        Find Groups
+                    </button>
+
+                </div>
+
+            `;
+
+        }else{
+
+            myGroups.forEach(
+                group => {
+
+                    html += renderMyGroup(
+                        group
+                    );
+
+                }
+            );
+
+        }
+
+
+        openModal(
+            "⭐ My Groups",
+            html
+        );
+
+
+    }catch(error){
+
+        hideLoading();
+
+        showToast(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER MY GROUP
+========================================================= */
+
+function renderMyGroup(group){
+
+    const members =
+        Array.isArray(group.members)
+        ? group.members
+        : [];
+
+
+    let membersHtml = "";
+
+
+    if(members.length === 0){
+
+        membersHtml = `
+
+            <div
+                style="
+                color:#8d9bb2;
+                text-align:center;
+                padding:15px
+                "
+            >
+                No members found.
+            </div>
+
+        `;
+
+    }else{
+
+        members.forEach(
+            member => {
+
+                const normalized =
+                    normalizeMember(
+                        member
+                    );
+
+
+                if(
+                    String(normalized.playerId) ===
+                    String(currentPlayer.playerId)
+                ){
+
+                    membersHtml += `
+
+                        <div class="member-row">
+
+                            <div class="member-left">
+
+                                <div
+                                    class="online-dot online"
+                                ></div>
+
+                                <div>
+
+                                    <div class="list-name">
+                                        ${escapeHtml(
+                                            normalized.name ||
+                                            currentPlayer.name ||
+                                            "You"
+                                        )}
+                                    </div>
+
+                                    <div class="online-text">
+                                        You • Online
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                const isOnline =
+                    getOnlineStatus(
+                        normalized
+                    );
+
+
+                membersHtml += `
+
+                    <div class="member-row">
+
+                        <div class="member-left">
+
+                            <div
+                                class="
+                                online-dot
+                                ${isOnline ? "online" : ""}
+                                "
+                            ></div>
+
+                            <div>
+
+                                <div class="list-name">
+
+                                    ${escapeHtml(
+                                        normalized.name ||
+                                        normalized.username ||
+                                        normalized.playerId ||
+                                        "Player"
+                                    )}
+
+                                </div>
+
+                                <div class="online-text">
+
+                                    @${escapeHtml(
+                                        normalized.username ||
+                                        ""
+                                    )}
+
+                                    •
+
+                                    ${
+                                        isOnline
+                                        ? "Online"
+                                        : "Offline"
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            class="small-btn
+                            ${isOnline ? "" : "dark"}"
+                            ${isOnline ? "" : "disabled"}
+                            onclick="
+                                sendPlayRequestFromGroup(
+                                    '${escapeJs(
+                                        normalized.playerId
+                                    )}',
+                                    '${escapeJs(
+                                        normalized.name ||
+                                        normalized.username ||
+                                        "Player"
+                                    )}'
+                                )
+                            "
+                        >
+
+                            🎮 Play
+
+                        </button>
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+    }
+
+
+    return `
+
+        <div
+            class="card"
+            style="
+            padding:15px;
+            margin-bottom:15px;
+            "
+        >
+
+            <div
+                style="
+                display:flex;
+                justify-content:space-between;
+                gap:10px;
+                align-items:center;
+                margin-bottom:12px;
+                "
+            >
+
+                <div>
+
+                    <div
+                        style="
+                        font-size:18px;
+                        font-weight:1000;
+                        "
+                    >
+                        ${escapeHtml(
+                            group.name ||
+                            "Unnamed Group"
+                        )}
+                    </div>
+
+                    <div
+                        class="list-meta"
+                    >
+                        ${
+                            members.length
+                        }
+                        member(s)
+                    </div>
+
+                </div>
+
+                <button
+                    class="small-btn red"
+                    onclick="
+                        leaveGroup(
+                            '${escapeJs(
+                                group.groupId
+                            )}'
+                        )
+                    "
+                >
+                    Leave
+                </button>
+
+            </div>
+
+
+            <div class="list">
+
+                ${membersHtml}
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   NORMALIZE GROUP MEMBER
+========================================================= */
+
+function normalizeMember(member){
+
+    if(typeof member === "string"){
+
+        return {
+
+            playerId:
+                member,
+
+            name:
+                member,
+
+            username:
+                "",
+
+            online:
+                false
+
+        };
+
+    }
+
+
+    return {
+
+        playerId:
+            member.playerId ||
+            member.id ||
+            member._id ||
+            "",
+
+        name:
+            member.name ||
+            member.displayName ||
+            "",
+
+        username:
+            member.username ||
+            "",
+
+        online:
+            member.online ??
+            member.isOnline ??
+            member.onlineStatus ??
+            false
+
+    };
+
+}
+
+
+/* =========================================================
+   ONLINE STATUS
+========================================================= */
+
+function getOnlineStatus(member){
+
+    return (
+        member.online === true ||
+        member.isOnline === true ||
+        member.onlineStatus === true ||
+        member.status === "online"
+    );
+
+}
+
+
+/* =========================================================
+   SEND PLAY REQUEST FROM GROUP
+========================================================= */
+
+async function sendPlayRequestFromGroup(
+    playerId,
+    playerName
+){
+
+    if(!playerId){
+
+        showToast(
+            "Player ID not available.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        String(playerId) ===
+        String(currentPlayer.playerId)
+    ){
+
+        return;
+
+    }
+
+
+    if(
+        !confirm(
+            `Send a game request to ${playerName}?`
+        )
+    ){
+
+        return;
+
+    }
+
+
+    try{
+
+        await apiRequest(
+            "/request/send",
+            {
+                method:"POST",
+
+                body:
+                    JSON.stringify({
+
+                        receiverId:
+                            playerId,
+
+                        playerId:
+                            playerId
+
+                    })
+            }
+        );
+
+
+        showToast(
+            `Game request sent to ${playerName}!`
         );
 
 
@@ -3711,7 +5526,63 @@ async function joinGroup(groupId){
             error.message,
             "error"
         );
+
     }
+
+}
+
+
+/* =========================================================
+   LEAVE GROUP
+========================================================= */
+
+async function leaveGroup(
+    groupId
+){
+
+    if(
+        !confirm(
+            "Are you sure you want to leave this group?"
+        )
+    ){
+
+        return;
+
+    }
+
+
+    try{
+
+        await apiRequest(
+            "/group/leave",
+            {
+                method:"POST",
+
+                body:
+                    JSON.stringify({
+                        groupId
+                    })
+            }
+        );
+
+
+        showToast(
+            "Left group successfully."
+        );
+
+
+        openMyGroups();
+
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+
+    }
+
 }
 
 
@@ -3740,6 +5611,7 @@ async function loadLeaderboard(){
         ){
 
             html += `
+
                 <div
                     style="
                     text-align:center;
@@ -3749,64 +5621,82 @@ async function loadLeaderboard(){
                 >
                     No players yet.
                 </div>
+
             `;
 
         }else{
 
             data.leaderboard.forEach(
-                player => {
+                (player,index) => {
 
                     html += `
 
-                    <div class="list-item">
+                        <div class="list-item">
 
-                        <div
-                            style="
-                            display:flex;
-                            align-items:center;
-                            gap:12px
-                            "
-                        >
+                            <div
+                                style="
+                                display:flex;
+                                align-items:center;
+                                gap:12px
+                                "
+                            >
 
-                            <div class="rank">
-                                #${player.rank}
+                                <div class="rank">
+
+                                    #${player.rank || index + 1}
+
+                                </div>
+
+                                <div class="list-main">
+
+                                    <div class="list-name">
+
+                                        ${escapeHtml(
+                                            player.name ||
+                                            "Player"
+                                        )}
+
+                                    </div>
+
+                                    <div class="list-meta">
+
+                                        @${escapeHtml(
+                                            player.username ||
+                                            ""
+                                        )}
+
+                                        •
+
+                                        ${player.wins || 0}W /
+
+                                        ${player.losses || 0}L /
+
+                                        ${player.draws || 0}D
+
+                                    </div>
+
+                                </div>
+
                             </div>
 
-                            <div class="list-main">
 
-                                <div class="list-name">
-                                    ${escapeHtml(
-                                        player.name
-                                    )}
-                                </div>
+                            <div
+                                style="
+                                font-weight:900
+                                "
+                            >
 
-                                <div class="list-meta">
-                                    @${escapeHtml(
-                                        player.username
-                                    )}
-                                    •
-                                    ${player.wins}W /
-                                    ${player.losses}L /
-                                    ${player.draws}D
-                                </div>
+                                ${player.winRate || 0}%
 
                             </div>
 
                         </div>
-
-                        <div
-                            style="
-                            font-weight:900
-                            "
-                        >
-                            ${player.winRate}%
-                        </div>
-
-                    </div>
 
                     `;
+
                 }
             );
+
         }
 
 
@@ -3820,18 +5710,21 @@ async function loadLeaderboard(){
             html
         );
 
+
     }catch(error){
 
         showToast(
             error.message,
             "error"
         );
+
     }
+
 }
 
 
 /* =========================================================
-   GAME HISTORY
+   HISTORY
 ========================================================= */
 
 async function loadHistory(){
@@ -3855,6 +5748,7 @@ async function loadHistory(){
         ){
 
             html += `
+
                 <div
                     style="
                     text-align:center;
@@ -3864,6 +5758,7 @@ async function loadHistory(){
                 >
                     No games played yet.
                 </div>
+
             `;
 
         }else{
@@ -3874,54 +5769,70 @@ async function loadHistory(){
                     let result =
                         "DRAW";
 
+
                     if(
-                        game.winner ===
-                        currentPlayer.playerId
+                        String(game.winner) ===
+                        String(currentPlayer.playerId)
                     ){
 
-                        result = "WIN";
+                        result =
+                            "WIN";
 
                     }else if(
                         game.winner
                     ){
 
-                        result = "LOSS";
+                        result =
+                            "LOSS";
+
                     }
 
 
                     html += `
 
-                    <div class="list-item">
+                        <div class="list-item">
 
-                        <div class="list-main">
+                            <div class="list-main">
 
-                            <div class="list-name">
-                                ${result}
+                                <div class="list-name">
+
+                                    ${result}
+
+                                </div>
+
+                                <div class="list-meta">
+
+                                    Game:
+                                    ${escapeHtml(
+                                        game.gameId ||
+                                        ""
+                                    )}
+
+                                </div>
+
                             </div>
 
-                            <div class="list-meta">
-                                Game:
+                            <div
+                                style="
+                                font-size:12px;
+                                color:#8d9bb2
+                                "
+                            >
+
                                 ${escapeHtml(
-                                    game.gameId
+                                    game.result ||
+                                    ""
                                 )}
+
                             </div>
 
                         </div>
-
-                        <div
-                            style="
-                            font-size:12px;
-                            color:#8d9bb2
-                            "
-                        >
-                            ${game.result || ""}
-                        </div>
-
-                    </div>
 
                     `;
+
                 }
             );
+
         }
 
 
@@ -3935,13 +5846,16 @@ async function loadHistory(){
             html
         );
 
+
     }catch(error){
 
         showToast(
             error.message,
             "error"
         );
+
     }
+
 }
 
 
@@ -3960,7 +5874,24 @@ async function loadRequests(){
 
 
         let html = `
+
+            <div
+                style="
+                margin-bottom:15px;
+                "
+            >
+
+                <button
+                    class="small-btn"
+                    onclick="openSendRequestModal()"
+                >
+                    ➕ Send Game Request
+                </button>
+
+            </div>
+
             <div class="list">
+
         `;
 
 
@@ -3970,6 +5901,7 @@ async function loadRequests(){
         ){
 
             html += `
+
                 <div
                     style="
                     text-align:center;
@@ -3979,16 +5911,18 @@ async function loadRequests(){
                 >
                     No pending requests.
                 </div>
+
             `;
 
         }else{
 
             for(
-                const req
-                of data.requests
+                const req of data.requests
             ){
 
                 let senderName =
+                    req.senderName ||
+                    req.senderUsername ||
                     req.senderId;
 
 
@@ -4001,70 +5935,79 @@ async function loadRequests(){
                             )}`
                         );
 
+
                     senderName =
                         sender.player?.name ||
-                        req.senderId;
+                        sender.player?.username ||
+                        senderName;
 
                 }catch{}
 
 
                 html += `
 
-                <div class="list-item">
+                    <div class="list-item">
 
-                    <div class="list-main">
+                        <div class="list-main">
 
-                        <div class="list-name">
-                            ${escapeHtml(
-                                senderName
-                            )}
+                            <div class="list-name">
+
+                                ${escapeHtml(
+                                    senderName
+                                )}
+
+                            </div>
+
+                            <div class="list-meta">
+
+                                wants to play with you
+
+                            </div>
+
                         </div>
 
-                        <div class="list-meta">
-                            wants to play with you
+
+                        <div
+                            style="
+                            display:flex;
+                            gap:6px
+                            "
+                        >
+
+                            <button
+                                class="small-btn"
+                                onclick="
+                                    acceptRequest(
+                                        '${escapeJs(
+                                            req.requestId
+                                        )}'
+                                    )
+                                "
+                            >
+                                Accept
+                            </button>
+
+                            <button
+                                class="small-btn red"
+                                onclick="
+                                    rejectRequest(
+                                        '${escapeJs(
+                                            req.requestId
+                                        )}'
+                                    )
+                                "
+                            >
+                                Reject
+                            </button>
+
                         </div>
 
                     </div>
-
-                    <div
-                        style="
-                        display:flex;
-                        gap:6px
-                        "
-                    >
-
-                        <button
-                            class="small-btn"
-                            onclick="
-                                acceptRequest(
-                                    '${escapeJs(
-                                        req.requestId
-                                    )}'
-                                )
-                            "
-                        >
-                            Accept
-                        </button>
-
-                        <button
-                            class="small-btn red"
-                            onclick="
-                                rejectRequest(
-                                    '${escapeJs(
-                                        req.requestId
-                                    )}'
-                                )
-                            "
-                        >
-                            Reject
-                        </button>
-
-                    </div>
-
-                </div>
 
                 `;
+
             }
+
         }
 
 
@@ -4078,13 +6021,113 @@ async function loadRequests(){
             html
         );
 
+
     }catch(error){
 
         showToast(
             error.message,
             "error"
         );
+
     }
+
+}
+
+
+/* =========================================================
+   SEND REQUEST MODAL
+========================================================= */
+
+function openSendRequestModal(){
+
+    openModal(
+        "🎮 Send Game Request",
+        `
+
+        <div class="form-group">
+
+            <label>
+                Player ID
+            </label>
+
+            <input
+                id="requestPlayerId"
+                placeholder="Enter player's Player ID"
+            >
+
+        </div>
+
+
+        <button
+            class="primary-btn"
+            onclick="sendDirectRequest()"
+        >
+            Send Request
+        </button>
+
+        `
+    );
+
+}
+
+
+async function sendDirectRequest(){
+
+    const playerId =
+        $("requestPlayerId")
+        ?.value
+        .trim();
+
+
+    if(!playerId){
+
+        showToast(
+            "Enter a Player ID.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        await apiRequest(
+            "/request/send",
+            {
+                method:"POST",
+
+                body:
+                    JSON.stringify({
+
+                        receiverId:
+                            playerId,
+
+                        playerId:
+                            playerId
+
+                    })
+            }
+        );
+
+
+        closeModal();
+
+        showToast(
+            "Game request sent!"
+        );
+
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+
+    }
+
 }
 
 
@@ -4092,7 +6135,9 @@ async function loadRequests(){
    ACCEPT REQUEST
 ========================================================= */
 
-async function acceptRequest(requestId){
+async function acceptRequest(
+    requestId
+){
 
     try{
 
@@ -4101,18 +6146,32 @@ async function acceptRequest(requestId){
                 "/request/accept",
                 {
                     method:"POST",
-                    body:JSON.stringify({
-                        requestId
-                    })
+
+                    body:
+                        JSON.stringify({
+                            requestId
+                        })
                 }
             );
 
 
         closeModal();
 
-        openGame(
-            data.game
-        );
+
+        if(data.game){
+
+            openGame(
+                data.game
+            );
+
+        }else{
+
+            showToast(
+                "Request accepted."
+            );
+
+        }
+
 
     }catch(error){
 
@@ -4120,7 +6179,9 @@ async function acceptRequest(requestId){
             error.message,
             "error"
         );
+
     }
+
 }
 
 
@@ -4128,7 +6189,9 @@ async function acceptRequest(requestId){
    REJECT REQUEST
 ========================================================= */
 
-async function rejectRequest(requestId){
+async function rejectRequest(
+    requestId
+){
 
     try{
 
@@ -4136,9 +6199,11 @@ async function rejectRequest(requestId){
             "/request/reject",
             {
                 method:"POST",
-                body:JSON.stringify({
-                    requestId
-                })
+
+                body:
+                    JSON.stringify({
+                        requestId
+                    })
             }
         );
 
@@ -4150,13 +6215,16 @@ async function rejectRequest(requestId){
 
         loadRequests();
 
+
     }catch(error){
 
         showToast(
             error.message,
             "error"
         );
+
     }
+
 }
 
 
@@ -4170,24 +6238,34 @@ function openModal(
 ){
 
     $("modalTitle")
-        .textContent = title;
+        .textContent =
+        title;
 
     $("modalContent")
-        .innerHTML = content;
+        .innerHTML =
+        content;
 
     $("modal")
-        .classList.remove("hidden");
+        .classList.remove(
+            "hidden"
+        );
+
 }
 
 
 function closeModal(){
 
     $("modal")
-        .classList.add("hidden");
+        .classList.add(
+            "hidden"
+        );
+
 }
 
 
-function modalBackgroundClick(event){
+function modalBackgroundClick(
+    event
+){
 
     if(
         event.target ===
@@ -4195,35 +6273,64 @@ function modalBackgroundClick(event){
     ){
 
         closeModal();
+
     }
+
 }
 
 
 /* =========================================================
-   ESCAPE HTML
+   ESCAPE
 ========================================================= */
 
 function escapeHtml(value){
 
-    return String(value ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+    return String(
+        value ?? ""
+    )
+    .replaceAll(
+        "&",
+        "&amp;"
+    )
+    .replaceAll(
+        "<",
+        "&lt;"
+    )
+    .replaceAll(
+        ">",
+        "&gt;"
+    )
+    .replaceAll(
+        '"',
+        "&quot;"
+    )
+    .replaceAll(
+        "'",
+        "&#039;"
+    );
+
 }
 
 
 function escapeJs(value){
 
-    return String(value ?? "")
-        .replaceAll("\\","\\\\")
-        .replaceAll("'","\\'");
+    return String(
+        value ?? ""
+    )
+    .replaceAll(
+        "\\",
+        "\\\\"
+    )
+    .replaceAll(
+        "'",
+        "\\'"
+    );
+
 }
 
 
 /* =========================================================
-   AUTO LOGIN / SESSION RESTORE
+   SESSION RESTORE
 ========================================================= */
 
 async function restoreSession(){
@@ -4239,6 +6346,7 @@ async function restoreSession(){
         showAuthScreen();
 
         return;
+
     }
 
 
@@ -4247,6 +6355,7 @@ async function restoreSession(){
         showLoading(
             "Restoring session..."
         );
+
 
         const data =
             await apiRequest(
@@ -4257,9 +6366,11 @@ async function restoreSession(){
         currentPlayer =
             data.player;
 
+
         hideLoading();
 
         openDashboard();
+
 
     }catch(error){
 
@@ -4270,12 +6381,14 @@ async function restoreSession(){
         );
 
         showAuthScreen();
+
     }
+
 }
 
 
 /* =========================================================
-   KEYBOARD SUPPORT
+   ESCAPE KEY
 ========================================================= */
 
 document.addEventListener(
@@ -4283,13 +6396,58 @@ document.addEventListener(
     event => {
 
         if(
-            event.key === "Escape"
+            event.key ===
+            "Escape"
         ){
 
+            if(
+                !$("resultModal")
+                .classList.contains(
+                    "hidden"
+                )
+            ){
+
+                $("resultModal")
+                    .classList.add(
+                        "hidden"
+                    );
+
+                return;
+
+            }
+
+
             closeModal();
+
         }
+
     }
 );
+
+
+/* =========================================================
+   RESULT MODAL BACKGROUND
+========================================================= */
+
+$("resultModal")
+    .addEventListener(
+        "click",
+        event => {
+
+            if(
+                event.target ===
+                $("resultModal")
+            ){
+
+                $("resultModal")
+                    .classList.add(
+                        "hidden"
+                    );
+
+            }
+
+        }
+    );
 
 
 /* =========================================================
@@ -4309,3 +6467,4 @@ document.addEventListener(
 
 </body>
 </html>
+```
