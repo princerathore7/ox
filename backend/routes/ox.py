@@ -1076,35 +1076,51 @@ def get_game(game_id):
 @ox_bp.route("/move", methods=["POST"])
 def make_move():
 
+    # --------------------------------------------------------
+    # PLAYER AUTHENTICATION
+    # --------------------------------------------------------
+
     player, error = require_player()
 
     if error:
         return error
 
+    # --------------------------------------------------------
+    # REQUEST DATA
+    # --------------------------------------------------------
+
     data = request.get_json(silent=True) or {}
 
-    game_id = clean_string(data.get("gameId"))
+    game_id = clean_string(
+        data.get("gameId")
+    )
+
+    # --------------------------------------------------------
+    # ROW / COLUMN
+    # --------------------------------------------------------
 
     try:
         row = int(data.get("row"))
         col = int(data.get("col"))
-    except Exception:
+    except (TypeError, ValueError):
         return jsonify({
             "success": False,
-            "message": "row and col must be numbers."
+            "message": "Invalid move coordinates."
         }), 400
 
-    # if row < 0 or row >= BOARD_SIZE:
-    #     return jsonify({
-    #         "success": False,
-    #         "message": "Invalid row."
-    #     }), 400
+    # --------------------------------------------------------
+    # GAME ID CHECK
+    # --------------------------------------------------------
 
-    # if col < 0 or col >= BOARD_SIZE:
-    #     return jsonify({
-    #         "success": False,
-    #         "message": "Invalid column."
-    #     }), 400
+    if not game_id:
+        return jsonify({
+            "success": False,
+            "message": "Game ID is required."
+        }), 400
+
+    # --------------------------------------------------------
+    # FIND GAME
+    # --------------------------------------------------------
 
     game = find_game_for_player(
         game_id,
@@ -1117,25 +1133,19 @@ def make_move():
             "message": "Game not found."
         }), 404
 
+    # --------------------------------------------------------
+    # GAME STATUS
+    # --------------------------------------------------------
+
     if game.get("status") != "active":
         return jsonify({
             "success": False,
             "message": "Game has already ended."
         }), 400
 
-    if game.get("currentTurn") != player["playerId"]:
-        return jsonify({
-            "success": False,
-            "message": "It is not your turn."
-        }), 400
-
-    board = game.get("board", create_empty_board())
-
-    if board[row][col] is not None:
-        return jsonify({
-            "success": False,
-            "message": "This cell is already occupied."
-        }), 400
+    # --------------------------------------------------------
+    # CHECK PLAYER
+    # --------------------------------------------------------
 
     current_player = player_in_game(
         game,
@@ -1148,19 +1158,136 @@ def make_move():
             "message": "Player is not part of this game."
         }), 403
 
-    symbol = current_player["symbol"]
+    # --------------------------------------------------------
+    # CHECK TURN
+    # --------------------------------------------------------
+
+    if game.get("currentTurn") != player["playerId"]:
+        return jsonify({
+            "success": False,
+            "message": "It is not your turn."
+        }), 400
+
+    # --------------------------------------------------------
+    # GET BOARD
+    # --------------------------------------------------------
+
+    board = game.get("board")
+
+    if not isinstance(board, list) or not board:
+        board = create_empty_board()
+
+    # --------------------------------------------------------
+    # ACTUAL BOARD DIMENSIONS
+    #
+    # We use the board itself instead of relying only on
+    # BOARD_SIZE.
+    # --------------------------------------------------------
+
+    board_rows = len(board)
+
+    if board_rows <= 0:
+        return jsonify({
+            "success": False,
+            "message": "Invalid game board."
+        }), 500
+
+    # --------------------------------------------------------
+    # ROW VALIDATION
+    # --------------------------------------------------------
+
+    if row < 0 or row >= board_rows:
+        return jsonify({
+            "success": False,
+            "message": "Invalid move."
+        }), 400
+
+    # --------------------------------------------------------
+    # COLUMN VALIDATION
+    #
+    # Every row can theoretically have its own length, so
+    # validate against the selected row.
+    # --------------------------------------------------------
+
+    if not isinstance(board[row], list):
+        return jsonify({
+            "success": False,
+            "message": "Invalid game board."
+        }), 500
+
+    board_cols = len(board[row])
+
+    if board_cols <= 0:
+        return jsonify({
+            "success": False,
+            "message": "Invalid game board."
+        }), 500
+
+    if col < 0 or col >= board_cols:
+        return jsonify({
+            "success": False,
+            "message": "Invalid move."
+        }), 400
+
+    # --------------------------------------------------------
+    # SYMBOL
+    #
+    # Player already has an assigned symbol such as X or O.
+    # They can use that symbol in ANY empty cell.
+    # --------------------------------------------------------
+
+    symbol = current_player.get("symbol")
+
+    if symbol not in ["X", "O"]:
+        return jsonify({
+            "success": False,
+            "message": "Player does not have a valid symbol."
+        }), 400
+
+    # --------------------------------------------------------
+    # CELL OCCUPIED CHECK
+    # --------------------------------------------------------
+
+    if board[row][col] is not None:
+        return jsonify({
+            "success": False,
+            "message": "This cell is already occupied."
+        }), 400
+
+    # --------------------------------------------------------
+    # MAKE MOVE
+    #
+    # NO ROW RESTRICTION
+    # NO COLUMN RESTRICTION
+    #
+    # Player can play ANYWHERE on the board as long as:
+    # 1. It is their turn
+    # 2. Cell is empty
+    # --------------------------------------------------------
 
     board[row][col] = symbol
+
+    # --------------------------------------------------------
+    # CHECK WIN
+    # --------------------------------------------------------
 
     winning_line = find_winning_line(
         board,
         symbol
     )
 
+    # --------------------------------------------------------
+    # BASE UPDATE
+    # --------------------------------------------------------
+
     update_data = {
         "board": board,
         "updatedAt": now_utc()
     }
+
+    # --------------------------------------------------------
+    # WIN
+    # --------------------------------------------------------
 
     if winning_line:
 
@@ -1190,12 +1317,17 @@ def make_move():
                 "message": "Move could not be completed. Reload the game."
             }), 409
 
+        # Update player statistics
         update_finished_stats(updated)
 
         return jsonify({
             "success": True,
             "game": game_public(updated)
         })
+
+    # --------------------------------------------------------
+    # DRAW
+    # --------------------------------------------------------
 
     if board_full(board):
 
@@ -1225,6 +1357,7 @@ def make_move():
                 "message": "Move could not be completed. Reload the game."
             }), 409
 
+        # Update player statistics
         update_finished_stats(updated)
 
         return jsonify({
@@ -1232,14 +1365,41 @@ def make_move():
             "game": game_public(updated)
         })
 
+    # --------------------------------------------------------
+    # FIND OPPONENT
+    # --------------------------------------------------------
+
     opponent = None
 
-    for p in game["players"]:
-        if p["playerId"] != player["playerId"]:
+    for p in game.get("players", []):
+
+        if p.get("playerId") != player["playerId"]:
             opponent = p
             break
 
-    update_data["currentTurn"] = opponent["playerId"]
+    if not opponent:
+        return jsonify({
+            "success": False,
+            "message": "Opponent not found."
+        }), 400
+
+    opponent_id = opponent.get("playerId")
+
+    if not opponent_id:
+        return jsonify({
+            "success": False,
+            "message": "Invalid opponent."
+        }), 400
+
+    # --------------------------------------------------------
+    # CHANGE TURN
+    # --------------------------------------------------------
+
+    update_data["currentTurn"] = opponent_id
+
+    # --------------------------------------------------------
+    # SAVE MOVE
+    # --------------------------------------------------------
 
     updated = games_col.find_one_and_update(
         {
@@ -1259,11 +1419,15 @@ def make_move():
             "message": "Move could not be completed. Reload the game."
         }), 409
 
+    # --------------------------------------------------------
+    # RESPONSE
+    # --------------------------------------------------------
+
     return jsonify({
         "success": True,
+        "message": "Move successful.",
         "game": game_public(updated)
     })
-
 
 # ============================================================
 # RESIGN
