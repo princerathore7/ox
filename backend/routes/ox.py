@@ -1094,17 +1094,17 @@ def make_move():
             "message": "row and col must be numbers."
         }), 400
 
-    if row < 0 or row >= BOARD_SIZE:
-        return jsonify({
-            "success": False,
-            "message": "Invalid row."
-        }), 400
+    # if row < 0 or row >= BOARD_SIZE:
+    #     return jsonify({
+    #         "success": False,
+    #         "message": "Invalid row."
+    #     }), 400
 
-    if col < 0 or col >= BOARD_SIZE:
-        return jsonify({
-            "success": False,
-            "message": "Invalid column."
-        }), 400
+    # if col < 0 or col >= BOARD_SIZE:
+    #     return jsonify({
+    #         "success": False,
+    #         "message": "Invalid column."
+    #     }), 400
 
     game = find_game_for_player(
         game_id,
