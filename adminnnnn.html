@@ -1,0 +1,2884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>OX Fighter Jets — Admin Panel</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:Inter,Arial,sans-serif;
+    background:#050914;
+    color:#fff;
+    min-height:100vh;
+}
+
+/* =========================
+   VARIABLES
+========================= */
+
+:root{
+    --blue:#147cff;
+    --blue2:#00b7ff;
+    --red:#ff1744;
+    --green:#00e676;
+    --yellow:#ffc107;
+    --bg:#050914;
+    --card:#0b1222;
+    --card2:#0f192d;
+    --border:rgba(255,255,255,.09);
+    --muted:#8d9ab0;
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+.login-screen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:
+        radial-gradient(circle at 20% 20%,rgba(20,124,255,.18),transparent 30%),
+        radial-gradient(circle at 80% 80%,rgba(255,23,68,.13),transparent 30%),
+        #050914;
+}
+
+.login-box{
+    width:100%;
+    max-width:430px;
+    background:rgba(11,18,34,.94);
+    border:1px solid rgba(20,124,255,.3);
+    border-radius:22px;
+    padding:35px;
+    box-shadow:
+        0 0 50px rgba(0,0,0,.45),
+        0 0 30px rgba(20,124,255,.08);
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:28px;
+}
+
+.logo .jet{
+    font-size:50px;
+    margin-bottom:8px;
+}
+
+.logo h1{
+    font-size:28px;
+    letter-spacing:2px;
+}
+
+.logo h1 span{
+    color:var(--red);
+}
+
+.logo p{
+    color:var(--muted);
+    margin-top:8px;
+    font-size:13px;
+}
+
+.form-group{
+    margin-bottom:18px;
+}
+
+.form-group label{
+    display:block;
+    color:#c9d3e4;
+    font-size:13px;
+    margin-bottom:8px;
+}
+
+input,
+select{
+    width:100%;
+    background:#070d19;
+    border:1px solid var(--border);
+    color:#fff;
+    border-radius:11px;
+    padding:13px 14px;
+    outline:none;
+    font-size:14px;
+}
+
+input:focus,
+select:focus{
+    border-color:var(--blue);
+    box-shadow:0 0 0 3px rgba(20,124,255,.1);
+}
+
+button{
+    border:none;
+    cursor:pointer;
+    color:#fff;
+    border-radius:10px;
+    padding:11px 15px;
+    font-weight:700;
+    transition:.2s;
+}
+
+button:hover{
+    transform:translateY(-1px);
+    filter:brightness(1.08);
+}
+
+.btn-primary{
+    width:100%;
+    background:linear-gradient(135deg,var(--blue),#0053c7);
+}
+
+.error{
+    background:rgba(255,23,68,.1);
+    border:1px solid rgba(255,23,68,.3);
+    color:#ff6f8d;
+    padding:11px;
+    border-radius:10px;
+    margin-bottom:15px;
+    font-size:13px;
+    display:none;
+}
+
+/* =========================
+   ADMIN APP
+========================= */
+
+.admin-app{
+    display:none;
+}
+
+.topbar{
+    height:72px;
+    border-bottom:1px solid var(--border);
+    background:rgba(5,9,20,.95);
+    backdrop-filter:blur(15px);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 25px;
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.brand-icon{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,var(--blue),var(--red));
+    font-size:22px;
+}
+
+.brand-text h2{
+    font-size:18px;
+}
+
+.brand-text span{
+    font-size:11px;
+    color:var(--muted);
+}
+
+.top-actions{
+    display:flex;
+    gap:10px;
+}
+
+.btn-small{
+    padding:9px 13px;
+    background:#101b30;
+    border:1px solid var(--border);
+}
+
+.btn-logout{
+    background:rgba(255,23,68,.12);
+    color:#ff6683;
+    border:1px solid rgba(255,23,68,.25);
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.container{
+    max-width:1450px;
+    margin:auto;
+    padding:25px;
+}
+
+.page-title{
+    margin-bottom:22px;
+}
+
+.page-title h1{
+    font-size:28px;
+}
+
+.page-title p{
+    color:var(--muted);
+    font-size:13px;
+    margin-top:5px;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-bottom:25px;
+}
+
+.stat-card{
+    background:linear-gradient(145deg,#0b1222,#0d1729);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:20px;
+}
+
+.stat-label{
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:9px;
+}
+
+.stat-value{
+    font-size:28px;
+    font-weight:800;
+}
+
+.stat-blue{
+    color:#35a1ff;
+}
+
+.stat-green{
+    color:#00e676;
+}
+
+.stat-red{
+    color:#ff4569;
+}
+
+.stat-yellow{
+    color:#ffd54f;
+}
+
+/* =========================
+   TOOLBAR
+========================= */
+
+.toolbar{
+    background:#0b1222;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:15px;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+}
+
+.search{
+    flex:1;
+    min-width:240px;
+}
+
+.refresh-btn{
+    background:linear-gradient(135deg,#147cff,#0753b6);
+}
+
+.count{
+    color:var(--muted);
+    font-size:13px;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.table-card{
+    background:#0b1222;
+    border:1px solid var(--border);
+    border-radius:18px;
+    overflow:hidden;
+}
+
+.table-wrapper{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:1100px;
+}
+
+thead{
+    background:#101a2d;
+}
+
+th{
+    text-align:left;
+    padding:15px;
+    font-size:12px;
+    color:#91a1ba;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+}
+
+td{
+    padding:15px;
+    border-top:1px solid rgba(255,255,255,.05);
+    font-size:13px;
+    vertical-align:middle;
+}
+
+tr:hover td{
+    background:rgba(20,124,255,.035);
+}
+
+.player-name{
+    font-weight:700;
+}
+
+.player-id{
+    color:#43a6ff;
+    font-family:monospace;
+    font-size:12px;
+}
+
+.rank{
+    color:#ffd54f;
+    font-weight:800;
+}
+
+.badge{
+    display:inline-flex;
+    align-items:center;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:10px;
+    font-weight:800;
+}
+
+.badge-online{
+    background:rgba(0,230,118,.1);
+    color:#00e676;
+}
+
+.badge-offline{
+    background:rgba(141,154,176,.1);
+    color:#8d9ab0;
+}
+
+.badge-blocked{
+    background:rgba(255,23,68,.12);
+    color:#ff5575;
+}
+
+.badge-suspended{
+    background:rgba(255,193,7,.12);
+    color:#ffd54f;
+}
+
+.badge-active{
+    background:rgba(0,230,118,.1);
+    color:#00e676;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.actions{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+}
+
+.action-btn{
+    padding:7px 9px;
+    font-size:11px;
+    background:#152239;
+    border:1px solid var(--border);
+}
+
+.action-edit{
+    color:#55aaff;
+}
+
+.action-block{
+    color:#ff6883;
+}
+
+.action-suspend{
+    color:#ffd54f;
+}
+
+.action-delete{
+    background:rgba(255,23,68,.1);
+    color:#ff5475;
+}
+
+.action-save{
+    background:rgba(0,230,118,.1);
+    color:#00e676;
+}
+
+/* =========================
+   RANK EDIT
+========================= */
+
+.rank-edit{
+    display:flex;
+    gap:5px;
+    align-items:center;
+}
+
+.rank-input{
+    width:80px;
+    padding:7px 8px;
+    font-size:12px;
+}
+
+.save-rank{
+    background:rgba(0,230,118,.1);
+    color:#00e676;
+    padding:7px 9px;
+    font-size:11px;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    backdrop-filter:blur(8px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:500;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-box{
+    width:100%;
+    max-width:650px;
+    max-height:90vh;
+    overflow-y:auto;
+    background:#0b1222;
+    border:1px solid rgba(20,124,255,.25);
+    border-radius:20px;
+    box-shadow:0 20px 80px rgba(0,0,0,.55);
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px;
+    border-bottom:1px solid var(--border);
+}
+
+.modal-header h2{
+    font-size:18px;
+}
+
+.close{
+    width:34px;
+    height:34px;
+    border-radius:9px;
+    padding:0;
+    background:#141f32;
+}
+
+.modal-body{
+    padding:20px;
+}
+
+.detail-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.detail-box{
+    background:#07101e;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:14px;
+}
+
+.detail-box label{
+    color:var(--muted);
+    font-size:11px;
+    display:block;
+    margin-bottom:6px;
+}
+
+.detail-box strong{
+    font-size:14px;
+    word-break:break-word;
+}
+
+.edit-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+    margin-top:18px;
+}
+
+.modal-footer{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    padding:15px 20px;
+    border-top:1px solid var(--border);
+}
+
+.save-btn{
+    background:linear-gradient(135deg,#00a95a,#00e676);
+    color:#001b0c;
+}
+
+.cancel-btn{
+    background:#172238;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.loading{
+    position:fixed;
+    inset:0;
+    background:rgba(5,9,20,.78);
+    backdrop-filter:blur(5px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+}
+
+.loading.show{
+    display:flex;
+}
+
+.loader-box{
+    background:#0c1527;
+    border:1px solid var(--border);
+    border-radius:15px;
+    padding:25px 35px;
+    text-align:center;
+}
+
+.spinner{
+    width:35px;
+    height:35px;
+    border:3px solid rgba(255,255,255,.12);
+    border-top-color:var(--blue);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+    margin:auto auto 12px;
+}
+
+@keyframes spin{
+    to{transform:rotate(360deg)}
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    max-width:360px;
+    padding:14px 17px;
+    border-radius:12px;
+    background:#101c31;
+    border:1px solid var(--border);
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+    transform:translateY(100px);
+    opacity:0;
+    pointer-events:none;
+    transition:.3s;
+    z-index:1500;
+    font-size:13px;
+}
+
+.toast.show{
+    transform:translateY(0);
+    opacity:1;
+}
+
+.toast.success{
+    border-color:rgba(0,230,118,.35);
+}
+
+.toast.error{
+    border-color:rgba(255,23,68,.35);
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty{
+    padding:50px 20px;
+    text-align:center;
+    color:var(--muted);
+}
+
+.empty-icon{
+    font-size:40px;
+    margin-bottom:12px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:900px){
+
+    .stats-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:600px){
+
+    .topbar{
+        padding:0 12px;
+    }
+
+    .brand-text{
+        display:none;
+    }
+
+    .container{
+        padding:15px;
+    }
+
+    .stats-grid{
+        grid-template-columns:1fr 1fr;
+        gap:9px;
+    }
+
+    .stat-card{
+        padding:14px;
+    }
+
+    .stat-value{
+        font-size:22px;
+    }
+
+    .detail-grid,
+    .edit-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     LOGIN SCREEN
+========================================================= -->
+
+<section id="loginScreen" class="login-screen">
+
+    <div class="login-box">
+
+        <div class="logo">
+            <div class="jet">✈️</div>
+            <h1>OX <span>FIGHTER</span> JETS</h1>
+            <p>Administrator Control Panel</p>
+        </div>
+
+        <div id="loginError" class="error"></div>
+
+        <form id="loginForm">
+
+            <div class="form-group">
+                <label>Admin Username</label>
+                <input
+                    type="text"
+                    id="adminUsername"
+                    autocomplete="username"
+                    placeholder="Enter admin username"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Admin Password</label>
+                <input
+                    type="password"
+                    id="adminPassword"
+                    autocomplete="current-password"
+                    placeholder="Enter admin password"
+                    required
+                >
+            </div>
+
+            <button class="btn-primary" type="submit">
+                🔐 LOGIN TO ADMIN PANEL
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     ADMIN APP
+========================================================= -->
+
+<div id="adminApp" class="admin-app">
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ✈️
+            </div>
+
+            <div class="brand-text">
+                <h2>OX Fighter Jets</h2>
+                <span>Admin Control Panel</span>
+            </div>
+
+        </div>
+
+        <div class="top-actions">
+
+            <button
+                class="btn-small"
+                onclick="loadDashboard()"
+            >
+                📊 Dashboard
+            </button>
+
+            <button
+                class="btn-small"
+                onclick="loadUsers()"
+            >
+                👥 Players
+            </button>
+
+            <button
+                class="btn-small btn-logout"
+                onclick="adminLogout()"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main class="container">
+
+        <div class="page-title">
+
+            <h1>Admin Dashboard</h1>
+
+            <p>
+                Manage player IDs, ranks, statistics and account status.
+            </p>
+
+        </div>
+
+
+        <!-- STATS -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    TOTAL PLAYERS
+                </div>
+
+                <div
+                    id="totalPlayers"
+                    class="stat-value stat-blue"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    ACTIVE PLAYERS
+                </div>
+
+                <div
+                    id="activePlayers"
+                    class="stat-value stat-green"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    BLOCKED
+                </div>
+
+                <div
+                    id="blockedPlayers"
+                    class="stat-value stat-red"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    TOTAL GAMES
+                </div>
+
+                <div
+                    id="totalGames"
+                    class="stat-value stat-yellow"
+                >
+                    0
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- TOOLBAR -->
+
+        <section class="toolbar">
+
+            <input
+                id="searchInput"
+                class="search"
+                type="text"
+                placeholder="🔎 Search by name, username or Player ID..."
+                oninput="renderUsers()"
+            >
+
+            <select
+                id="statusFilter"
+                onchange="renderUsers()"
+                style="width:170px"
+            >
+                <option value="all">All Players</option>
+                <option value="active">Active</option>
+                <option value="blocked">Blocked</option>
+                <option value="suspended">Suspended</option>
+            </select>
+
+            <button
+                class="refresh-btn"
+                onclick="loadUsers()"
+            >
+                🔄 Refresh
+            </button>
+
+            <span
+                id="userCount"
+                class="count"
+            >
+                0 players
+            </span>
+
+        </section>
+
+
+        <!-- USERS TABLE -->
+
+        <section class="table-card">
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Player</th>
+
+                            <th>Player ID</th>
+
+                            <th>Rank</th>
+
+                            <th>Wins</th>
+
+                            <th>Losses</th>
+
+                            <th>Draws</th>
+
+                            <th>Status</th>
+
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="usersTableBody">
+
+                        <tr>
+                            <td colspan="8">
+
+                                <div class="empty">
+
+                                    <div class="empty-icon">
+                                        👥
+                                    </div>
+
+                                    Loading players...
+
+                                </div>
+
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     PLAYER DETAIL MODAL
+========================================================= -->
+
+<div id="playerModal" class="modal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2>👤 Player Details</h2>
+
+            <button
+                class="close"
+                onclick="closePlayerModal()"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+            <div
+                id="playerDetails"
+            ></div>
+
+            <div class="edit-grid">
+
+                <div class="form-group">
+
+                    <label>Rank</label>
+
+                    <input
+                        id="editRank"
+                        type="number"
+                        min="0"
+                        placeholder="Rank"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Wins</label>
+
+                    <input
+                        id="editWins"
+                        type="number"
+                        min="0"
+                        placeholder="Wins"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Losses</label>
+
+                    <input
+                        id="editLosses"
+                        type="number"
+                        min="0"
+                        placeholder="Losses"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Draws</label>
+
+                    <input
+                        id="editDraws"
+                        type="number"
+                        min="0"
+                        placeholder="Draws"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Games Played</label>
+
+                    <input
+                        id="editGames"
+                        type="number"
+                        min="0"
+                        placeholder="Games"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Rating / ELO</label>
+
+                    <input
+                        id="editRating"
+                        type="number"
+                        min="0"
+                        placeholder="Rating"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-footer">
+
+            <button
+                class="cancel-btn"
+                onclick="closePlayerModal()"
+            >
+                Cancel
+            </button>
+
+            <button
+                class="save-btn"
+                onclick="savePlayerStats()"
+            >
+                💾 Save Changes
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     LOADING
+========================================================= -->
+
+<div id="loading" class="loading">
+
+    <div class="loader-box">
+
+        <div class="spinner"></div>
+
+        <div id="loadingText">
+            Please wait...
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TOAST
+========================================================= -->
+
+<div id="toast" class="toast"></div>
+
+
+<script>
+
+/* =========================================================
+   CONFIG
+========================================================= */
+
+const API_BASE_URL =
+    "https://oxfighterjets.onrender.com";
+
+const API_PREFIX =
+    `${API_BASE_URL}/api/ox`;
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let adminToken =
+    localStorage.getItem("oxAdminToken") || "";
+
+let users = [];
+
+let selectedPlayerId = null;
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function $(id){
+    return document.getElementById(id);
+}
+
+
+function showLoading(text="Please wait..."){
+
+    $("loadingText").textContent = text;
+
+    $("loading").classList.add("show");
+}
+
+
+function hideLoading(){
+
+    $("loading").classList.remove("show");
+}
+
+
+function toast(message,type="success"){
+
+    const el = $("toast");
+
+    el.textContent = message;
+
+    el.className = "toast show " + type;
+
+    clearTimeout(window.toastTimer);
+
+    window.toastTimer =
+        setTimeout(() => {
+            el.classList.remove("show");
+        },3000);
+}
+
+
+function escapeHTML(value){
+
+    if(value === null || value === undefined){
+        return "";
+    }
+
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+
+/* =========================================================
+   API
+========================================================= */
+
+async function api(
+    endpoint,
+    options={}
+){
+
+    const headers = {
+        "Content-Type":"application/json",
+        ...(options.headers || {})
+    };
+
+    if(adminToken){
+
+        headers["Authorization"] =
+            `Bearer ${adminToken}`;
+
+        headers["X-OX-Admin-Token"] =
+            adminToken;
+
+    }
+
+    const response =
+        await fetch(
+            API_PREFIX + endpoint,
+            {
+                ...options,
+                headers
+            }
+        );
+
+    let data;
+
+    try{
+        data = await response.json();
+    }
+    catch{
+        data = {
+            success:false,
+            message:"Invalid server response"
+        };
+    }
+
+    if(response.status === 401){
+
+        adminToken = "";
+
+        localStorage.removeItem("oxAdminToken");
+
+        showLogin();
+
+        throw new Error(
+            data.message || "Admin session expired"
+        );
+    }
+
+    if(!response.ok || data.success === false){
+
+        throw new Error(
+            data.message ||
+            data.error ||
+            `Request failed (${response.status})`
+        );
+    }
+
+    return data;
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+$("loginForm").addEventListener(
+    "submit",
+    async function(e){
+
+        e.preventDefault();
+
+        const username =
+            $("adminUsername").value.trim();
+
+        const password =
+            $("adminPassword").value;
+
+        $("loginError").style.display =
+            "none";
+
+        showLoading("Authenticating admin...");
+
+        try{
+
+            const data =
+                await fetch(
+                    API_PREFIX + "/admin/login",
+                    {
+                        method:"POST",
+                        headers:{
+                            "Content-Type":
+                                "application/json"
+                        },
+                        body:JSON.stringify({
+                            username,
+                            password
+                        })
+                    }
+                );
+
+            const result =
+                await data.json();
+
+            if(!data.ok || result.success === false){
+
+                throw new Error(
+                    result.message ||
+                    result.error ||
+                    "Invalid admin credentials"
+                );
+            }
+
+            /*
+             * Backend may return token as:
+             * token
+             * adminToken
+             * sessionToken
+             */
+
+            adminToken =
+                result.token ||
+                result.adminToken ||
+                result.sessionToken ||
+                result.data?.token ||
+                "";
+
+            if(!adminToken){
+
+                /*
+                 * Some backends may use cookie/session.
+                 * We still continue if login succeeded.
+                 */
+                console.warn(
+                    "Admin login succeeded but no token was returned."
+                );
+            }
+            else{
+
+                localStorage.setItem(
+                    "oxAdminToken",
+                    adminToken
+                );
+
+            }
+
+            showAdminApp();
+
+            await Promise.all([
+                loadDashboard(),
+                loadUsers()
+            ]);
+
+            toast(
+                "Admin login successful",
+                "success"
+            );
+
+        }
+        catch(error){
+
+            $("loginError").textContent =
+                error.message;
+
+            $("loginError").style.display =
+                "block";
+
+        }
+        finally{
+
+            hideLoading();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SHOW / HIDE
+========================================================= */
+
+function showAdminApp(){
+
+    $("loginScreen").style.display =
+        "none";
+
+    $("adminApp").style.display =
+        "block";
+}
+
+
+function showLogin(){
+
+    $("adminApp").style.display =
+        "none";
+
+    $("loginScreen").style.display =
+        "flex";
+}
+
+
+/* =========================================================
+   CHECK SAVED LOGIN
+========================================================= */
+
+async function checkAdminSession(){
+
+    if(!adminToken){
+
+        showLogin();
+
+        return;
+
+    }
+
+    showLoading("Checking admin session...");
+
+    try{
+
+        /*
+         * Try dashboard to verify token.
+         */
+
+        await api("/admin/dashboard");
+
+        showAdminApp();
+
+        await loadDashboard();
+
+        await loadUsers();
+
+    }
+    catch(error){
+
+        console.log(
+            "Admin session invalid:",
+            error.message
+        );
+
+        adminToken = "";
+
+        localStorage.removeItem(
+            "oxAdminToken"
+        );
+
+        showLogin();
+
+    }
+    finally{
+
+        hideLoading();
+
+    }
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+async function loadDashboard(){
+
+    try{
+
+        const data =
+            await api("/admin/dashboard");
+
+        const d =
+            data.dashboard ||
+            data.data ||
+            data;
+
+        $("totalPlayers").textContent =
+            d.totalPlayers ??
+            d.total_players ??
+            d.players ??
+            0;
+
+        $("activePlayers").textContent =
+            d.activePlayers ??
+            d.active_players ??
+            d.onlinePlayers ??
+            0;
+
+        $("blockedPlayers").textContent =
+            d.blockedPlayers ??
+            d.blocked_players ??
+            d.blocked ??
+            0;
+
+        $("totalGames").textContent =
+            d.totalGames ??
+            d.total_games ??
+            d.games ??
+            0;
+
+    }
+    catch(error){
+
+        console.error(
+            "Dashboard error:",
+            error
+        );
+
+        toast(
+            "Could not load dashboard: " +
+            error.message,
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOAD USERS
+========================================================= */
+
+async function loadUsers(){
+
+    showLoading("Fetching player IDs...");
+
+    try{
+
+        const data =
+            await api("/admin/users");
+
+        /*
+         * Support multiple possible response shapes.
+         */
+
+        users =
+            data.users ||
+            data.players ||
+            data.data ||
+            [];
+
+        if(!Array.isArray(users)){
+
+            users = [];
+
+        }
+
+        renderUsers();
+
+        updateCounts();
+
+        toast(
+            `${users.length} players loaded`,
+            "success"
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            "Users error:",
+            error
+        );
+
+        toast(
+            "Could not fetch players: " +
+            error.message,
+            "error"
+        );
+
+        $("usersTableBody").innerHTML = `
+
+            <tr>
+
+                <td colspan="8">
+
+                    <div class="empty">
+
+                        <div class="empty-icon">
+                            ⚠️
+                        </div>
+
+                        Failed to load players.
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+    finally{
+
+        hideLoading();
+
+    }
+
+}
+
+
+/* =========================================================
+   NORMALIZE USER
+========================================================= */
+
+function normalizeUser(user){
+
+    const stats =
+        user.stats || {};
+
+    return {
+
+        id:
+            user.playerId ||
+            user.player_id ||
+            user.id ||
+            user._id ||
+            "",
+
+        name:
+            user.name ||
+            user.username ||
+            user.displayName ||
+            "Unknown Player",
+
+        username:
+            user.username ||
+            "",
+
+        rank:
+            user.rank ??
+            stats.rank ??
+            0,
+
+        wins:
+            user.wins ??
+            stats.wins ??
+            0,
+
+        losses:
+            user.losses ??
+            stats.losses ??
+            0,
+
+        draws:
+            user.draws ??
+            stats.draws ??
+            0,
+
+        games:
+            user.games ??
+            user.gamesPlayed ??
+            stats.games ??
+            stats.gamesPlayed ??
+            0,
+
+        rating:
+            user.rating ??
+            user.elo ??
+            stats.rating ??
+            stats.elo ??
+            0,
+
+        online:
+            user.online ??
+            user.isOnline ??
+            false,
+
+        blocked:
+            user.blocked ??
+            user.isBlocked ??
+            false,
+
+        suspended:
+            user.suspended ??
+            user.isSuspended ??
+            false,
+
+        raw:user
+    };
+
+}
+
+
+/* =========================================================
+   RENDER USERS
+========================================================= */
+
+function renderUsers(){
+
+    const search =
+        $("searchInput")
+            .value
+            .trim()
+            .toLowerCase();
+
+    const filter =
+        $("statusFilter").value;
+
+    let filtered =
+        users
+        .map(normalizeUser)
+        .filter(user => {
+
+            const matchesSearch =
+                !search ||
+
+                user.name
+                    .toLowerCase()
+                    .includes(search) ||
+
+                user.username
+                    .toLowerCase()
+                    .includes(search) ||
+
+                user.id
+                    .toLowerCase()
+                    .includes(search);
+
+            if(!matchesSearch){
+
+                return false;
+
+            }
+
+            if(filter === "active"){
+
+                return !user.blocked &&
+                       !user.suspended;
+
+            }
+
+            if(filter === "blocked"){
+
+                return user.blocked;
+
+            }
+
+            if(filter === "suspended"){
+
+                return user.suspended;
+
+            }
+
+            return true;
+
+        });
+
+    $("userCount").textContent =
+        `${filtered.length} players`;
+
+    if(!filtered.length){
+
+        $("usersTableBody").innerHTML = `
+
+            <tr>
+
+                <td colspan="8">
+
+                    <div class="empty">
+
+                        <div class="empty-icon">
+                            🔎
+                        </div>
+
+                        No players found.
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    $("usersTableBody").innerHTML =
+        filtered.map(user => {
+
+            let status = "";
+
+            if(user.blocked){
+
+                status =
+                    `<span class="badge badge-blocked">
+                        BLOCKED
+                    </span>`;
+
+            }
+            else if(user.suspended){
+
+                status =
+                    `<span class="badge badge-suspended">
+                        SUSPENDED
+                    </span>`;
+
+            }
+            else if(user.online){
+
+                status =
+                    `<span class="badge badge-online">
+                        ● ONLINE
+                    </span>`;
+
+            }
+            else{
+
+                status =
+                    `<span class="badge badge-offline">
+                        OFFLINE
+                    </span>`;
+
+            }
+
+
+            return `
+
+                <tr>
+
+                    <td>
+
+                        <div class="player-name">
+                            ${escapeHTML(user.name)}
+                        </div>
+
+                        ${
+                            user.username
+                            ?
+                            `<div style="
+                                color:#718099;
+                                font-size:10px;
+                                margin-top:3px;
+                            ">
+                                @${escapeHTML(user.username)}
+                            </div>`
+                            :
+                            ""
+                        }
+
+                    </td>
+
+
+                    <td>
+
+                        <div class="player-id">
+                            ${escapeHTML(user.id)}
+                        </div>
+
+                    </td>
+
+
+                    <td>
+
+                        <div class="rank-edit">
+
+                            <input
+                                class="rank-input"
+                                id="rank-${escapeHTML(user.id)}"
+                                type="number"
+                                min="0"
+                                value="${Number(user.rank) || 0}"
+                            >
+
+                            <button
+                                class="save-rank"
+                                onclick="quickSaveRank('${encodeURIComponent(user.id)}')"
+                                title="Save Rank"
+                            >
+                                ✓
+                            </button>
+
+                        </div>
+
+                    </td>
+
+
+                    <td>
+                        <strong style="color:#00e676">
+                            ${Number(user.wins) || 0}
+                        </strong>
+                    </td>
+
+
+                    <td>
+                        <strong style="color:#ff5d78">
+                            ${Number(user.losses) || 0}
+                        </strong>
+                    </td>
+
+
+                    <td>
+                        <strong style="color:#ffd54f">
+                            ${Number(user.draws) || 0}
+                        </strong>
+                    </td>
+
+
+                    <td>
+                        ${status}
+                    </td>
+
+
+                    <td>
+
+                        <div class="actions">
+
+                            <button
+                                class="action-btn action-edit"
+                                onclick="openPlayer('${encodeURIComponent(user.id)}')"
+                            >
+                                ✏️ Edit
+                            </button>
+
+                            ${
+                                user.blocked
+                                ?
+                                `
+                                <button
+                                    class="action-btn"
+                                    style="color:#00e676"
+                                    onclick="toggleBlock('${encodeURIComponent(user.id)}',false)"
+                                >
+                                    🔓 Unblock
+                                </button>
+                                `
+                                :
+                                `
+                                <button
+                                    class="action-btn action-block"
+                                    onclick="toggleBlock('${encodeURIComponent(user.id)}',true)"
+                                >
+                                    🚫 Block
+                                </button>
+                                `
+                            }
+
+
+                            ${
+                                user.suspended
+                                ?
+                                `
+                                <button
+                                    class="action-btn"
+                                    style="color:#00e676"
+                                    onclick="toggleSuspend('${encodeURIComponent(user.id)}',false)"
+                                >
+                                    ▶ Unsuspend
+                                </button>
+                                `
+                                :
+                                `
+                                <button
+                                    class="action-btn action-suspend"
+                                    onclick="toggleSuspend('${encodeURIComponent(user.id)}',true)"
+                                >
+                                    ⏸ Suspend
+                                </button>
+                                `
+                            }
+
+
+                            <button
+                                class="action-btn action-delete"
+                                onclick="deletePlayer('${encodeURIComponent(user.id)}')"
+                            >
+                                🗑 Delete
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }).join("");
+
+}
+
+
+/* =========================================================
+   COUNTS
+========================================================= */
+
+function updateCounts(){
+
+    const normalized =
+        users.map(normalizeUser);
+
+    const total =
+        normalized.length;
+
+    const blocked =
+        normalized.filter(
+            x => x.blocked
+        ).length;
+
+    const active =
+        normalized.filter(
+            x => !x.blocked && !x.suspended
+        ).length;
+
+    $("totalPlayers").textContent =
+        total;
+
+    $("blockedPlayers").textContent =
+        blocked;
+
+    $("activePlayers").textContent =
+        active;
+
+}
+
+
+/* =========================================================
+   FIND USER
+========================================================= */
+
+function findUser(playerId){
+
+    return users
+        .map(normalizeUser)
+        .find(
+            user =>
+                String(user.id) ===
+                String(playerId)
+        );
+
+}
+
+
+/* =========================================================
+   QUICK RANK SAVE
+========================================================= */
+
+async function quickSaveRank(encodedId){
+
+    const playerId =
+        decodeURIComponent(encodedId);
+
+    const input =
+        document.getElementById(
+            `rank-${playerId}`
+        );
+
+    if(!input){
+
+        toast(
+            "Rank input not found",
+            "error"
+        );
+
+        return;
+
+    }
+
+    const rank =
+        Number(input.value);
+
+    if(!Number.isFinite(rank) || rank < 0){
+
+        toast(
+            "Enter a valid rank",
+            "error"
+        );
+
+        return;
+
+    }
+
+    showLoading("Updating rank...");
+
+    try{
+
+        await updatePlayerStats(
+            playerId,
+            {
+                rank
+            }
+        );
+
+        toast(
+            "🏆 Rank updated successfully",
+            "success"
+        );
+
+        await loadUsers();
+
+    }
+    catch(error){
+
+        toast(
+            "Rank update failed: " +
+            error.message,
+            "error"
+        );
+
+    }
+    finally{
+
+        hideLoading();
+
+    }
+
+}
+
+
+/* =========================================================
+   OPEN PLAYER
+========================================================= */
+
+async function openPlayer(encodedId){
+
+    const playerId =
+        decodeURIComponent(encodedId);
+
+    selectedPlayerId =
+        playerId;
+
+    showLoading("Loading player details...");
+
+    try{
+
+        let user =
+            findUser(playerId);
+
+        /*
+         * Fetch detailed player from backend.
+         */
+
+        try{
+
+            const data =
+                await api(
+                    `/admin/users/${encodeURIComponent(playerId)}`
+                );
+
+            user =
+                data.user ||
+                data.player ||
+                data.data ||
+                data;
+
+        }
+        catch(detailError){
+
+            console.warn(
+                "Detailed player fetch failed:",
+                detailError
+            );
+
+        }
+
+
+        const normalized =
+            normalizeUser(user);
+
+
+        $("playerDetails").innerHTML = `
+
+            <div class="detail-grid">
+
+                <div class="detail-box">
+
+                    <label>PLAYER NAME</label>
+
+                    <strong>
+                        ${escapeHTML(normalized.name)}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>PLAYER ID</label>
+
+                    <strong style="
+                        color:#43a6ff;
+                        font-family:monospace;
+                    ">
+                        ${escapeHTML(normalized.id)}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>USERNAME</label>
+
+                    <strong>
+                        ${
+                            escapeHTML(
+                                normalized.username
+                            ) || "—"
+                        }
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>STATUS</label>
+
+                    <strong>
+
+                        ${
+                            normalized.blocked
+                            ?
+                            "🚫 BLOCKED"
+                            :
+                            normalized.suspended
+                            ?
+                            "⏸ SUSPENDED"
+                            :
+                            normalized.online
+                            ?
+                            "🟢 ONLINE"
+                            :
+                            "⚪ OFFLINE"
+                        }
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        $("editRank").value =
+            Number(normalized.rank) || 0;
+
+        $("editWins").value =
+            Number(normalized.wins) || 0;
+
+        $("editLosses").value =
+            Number(normalized.losses) || 0;
+
+        $("editDraws").value =
+            Number(normalized.draws) || 0;
+
+        $("editGames").value =
+            Number(normalized.games) || 0;
+
+        $("editRating").value =
+            Number(normalized.rating) || 0;
+
+
+        $("playerModal")
+            .classList.add("show");
+
+    }
+    catch(error){
+
+        toast(
+            "Could not load player: " +
+            error.message,
+            "error"
+        );
+
+    }
+    finally{
+
+        hideLoading();
+
+    }
+
+}
+
+
+/* =========================================================
+   CLOSE PLAYER
+========================================================= */
+
+function closePlayerModal(){
+
+    $("playerModal")
+        .classList.remove("show");
+
+    selectedPlayerId =
+        null;
+
+}
+
+
+/* =========================================================
+   UPDATE STATS
+========================================================= */
+
+async function updatePlayerStats(
+    playerId,
+    stats
+){
+
+    /*
+     * Existing backend route:
+     *
+     * PUT /api/ox/admin/users/<player_id>/stats
+     */
+
+    return await api(
+        `/admin/users/${encodeURIComponent(playerId)}/stats`,
+        {
+            method:"PUT",
+            body:JSON.stringify(stats)
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SAVE PLAYER STATS
+========================================================= */
+
+async function savePlayerStats(){
+
+    if(!selectedPlayerId){
+
+        toast(
+            "No player selected",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const stats = {
+
+        rank:
+            Number($("editRank").value) || 0,
+
+        wins:
+            Number($("editWins").value) || 0,
+
+        losses:
+            Number($("editLosses").value) || 0,
+
+        draws:
+            Number($("editDraws").value) || 0,
+
+        games:
+            Number($("editGames").value) || 0,
+
+        rating:
+            Number($("editRating").value) || 0
+
+    };
+
+
+    if(
+        stats.rank < 0 ||
+        stats.wins < 0 ||
+        stats.losses < 0 ||
+        stats.draws < 0 ||
+        stats.games < 0 ||
+        stats.rating < 0
+    ){
+
+        toast(
+            "Stats cannot be negative",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    showLoading(
+        "Saving player changes..."
+    );
+
+
+    try{
+
+        await updatePlayerStats(
+            selectedPlayerId,
+            stats
+        );
+
+
+        toast(
+            "✅ Player stats updated",
+            "success"
+        );
+
+
+        closePlayerModal();
+
+        await loadUsers();
+
+        await loadDashboard();
+
+    }
+    catch(error){
+
+        toast(
+            "Update failed: " +
+            error.message,
+            "error"
+        );
+
+    }
+    finally{
+
+        hideLoading();
+
+    }
+
+}
+
+
+/* =========================================================
+   BLOCK / UNBLOCK
+========================================================= */
+
+async function toggleBlock(
+    encodedId,
+    shouldBlock
+){
+
+    const playerId =
+        decodeURIComponent(encodedId);
+
+    const user =
+        findUser(playerId);
+
+    const name =
+        user?.name ||
+        playerId;
+
+
+    const action =
+        shouldBlock
+        ?
+        "BLOCK"
+        :
+        "UNBLOCK";
+
+
+    if(
+        !confirm(
+            `${action} player "${name}"?\n\nPlayer ID: ${playerId}`
+        )
+    ){
+
+        return;
+
+    }
+
+
+    showLoading(
+        shouldBlock
+        ?
+        "Blocking player..."
+        :
+        "Unblocking player..."
+    );
+
+
+    try{
+
+        const endpoint =
+            shouldBlock
+            ?
+            `/admin/users/${encodeURIComponent(playerId)}/block`
+            :
+            `/admin/users/${encodeURIComponent(playerId)}/unblock`;
+
+
+        await api(
+            endpoint,
+            {
+                method:"POST"
+            }
+        );
+
+
+        toast(
+            shouldBlock
+            ?
+            "🚫 Player blocked"
+            :
+            "🔓 Player unblocked",
+            "success"
+        );
+
+
+        await loadUsers();
+
+        await loadDashboard();
+
+    }
+    catch(error){
+
+        toast(
+            "Action failed: " +
+            error.message,
+            "error"
+        );
+
+    }
+    finally{
+
+        hideLoading();
+
+    }
+
+}
+
+
+/* =========================================================
+   SUSPEND / UNSUSPEND
+========================================================= */
+
+async function toggleSuspend(
+    encodedId,
+    shouldSuspend
+){
+
+    const playerId =
+        decodeURIComponent(encodedId);
+
+    const user =
+        findUser(playerId);
+
+    const name =
+        user?.name ||
+        playerId;
+
+
+    const action =
+        shouldSuspend
+        ?
+        "SUSPEND"
+        :
+        "UNSUSPEND";
+
+
+    if(
+        !confirm(
+            `${action} player "${name}"?\n\nPlayer ID: ${playerId}`
+        )
+    ){
+
+        return;
+
+    }
+
+
+    showLoading(
+        shouldSuspend
+        ?
+        "Suspending player..."
+        :
+        "Unsuspending player..."
+    );
+
+
+    try{
+
+        const endpoint =
+            shouldSuspend
+            ?
+            `/admin/users/${encodeURIComponent(playerId)}/suspend`
+            :
+            `/admin/users/${encodeURIComponent(playerId)}/unsuspend`;
+
+
+        await api(
+            endpoint,
+            {
+                method:"POST"
+            }
+        );
+
+
+        toast(
+            shouldSuspend
+            ?
+            "⏸ Player suspended"
+            :
+            "▶ Player unsuspended",
+            "success"
+        );
+
+
+        await loadUsers();
+
+        await loadDashboard();
+
+    }
+    catch(error){
+
+        toast(
+            "Action failed: " +
+            error.message,
+            "error"
+        );
+
+    }
+    finally{
+
+        hideLoading();
+
+    }
+
+}
+
+
+/* =========================================================
+   DELETE PLAYER
+========================================================= */
+
+async function deletePlayer(
+    encodedId
+){
+
+    const playerId =
+        decodeURIComponent(encodedId);
+
+    const user =
+        findUser(playerId);
+
+    const name =
+        user?.name ||
+        playerId;
+
+
+    const confirmed =
+        confirm(
+            `⚠️ DELETE PLAYER PERMANENTLY?\n\n` +
+            `Name: ${name}\n` +
+            `Player ID: ${playerId}\n\n` +
+            `This action cannot be undone.`
+        );
+
+
+    if(!confirmed){
+
+        return;
+
+    }
+
+
+    /*
+     * Double confirmation for permanent deletion.
+     */
+
+    const second =
+        confirm(
+            `FINAL CONFIRMATION\n\n` +
+            `Delete "${name}" (${playerId})?`
+        );
+
+
+    if(!second){
+
+        return;
+
+    }
+
+
+    showLoading(
+        "Deleting player..."
+    );
+
+
+    try{
+
+        await api(
+            `/admin/users/${encodeURIComponent(playerId)}`,
+            {
+                method:"DELETE"
+            }
+        );
+
+
+        toast(
+            "🗑 Player deleted successfully",
+            "success"
+        );
+
+
+        users =
+            users.filter(
+                user =>
+                    normalizeUser(user).id !==
+                    playerId
+            );
+
+
+        renderUsers();
+
+        await loadDashboard();
+
+    }
+    catch(error){
+
+        toast(
+            "Delete failed: " +
+            error.message,
+            "error"
+        );
+
+    }
+    finally{
+
+        hideLoading();
+
+    }
+
+}
+
+
+/* =========================================================
+   ADMIN LOGOUT
+========================================================= */
+
+async function adminLogout(){
+
+    try{
+
+        if(adminToken){
+
+            await fetch(
+                API_PREFIX + "/admin/logout",
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":
+                            "application/json",
+                        "Authorization":
+                            `Bearer ${adminToken}`,
+                        "X-OX-Admin-Token":
+                            adminToken
+                    }
+                }
+            );
+
+        }
+
+    }
+    catch(error){
+
+        console.log(
+            "Logout request failed",
+            error
+        );
+
+    }
+
+
+    adminToken = "";
+
+    localStorage.removeItem(
+        "oxAdminToken"
+    );
+
+    users = [];
+
+    showLogin();
+
+    toast(
+        "Logged out",
+        "success"
+    );
+
+}
+
+
+/* =========================================================
+   KEYBOARD / MODAL
+========================================================= */
+
+$("playerModal").addEventListener(
+    "click",
+    function(e){
+
+        if(e.target === this){
+
+            closePlayerModal();
+
+        }
+
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    function(e){
+
+        if(e.key === "Escape"){
+
+            closePlayerModal();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   AUTO LOAD
+========================================================= */
+
+checkAdminSession();
+
+</script>
+
+</body>
+</html>
