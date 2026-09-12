@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,289 +16,143 @@
 
 body{
     font-family:Inter,Arial,sans-serif;
-    background:#050914;
-    color:#fff;
-    min-height:100vh;
-}
-
-/* =========================
-   VARIABLES
-========================= */
-
-:root{
-    --blue:#147cff;
-    --blue2:#00b7ff;
-    --red:#ff1744;
-    --green:#00e676;
-    --yellow:#ffc107;
-    --bg:#050914;
-    --card:#0b1222;
-    --card2:#0f192d;
-    --border:rgba(255,255,255,.09);
-    --muted:#8d9ab0;
-}
-
-/* =========================
-   LOGIN
-========================= */
-
-.login-screen{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
     background:
-        radial-gradient(circle at 20% 20%,rgba(20,124,255,.18),transparent 30%),
-        radial-gradient(circle at 80% 80%,rgba(255,23,68,.13),transparent 30%),
-        #050914;
-}
-
-.login-box{
-    width:100%;
-    max-width:430px;
-    background:rgba(11,18,34,.94);
-    border:1px solid rgba(20,124,255,.3);
-    border-radius:22px;
-    padding:35px;
-    box-shadow:
-        0 0 50px rgba(0,0,0,.45),
-        0 0 30px rgba(20,124,255,.08);
-}
-
-.logo{
-    text-align:center;
-    margin-bottom:28px;
-}
-
-.logo .jet{
-    font-size:50px;
-    margin-bottom:8px;
-}
-
-.logo h1{
-    font-size:28px;
-    letter-spacing:2px;
-}
-
-.logo h1 span{
-    color:var(--red);
-}
-
-.logo p{
-    color:var(--muted);
-    margin-top:8px;
-    font-size:13px;
-}
-
-.form-group{
-    margin-bottom:18px;
-}
-
-.form-group label{
-    display:block;
-    color:#c9d3e4;
-    font-size:13px;
-    margin-bottom:8px;
-}
-
-input,
-select{
-    width:100%;
-    background:#070d19;
-    border:1px solid var(--border);
+        radial-gradient(circle at top left,rgba(225,6,0,.15),transparent 35%),
+        radial-gradient(circle at bottom right,rgba(0,110,255,.15),transparent 35%),
+        #050b16;
     color:#fff;
-    border-radius:11px;
-    padding:13px 14px;
-    outline:none;
-    font-size:14px;
+    min-height:100vh;
 }
 
-input:focus,
-select:focus{
-    border-color:var(--blue);
-    box-shadow:0 0 0 3px rgba(20,124,255,.1);
-}
+/* ================= HEADER ================= */
 
-button{
-    border:none;
-    cursor:pointer;
-    color:#fff;
-    border-radius:10px;
-    padding:11px 15px;
-    font-weight:700;
-    transition:.2s;
-}
-
-button:hover{
-    transform:translateY(-1px);
-    filter:brightness(1.08);
-}
-
-.btn-primary{
-    width:100%;
-    background:linear-gradient(135deg,var(--blue),#0053c7);
-}
-
-.error{
-    background:rgba(255,23,68,.1);
-    border:1px solid rgba(255,23,68,.3);
-    color:#ff6f8d;
-    padding:11px;
-    border-radius:10px;
-    margin-bottom:15px;
-    font-size:13px;
-    display:none;
-}
-
-/* =========================
-   ADMIN APP
-========================= */
-
-.admin-app{
-    display:none;
-}
-
-.topbar{
+.header{
     height:72px;
-    border-bottom:1px solid var(--border);
-    background:rgba(5,9,20,.95);
-    backdrop-filter:blur(15px);
+    padding:0 28px;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 25px;
+    background:rgba(5,11,22,.94);
+    border-bottom:1px solid rgba(255,255,255,.1);
     position:sticky;
     top:0;
-    z-index:100;
+    z-index:50;
+    backdrop-filter:blur(15px);
 }
 
-.brand{
+.logo{
     display:flex;
     align-items:center;
     gap:12px;
 }
 
-.brand-icon{
+.logo-icon{
     width:42px;
     height:42px;
     border-radius:12px;
     display:flex;
     align-items:center;
     justify-content:center;
-    background:linear-gradient(135deg,var(--blue),var(--red));
+    background:linear-gradient(135deg,#e10600,#ff3131);
     font-size:22px;
+    box-shadow:0 0 25px rgba(225,6,0,.35);
 }
 
-.brand-text h2{
-    font-size:18px;
+.logo-text{
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:.5px;
 }
 
-.brand-text span{
-    font-size:11px;
-    color:var(--muted);
+.logo-text span{
+    color:#e10600;
 }
 
-.top-actions{
+.header-right{
     display:flex;
+    align-items:center;
     gap:10px;
 }
 
-.btn-small{
-    padding:9px 13px;
-    background:#101b30;
-    border:1px solid var(--border);
+.status{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:13px;
+    color:#8fa3bd;
 }
 
-.btn-logout{
-    background:rgba(255,23,68,.12);
-    color:#ff6683;
-    border:1px solid rgba(255,23,68,.25);
+.status-dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#00e676;
+    box-shadow:0 0 10px #00e676;
 }
 
-/* =========================
-   CONTENT
-========================= */
+/* ================= CONTAINER ================= */
 
 .container{
-    max-width:1450px;
-    margin:auto;
-    padding:25px;
+    width:min(1450px,94%);
+    margin:28px auto 50px;
 }
 
 .page-title{
-    margin-bottom:22px;
+    margin-bottom:24px;
 }
 
 .page-title h1{
-    font-size:28px;
+    font-size:32px;
+    margin-bottom:7px;
 }
 
 .page-title p{
-    color:var(--muted);
-    font-size:13px;
-    margin-top:5px;
+    color:#8191a8;
 }
 
-/* =========================
-   STATS
-========================= */
+/* ================= STATS ================= */
 
-.stats-grid{
+.stats{
     display:grid;
     grid-template-columns:repeat(4,1fr);
-    gap:15px;
+    gap:16px;
     margin-bottom:25px;
 }
 
 .stat-card{
-    background:linear-gradient(145deg,#0b1222,#0d1729);
-    border:1px solid var(--border);
+    background:linear-gradient(
+        145deg,
+        rgba(17,31,54,.95),
+        rgba(8,17,31,.95)
+    );
+    border:1px solid rgba(255,255,255,.08);
     border-radius:16px;
     padding:20px;
+    box-shadow:0 12px 35px rgba(0,0,0,.25);
 }
 
 .stat-label{
-    color:var(--muted);
-    font-size:12px;
+    color:#8090a8;
+    font-size:13px;
     margin-bottom:9px;
 }
 
 .stat-value{
-    font-size:28px;
+    font-size:29px;
     font-weight:800;
 }
 
-.stat-blue{
-    color:#35a1ff;
-}
-
-.stat-green{
-    color:#00e676;
-}
-
-.stat-red{
-    color:#ff4569;
-}
-
-.stat-yellow{
-    color:#ffd54f;
-}
-
-/* =========================
-   TOOLBAR
-========================= */
+/* ================= TOOLBAR ================= */
 
 .toolbar{
-    background:#0b1222;
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:15px;
     display:flex;
     gap:12px;
-    align-items:center;
-    margin-bottom:18px;
     flex-wrap:wrap;
+    padding:16px;
+    background:rgba(10,21,38,.9);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    margin-bottom:20px;
 }
 
 .search{
@@ -305,112 +160,151 @@ button:hover{
     min-width:240px;
 }
 
-.refresh-btn{
-    background:linear-gradient(135deg,#147cff,#0753b6);
+input,select{
+    width:100%;
+    background:#07111f;
+    border:1px solid #243750;
+    color:#fff;
+    border-radius:10px;
+    padding:12px 14px;
+    outline:none;
+    font-size:14px;
 }
 
-.count{
-    color:var(--muted);
-    font-size:13px;
+input:focus,select:focus{
+    border-color:#e10600;
+    box-shadow:0 0 0 3px rgba(225,6,0,.1);
 }
 
-/* =========================
-   TABLE
-========================= */
-
-.table-card{
-    background:#0b1222;
-    border:1px solid var(--border);
-    border-radius:18px;
-    overflow:hidden;
+button{
+    border:0;
+    border-radius:10px;
+    padding:11px 17px;
+    color:#fff;
+    cursor:pointer;
+    font-weight:700;
+    transition:.2s;
 }
 
-.table-wrapper{
-    overflow-x:auto;
+button:hover{
+    transform:translateY(-1px);
+}
+
+.btn-red{
+    background:linear-gradient(135deg,#e10600,#ff3030);
+}
+
+.btn-blue{
+    background:linear-gradient(135deg,#006eff,#278cff);
+}
+
+.btn-dark{
+    background:#142238;
+    border:1px solid #293d59;
+}
+
+.btn-green{
+    background:#087f46;
+}
+
+.btn-orange{
+    background:#a85b00;
+}
+
+.btn-danger{
+    background:#8d0010;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrap{
+    background:rgba(8,18,32,.95);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:17px;
+    overflow:auto;
+    box-shadow:0 15px 50px rgba(0,0,0,.25);
 }
 
 table{
     width:100%;
     border-collapse:collapse;
-    min-width:1100px;
+    min-width:1050px;
 }
 
 thead{
-    background:#101a2d;
+    background:#0d1b2f;
 }
 
 th{
-    text-align:left;
     padding:15px;
+    text-align:left;
+    color:#8da0ba;
     font-size:12px;
-    color:#91a1ba;
     text-transform:uppercase;
-    letter-spacing:.6px;
+    letter-spacing:.5px;
 }
 
 td{
     padding:15px;
-    border-top:1px solid rgba(255,255,255,.05);
-    font-size:13px;
-    vertical-align:middle;
+    border-top:1px solid rgba(255,255,255,.055);
+    font-size:14px;
 }
 
 tr:hover td{
-    background:rgba(20,124,255,.035);
+    background:rgba(255,255,255,.018);
+}
+
+.player-id{
+    color:#55a7ff;
+    font-weight:800;
 }
 
 .player-name{
     font-weight:700;
 }
 
-.player-id{
-    color:#43a6ff;
-    font-family:monospace;
+.rank{
+    display:inline-flex;
+    padding:5px 9px;
+    border-radius:20px;
+    background:rgba(225,6,0,.13);
+    color:#ff6363;
+    font-weight:800;
     font-size:12px;
 }
 
-.rank{
-    color:#ffd54f;
-    font-weight:800;
+.online{
+    color:#00e676;
+}
+
+.offline{
+    color:#718096;
 }
 
 .badge{
-    display:inline-flex;
-    align-items:center;
+    display:inline-block;
     padding:5px 9px;
     border-radius:20px;
-    font-size:10px;
+    font-size:11px;
     font-weight:800;
 }
 
-.badge-online{
-    background:rgba(0,230,118,.1);
+.badge-active{
+    background:rgba(0,230,118,.12);
     color:#00e676;
-}
-
-.badge-offline{
-    background:rgba(141,154,176,.1);
-    color:#8d9ab0;
 }
 
 .badge-blocked{
-    background:rgba(255,23,68,.12);
-    color:#ff5575;
+    background:rgba(255,65,65,.12);
+    color:#ff6060;
 }
 
 .badge-suspended{
-    background:rgba(255,193,7,.12);
-    color:#ffd54f;
+    background:rgba(255,167,38,.12);
+    color:#ffb238;
 }
 
-.badge-active{
-    background:rgba(0,230,118,.1);
-    color:#00e676;
-}
-
-/* =========================
-   ACTIONS
-========================= */
+/* ================= ACTIONS ================= */
 
 .actions{
     display:flex;
@@ -418,72 +312,31 @@ tr:hover td{
     flex-wrap:wrap;
 }
 
-.action-btn{
-    padding:7px 9px;
-    font-size:11px;
-    background:#152239;
-    border:1px solid var(--border);
-}
-
-.action-edit{
-    color:#55aaff;
-}
-
-.action-block{
-    color:#ff6883;
-}
-
-.action-suspend{
-    color:#ffd54f;
-}
-
-.action-delete{
-    background:rgba(255,23,68,.1);
-    color:#ff5475;
-}
-
-.action-save{
-    background:rgba(0,230,118,.1);
-    color:#00e676;
-}
-
-/* =========================
-   RANK EDIT
-========================= */
-
-.rank-edit{
-    display:flex;
-    gap:5px;
-    align-items:center;
-}
-
-.rank-input{
-    width:80px;
-    padding:7px 8px;
-    font-size:12px;
-}
-
-.save-rank{
-    background:rgba(0,230,118,.1);
-    color:#00e676;
-    padding:7px 9px;
+.actions button{
+    padding:7px 10px;
     font-size:11px;
 }
 
-/* =========================
-   MODAL
-========================= */
+/* ================= EMPTY ================= */
+
+.empty{
+    padding:50px;
+    text-align:center;
+    color:#718096;
+}
+
+/* ================= MODAL ================= */
 
 .modal{
     position:fixed;
     inset:0;
     background:rgba(0,0,0,.72);
-    backdrop-filter:blur(8px);
     display:none;
     align-items:center;
     justify-content:center;
+    z-index:200;
     padding:20px;
-    z-index:500;
+    backdrop-filter:blur(8px);
 }
 
 .modal.show{
@@ -491,150 +344,107 @@ tr:hover td{
 }
 
 .modal-box{
-    width:100%;
-    max-width:650px;
+    width:min(650px,100%);
     max-height:90vh;
-    overflow-y:auto;
-    background:#0b1222;
-    border:1px solid rgba(20,124,255,.25);
+    overflow:auto;
+    background:#0a1627;
+    border:1px solid rgba(255,255,255,.12);
     border-radius:20px;
-    box-shadow:0 20px 80px rgba(0,0,0,.55);
+    box-shadow:0 30px 100px rgba(0,0,0,.6);
 }
 
 .modal-header{
     display:flex;
-    justify-content:space-between;
     align-items:center;
-    padding:20px;
-    border-bottom:1px solid var(--border);
+    justify-content:space-between;
+    padding:20px 22px;
+    border-bottom:1px solid rgba(255,255,255,.08);
 }
 
 .modal-header h2{
-    font-size:18px;
+    font-size:20px;
 }
 
 .close{
-    width:34px;
-    height:34px;
-    border-radius:9px;
+    width:38px;
+    height:38px;
     padding:0;
-    background:#141f32;
+    border-radius:50%;
+    background:#15253b;
+    font-size:18px;
 }
 
 .modal-body{
-    padding:20px;
+    padding:22px;
 }
 
-.detail-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:12px;
+.form-group{
+    margin-bottom:16px;
 }
 
-.detail-box{
-    background:#07101e;
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:14px;
-}
-
-.detail-box label{
-    color:var(--muted);
-    font-size:11px;
+.form-group label{
     display:block;
-    margin-bottom:6px;
+    font-size:12px;
+    color:#8799b1;
+    margin-bottom:7px;
 }
 
-.detail-box strong{
-    font-size:14px;
-    word-break:break-word;
-}
-
-.edit-grid{
+.form-grid{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:1fr 1fr;
     gap:14px;
-    margin-top:18px;
 }
 
 .modal-footer{
     display:flex;
     justify-content:flex-end;
     gap:10px;
-    padding:15px 20px;
-    border-top:1px solid var(--border);
+    padding:18px 22px;
+    border-top:1px solid rgba(255,255,255,.08);
 }
 
-.save-btn{
-    background:linear-gradient(135deg,#00a95a,#00e676);
-    color:#001b0c;
+/* ================= DETAILS ================= */
+
+.detail-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
 }
 
-.cancel-btn{
-    background:#172238;
+.detail{
+    background:#07111f;
+    border:1px solid #1d3048;
+    padding:13px;
+    border-radius:10px;
 }
 
-/* =========================
-   LOADING
-========================= */
-
-.loading{
-    position:fixed;
-    inset:0;
-    background:rgba(5,9,20,.78);
-    backdrop-filter:blur(5px);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:1000;
+.detail small{
+    display:block;
+    color:#718096;
+    margin-bottom:4px;
 }
 
-.loading.show{
-    display:flex;
+.detail strong{
+    word-break:break-word;
 }
 
-.loader-box{
-    background:#0c1527;
-    border:1px solid var(--border);
-    border-radius:15px;
-    padding:25px 35px;
-    text-align:center;
-}
-
-.spinner{
-    width:35px;
-    height:35px;
-    border:3px solid rgba(255,255,255,.12);
-    border-top-color:var(--blue);
-    border-radius:50%;
-    animation:spin .8s linear infinite;
-    margin:auto auto 12px;
-}
-
-@keyframes spin{
-    to{transform:rotate(360deg)}
-}
-
-/* =========================
-   TOAST
-========================= */
+/* ================= TOAST ================= */
 
 .toast{
     position:fixed;
-    right:20px;
-    bottom:20px;
-    max-width:360px;
-    padding:14px 17px;
+    right:22px;
+    bottom:22px;
+    z-index:500;
+    min-width:280px;
+    max-width:420px;
+    padding:15px 18px;
     border-radius:12px;
-    background:#101c31;
-    border:1px solid var(--border);
-    box-shadow:0 10px 30px rgba(0,0,0,.35);
-    transform:translateY(100px);
+    background:#102137;
+    border:1px solid #29415f;
+    box-shadow:0 15px 45px rgba(0,0,0,.45);
+    transform:translateY(120px);
     opacity:0;
-    pointer-events:none;
     transition:.3s;
-    z-index:1500;
-    font-size:13px;
 }
 
 .toast.show{
@@ -643,381 +453,239 @@ tr:hover td{
 }
 
 .toast.success{
-    border-color:rgba(0,230,118,.35);
+    border-color:#00a85a;
 }
 
 .toast.error{
-    border-color:rgba(255,23,68,.35);
+    border-color:#e10600;
 }
 
-/* =========================
-   EMPTY
-========================= */
+/* ================= LOADER ================= */
 
-.empty{
-    padding:50px 20px;
+.loader{
+    position:fixed;
+    inset:0;
+    background:rgba(4,9,17,.8);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:600;
+}
+
+.loader.show{
+    display:flex;
+}
+
+.loader-box{
+    background:#0d1b2f;
+    padding:25px 35px;
+    border-radius:16px;
     text-align:center;
-    color:var(--muted);
 }
 
-.empty-icon{
-    font-size:40px;
-    margin-bottom:12px;
+.spinner{
+    width:38px;
+    height:38px;
+    border:4px solid #263951;
+    border-top-color:#e10600;
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+    margin:0 auto 13px;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+@keyframes spin{
+    to{transform:rotate(360deg)}
+}
+
+/* ================= RESPONSIVE ================= */
 
 @media(max-width:900px){
-
-    .stats-grid{
+    .stats{
         grid-template-columns:repeat(2,1fr);
     }
-
 }
 
 @media(max-width:600px){
-
-    .topbar{
-        padding:0 12px;
+    .header{
+        padding:0 14px;
     }
 
-    .brand-text{
+    .logo-text{
+        font-size:16px;
+    }
+
+    .status{
         display:none;
     }
 
     .container{
-        padding:15px;
+        width:94%;
+        margin-top:20px;
     }
 
-    .stats-grid{
+    .page-title h1{
+        font-size:25px;
+    }
+
+    .stats{
         grid-template-columns:1fr 1fr;
-        gap:9px;
+        gap:10px;
     }
 
     .stat-card{
-        padding:14px;
+        padding:15px;
     }
 
     .stat-value{
-        font-size:22px;
+        font-size:23px;
     }
 
-    .detail-grid,
-    .edit-grid{
+    .form-grid,
+    .detail-grid{
         grid-template-columns:1fr;
     }
-
 }
 </style>
 </head>
 
 <body>
 
-<!-- =========================================================
-     LOGIN SCREEN
-========================================================= -->
+<header class="header">
 
-<section id="loginScreen" class="login-screen">
-
-    <div class="login-box">
-
-        <div class="logo">
-            <div class="jet">✈️</div>
-            <h1>OX <span>FIGHTER</span> JETS</h1>
-            <p>Administrator Control Panel</p>
+    <div class="logo">
+        <div class="logo-icon">✈️</div>
+        <div class="logo-text">
+            OX <span>FIGHTER JETS</span>
         </div>
-
-        <div id="loginError" class="error"></div>
-
-        <form id="loginForm">
-
-            <div class="form-group">
-                <label>Admin Username</label>
-                <input
-                    type="text"
-                    id="adminUsername"
-                    autocomplete="username"
-                    placeholder="Enter admin username"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label>Admin Password</label>
-                <input
-                    type="password"
-                    id="adminPassword"
-                    autocomplete="current-password"
-                    placeholder="Enter admin password"
-                    required
-                >
-            </div>
-
-            <button class="btn-primary" type="submit">
-                🔐 LOGIN TO ADMIN PANEL
-            </button>
-
-        </form>
-
     </div>
 
-</section>
-
-
-<!-- =========================================================
-     ADMIN APP
-========================================================= -->
-
-<div id="adminApp" class="admin-app">
-
-    <header class="topbar">
-
-        <div class="brand">
-
-            <div class="brand-icon">
-                ✈️
-            </div>
-
-            <div class="brand-text">
-                <h2>OX Fighter Jets</h2>
-                <span>Admin Control Panel</span>
-            </div>
-
+    <div class="header-right">
+        <div class="status">
+            <span class="status-dot"></span>
+            Admin Panel Online
         </div>
 
-        <div class="top-actions">
+        <button class="btn-blue" onclick="loadUsers()">
+            ↻ Refresh
+        </button>
+    </div>
 
-            <button
-                class="btn-small"
-                onclick="loadDashboard()"
-            >
-                📊 Dashboard
-            </button>
+</header>
 
-            <button
-                class="btn-small"
-                onclick="loadUsers()"
-            >
-                👥 Players
-            </button>
 
-            <button
-                class="btn-small btn-logout"
-                onclick="adminLogout()"
-            >
-                Logout
-            </button>
+<main class="container">
 
+    <div class="page-title">
+        <h1>⚡ Admin Control Center</h1>
+        <p>Manage OX Fighter Jets players, ranks and accounts.</p>
+    </div>
+
+
+    <!-- STATS -->
+
+    <section class="stats">
+
+        <div class="stat-card">
+            <div class="stat-label">TOTAL PLAYERS</div>
+            <div class="stat-value" id="totalPlayers">0</div>
         </div>
 
-    </header>
-
-
-    <main class="container">
-
-        <div class="page-title">
-
-            <h1>Admin Dashboard</h1>
-
-            <p>
-                Manage player IDs, ranks, statistics and account status.
-            </p>
-
+        <div class="stat-card">
+            <div class="stat-label">ONLINE</div>
+            <div class="stat-value" id="onlinePlayers">0</div>
         </div>
 
+        <div class="stat-card">
+            <div class="stat-label">BLOCKED</div>
+            <div class="stat-value" id="blockedPlayers">0</div>
+        </div>
 
-        <!-- STATS -->
+        <div class="stat-card">
+            <div class="stat-label">SUSPENDED</div>
+            <div class="stat-value" id="suspendedPlayers">0</div>
+        </div>
 
-        <section class="stats-grid">
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    TOTAL PLAYERS
-                </div>
-
-                <div
-                    id="totalPlayers"
-                    class="stat-value stat-blue"
-                >
-                    0
-                </div>
-
-            </div>
+    </section>
 
 
-            <div class="stat-card">
+    <!-- TOOLBAR -->
 
-                <div class="stat-label">
-                    ACTIVE PLAYERS
-                </div>
+    <section class="toolbar">
 
-                <div
-                    id="activePlayers"
-                    class="stat-value stat-green"
-                >
-                    0
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    BLOCKED
-                </div>
-
-                <div
-                    id="blockedPlayers"
-                    class="stat-value stat-red"
-                >
-                    0
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-label">
-                    TOTAL GAMES
-                </div>
-
-                <div
-                    id="totalGames"
-                    class="stat-value stat-yellow"
-                >
-                    0
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- TOOLBAR -->
-
-        <section class="toolbar">
-
+        <div class="search">
             <input
                 id="searchInput"
-                class="search"
                 type="text"
-                placeholder="🔎 Search by name, username or Player ID..."
+                placeholder="🔎 Search by Player ID or name..."
                 oninput="renderUsers()"
             >
+        </div>
 
-            <select
-                id="statusFilter"
-                onchange="renderUsers()"
-                style="width:170px"
-            >
+        <div style="width:170px">
+            <select id="statusFilter" onchange="renderUsers()">
                 <option value="all">All Players</option>
-                <option value="active">Active</option>
+                <option value="online">Online</option>
                 <option value="blocked">Blocked</option>
                 <option value="suspended">Suspended</option>
+                <option value="active">Active</option>
             </select>
+        </div>
 
-            <button
-                class="refresh-btn"
-                onclick="loadUsers()"
-            >
-                🔄 Refresh
-            </button>
+        <button class="btn-dark" onclick="clearFilters()">
+            Clear
+        </button>
 
-            <span
-                id="userCount"
-                class="count"
-            >
-                0 players
-            </span>
-
-        </section>
+    </section>
 
 
-        <!-- USERS TABLE -->
+    <!-- USERS TABLE -->
 
-        <section class="table-card">
+    <section class="table-wrap">
 
-            <div class="table-wrapper">
+        <table>
 
-                <table>
+            <thead>
+                <tr>
+                    <th>Player ID</th>
+                    <th>Name</th>
+                    <th>Rank</th>
+                    <th>Rating</th>
+                    <th>W / L / D</th>
+                    <th>Status</th>
+                    <th>Online</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
 
-                    <thead>
+            <tbody id="usersTable">
+                <tr>
+                    <td colspan="8">
+                        <div class="empty">
+                            Loading players...
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
 
-                        <tr>
+        </table>
 
-                            <th>Player</th>
+    </section>
 
-                            <th>Player ID</th>
-
-                            <th>Rank</th>
-
-                            <th>Wins</th>
-
-                            <th>Losses</th>
-
-                            <th>Draws</th>
-
-                            <th>Status</th>
-
-                            <th>Actions</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="usersTableBody">
-
-                        <tr>
-                            <td colspan="8">
-
-                                <div class="empty">
-
-                                    <div class="empty-icon">
-                                        👥
-                                    </div>
-
-                                    Loading players...
-
-                                </div>
-
-                            </td>
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </section>
-
-    </main>
-
-</div>
+</main>
 
 
-<!-- =========================================================
-     PLAYER DETAIL MODAL
-========================================================= -->
+<!-- ================= EDIT PLAYER MODAL ================= -->
 
-<div id="playerModal" class="modal">
+<div class="modal" id="editModal">
 
     <div class="modal-box">
 
         <div class="modal-header">
 
-            <h2>👤 Player Details</h2>
+            <h2>✏️ Edit Player</h2>
 
-            <button
-                class="close"
-                onclick="closePlayerModal()"
-            >
-                ✕
+            <button class="close" onclick="closeModal('editModal')">
+                ×
             </button>
 
         </div>
@@ -1025,91 +693,87 @@ tr:hover td{
 
         <div class="modal-body">
 
-            <div
-                id="playerDetails"
-            ></div>
+            <input type="hidden" id="editPlayerId">
 
-            <div class="edit-grid">
+            <div class="form-group">
+                <label>PLAYER ID</label>
+                <input id="editId" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>PLAYER NAME</label>
+                <input id="editName" readonly>
+            </div>
+
+
+            <div class="form-grid">
 
                 <div class="form-group">
+                    <label>RANK</label>
 
-                    <label>Rank</label>
+                    <select id="editRank">
 
-                    <input
-                        id="editRank"
-                        type="number"
-                        min="0"
-                        placeholder="Rank"
-                    >
+                        <option value="Bronze">Bronze</option>
+                        <option value="Silver">Silver</option>
+                        <option value="Gold">Gold</option>
+                        <option value="Platinum">Platinum</option>
+                        <option value="Diamond">Diamond</option>
+                        <option value="Master">Master</option>
+                        <option value="Grandmaster">Grandmaster</option>
+                        <option value="Legend">Legend</option>
+
+                    </select>
 
                 </div>
 
 
                 <div class="form-group">
 
-                    <label>Wins</label>
-
-                    <input
-                        id="editWins"
-                        type="number"
-                        min="0"
-                        placeholder="Wins"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Losses</label>
-
-                    <input
-                        id="editLosses"
-                        type="number"
-                        min="0"
-                        placeholder="Losses"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Draws</label>
-
-                    <input
-                        id="editDraws"
-                        type="number"
-                        min="0"
-                        placeholder="Draws"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Games Played</label>
-
-                    <input
-                        id="editGames"
-                        type="number"
-                        min="0"
-                        placeholder="Games"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Rating / ELO</label>
+                    <label>RATING</label>
 
                     <input
                         id="editRating"
                         type="number"
                         min="0"
-                        placeholder="Rating"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>WINS</label>
+
+                    <input
+                        id="editWins"
+                        type="number"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>LOSSES</label>
+
+                    <input
+                        id="editLosses"
+                        type="number"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>DRAWS</label>
+
+                    <input
+                        id="editDraws"
+                        type="number"
+                        min="0"
                     >
 
                 </div>
@@ -1122,14 +786,14 @@ tr:hover td{
         <div class="modal-footer">
 
             <button
-                class="cancel-btn"
-                onclick="closePlayerModal()"
+                class="btn-dark"
+                onclick="closeModal('editModal')"
             >
                 Cancel
             </button>
 
             <button
-                class="save-btn"
+                class="btn-red"
                 onclick="savePlayerStats()"
             >
                 💾 Save Changes
@@ -1142,18 +806,37 @@ tr:hover td{
 </div>
 
 
-<!-- =========================================================
-     LOADING
-========================================================= -->
+<!-- ================= DETAILS MODAL ================= -->
 
-<div id="loading" class="loading">
+<div class="modal" id="detailsModal">
 
-    <div class="loader-box">
+    <div class="modal-box">
 
-        <div class="spinner"></div>
+        <div class="modal-header">
 
-        <div id="loadingText">
-            Please wait...
+            <h2>👤 Player Details</h2>
+
+            <button class="close" onclick="closeModal('detailsModal')">
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <div id="playerDetails"></div>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                class="btn-dark"
+                onclick="closeModal('detailsModal')"
+            >
+                Close
+            </button>
+
         </div>
 
     </div>
@@ -1161,152 +844,126 @@ tr:hover td{
 </div>
 
 
-<!-- =========================================================
-     TOAST
-========================================================= -->
+<!-- ================= CONFIRM MODAL ================= -->
 
-<div id="toast" class="toast"></div>
+<div class="modal" id="confirmModal">
+
+    <div class="modal-box" style="max-width:450px">
+
+        <div class="modal-header">
+
+            <h2 id="confirmTitle">Confirm Action</h2>
+
+            <button class="close" onclick="closeModal('confirmModal')">
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <p
+                id="confirmText"
+                style="color:#9aabc0;line-height:1.7"
+            ></p>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                class="btn-dark"
+                onclick="closeModal('confirmModal')"
+            >
+                Cancel
+            </button>
+
+            <button
+                class="btn-red"
+                id="confirmButton"
+            >
+                Confirm
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- LOADER -->
+
+<div class="loader" id="loader">
+
+    <div class="loader-box">
+
+        <div class="spinner"></div>
+
+        <div id="loaderText">
+            Processing...
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div class="toast" id="toast"></div>
 
 
 <script>
 
-/* =========================================================
+/* ============================================================
    CONFIG
-========================================================= */
+============================================================ */
 
-const API_BASE_URL =
-    "https://oxfighterjets.onrender.com";
-
-const API_PREFIX =
-    `${API_BASE_URL}/api/ox`;
+const API_BASE_URL = "https://oxfighterjets.onrender.com";
+const API_PREFIX = `${API_BASE_URL}/api/ox`;
 
 
-/* =========================================================
+/* ============================================================
    STATE
-========================================================= */
-
-let adminToken =
-    localStorage.getItem("oxAdminToken") || "";
+============================================================ */
 
 let users = [];
-
-let selectedPlayerId = null;
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function $(id){
-    return document.getElementById(id);
-}
+let currentEditingUser = null;
 
 
-function showLoading(text="Please wait..."){
+/* ============================================================
+   DOM
+============================================================ */
 
-    $("loadingText").textContent = text;
-
-    $("loading").classList.add("show");
-}
-
-
-function hideLoading(){
-
-    $("loading").classList.remove("show");
-}
+const $ = id => document.getElementById(id);
 
 
-function toast(message,type="success"){
+/* ============================================================
+   API HELPER
+============================================================ */
 
-    const el = $("toast");
-
-    el.textContent = message;
-
-    el.className = "toast show " + type;
-
-    clearTimeout(window.toastTimer);
-
-    window.toastTimer =
-        setTimeout(() => {
-            el.classList.remove("show");
-        },3000);
-}
-
-
-function escapeHTML(value){
-
-    if(value === null || value === undefined){
-        return "";
-    }
-
-    return String(value)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-}
-
-
-/* =========================================================
-   API
-========================================================= */
-
-async function api(
-    endpoint,
-    options={}
-){
+async function apiFetch(url, options = {}) {
 
     const headers = {
-        "Content-Type":"application/json",
+        "Content-Type": "application/json",
         ...(options.headers || {})
     };
 
-    if(adminToken){
+    const response = await fetch(url, {
+        ...options,
+        headers
+    });
 
-        headers["Authorization"] =
-            `Bearer ${adminToken}`;
-
-        headers["X-OX-Admin-Token"] =
-            adminToken;
-
-    }
-
-    const response =
-        await fetch(
-            API_PREFIX + endpoint,
-            {
-                ...options,
-                headers
-            }
-        );
-
-    let data;
+    let data = {};
 
     try{
         data = await response.json();
-    }
-    catch{
-        data = {
-            success:false,
-            message:"Invalid server response"
-        };
+    }catch(e){
+        data = {};
     }
 
-    if(response.status === 401){
-
-        adminToken = "";
-
-        localStorage.removeItem("oxAdminToken");
-
-        showLogin();
-
-        throw new Error(
-            data.message || "Admin session expired"
-        );
-    }
-
-    if(!response.ok || data.success === false){
+    if(!response.ok){
 
         throw new Error(
             data.message ||
@@ -1319,714 +976,420 @@ async function api(
 }
 
 
-/* =========================================================
-   LOGIN
-========================================================= */
+/* ============================================================
+   LOADER
+============================================================ */
 
-$("loginForm").addEventListener(
-    "submit",
-    async function(e){
+function showLoader(text = "Processing..."){
 
-        e.preventDefault();
+    $("loaderText").textContent = text;
 
-        const username =
-            $("adminUsername").value.trim();
-
-        const password =
-            $("adminPassword").value;
-
-        $("loginError").style.display =
-            "none";
-
-        showLoading("Authenticating admin...");
-
-        try{
-
-            const data =
-                await fetch(
-                    API_PREFIX + "/admin/login",
-                    {
-                        method:"POST",
-                        headers:{
-                            "Content-Type":
-                                "application/json"
-                        },
-                        body:JSON.stringify({
-                            username,
-                            password
-                        })
-                    }
-                );
-
-            const result =
-                await data.json();
-
-            if(!data.ok || result.success === false){
-
-                throw new Error(
-                    result.message ||
-                    result.error ||
-                    "Invalid admin credentials"
-                );
-            }
-
-            /*
-             * Backend may return token as:
-             * token
-             * adminToken
-             * sessionToken
-             */
-
-            adminToken =
-                result.token ||
-                result.adminToken ||
-                result.sessionToken ||
-                result.data?.token ||
-                "";
-
-            if(!adminToken){
-
-                /*
-                 * Some backends may use cookie/session.
-                 * We still continue if login succeeded.
-                 */
-                console.warn(
-                    "Admin login succeeded but no token was returned."
-                );
-            }
-            else{
-
-                localStorage.setItem(
-                    "oxAdminToken",
-                    adminToken
-                );
-
-            }
-
-            showAdminApp();
-
-            await Promise.all([
-                loadDashboard(),
-                loadUsers()
-            ]);
-
-            toast(
-                "Admin login successful",
-                "success"
-            );
-
-        }
-        catch(error){
-
-            $("loginError").textContent =
-                error.message;
-
-            $("loginError").style.display =
-                "block";
-
-        }
-        finally{
-
-            hideLoading();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   SHOW / HIDE
-========================================================= */
-
-function showAdminApp(){
-
-    $("loginScreen").style.display =
-        "none";
-
-    $("adminApp").style.display =
-        "block";
+    $("loader").classList.add("show");
 }
 
 
-function showLogin(){
+function hideLoader(){
 
-    $("adminApp").style.display =
-        "none";
-
-    $("loginScreen").style.display =
-        "flex";
+    $("loader").classList.remove("show");
 }
 
 
-/* =========================================================
-   CHECK SAVED LOGIN
-========================================================= */
+/* ============================================================
+   TOAST
+============================================================ */
 
-async function checkAdminSession(){
+let toastTimer;
 
-    if(!adminToken){
+function showToast(message, type = "success"){
 
-        showLogin();
+    const toast = $("toast");
 
-        return;
+    toast.textContent = message;
 
-    }
+    toast.className = "toast show " + type;
 
-    showLoading("Checking admin session...");
+    clearTimeout(toastTimer);
 
-    try{
+    toastTimer = setTimeout(() => {
 
-        /*
-         * Try dashboard to verify token.
-         */
+        toast.classList.remove("show");
 
-        await api("/admin/dashboard");
-
-        showAdminApp();
-
-        await loadDashboard();
-
-        await loadUsers();
-
-    }
-    catch(error){
-
-        console.log(
-            "Admin session invalid:",
-            error.message
-        );
-
-        adminToken = "";
-
-        localStorage.removeItem(
-            "oxAdminToken"
-        );
-
-        showLogin();
-
-    }
-    finally{
-
-        hideLoading();
-
-    }
-
+    }, 3500);
 }
 
 
-/* =========================================================
-   DASHBOARD
-========================================================= */
-
-async function loadDashboard(){
-
-    try{
-
-        const data =
-            await api("/admin/dashboard");
-
-        const d =
-            data.dashboard ||
-            data.data ||
-            data;
-
-        $("totalPlayers").textContent =
-            d.totalPlayers ??
-            d.total_players ??
-            d.players ??
-            0;
-
-        $("activePlayers").textContent =
-            d.activePlayers ??
-            d.active_players ??
-            d.onlinePlayers ??
-            0;
-
-        $("blockedPlayers").textContent =
-            d.blockedPlayers ??
-            d.blocked_players ??
-            d.blocked ??
-            0;
-
-        $("totalGames").textContent =
-            d.totalGames ??
-            d.total_games ??
-            d.games ??
-            0;
-
-    }
-    catch(error){
-
-        console.error(
-            "Dashboard error:",
-            error
-        );
-
-        toast(
-            "Could not load dashboard: " +
-            error.message,
-            "error"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
+/* ============================================================
    LOAD USERS
-========================================================= */
+============================================================ */
 
 async function loadUsers(){
 
-    showLoading("Fetching player IDs...");
+    showLoader("Fetching player IDs...");
 
     try{
 
-        const data =
-            await api("/admin/users");
+        const data = await apiFetch(
+            `${API_PREFIX}/admin/users`
+        );
 
         /*
-         * Support multiple possible response shapes.
+         Backend may return:
+
+         {
+             users: [...]
+         }
+
+         OR
+
+         {
+             players: [...]
+         }
+
          */
 
         users =
-            data.users ||
-            data.players ||
-            data.data ||
-            [];
+            Array.isArray(data)
+                ? data
+                : (
+                    data.users ||
+                    data.players ||
+                    data.data ||
+                    []
+                );
 
-        if(!Array.isArray(users)){
 
-            users = [];
-
-        }
+        updateStats();
 
         renderUsers();
 
-        updateCounts();
-
-        toast(
-            `${users.length} players loaded`,
+        showToast(
+            `${users.length} player(s) loaded`,
             "success"
         );
 
-    }
-    catch(error){
+    }catch(error){
 
-        console.error(
-            "Users error:",
-            error
-        );
+        console.error("Load users error:",error);
 
-        toast(
-            "Could not fetch players: " +
-            error.message,
+        showToast(
+            error.message || "Failed to fetch players",
             "error"
         );
 
-        $("usersTableBody").innerHTML = `
-
+        $("usersTable").innerHTML = `
             <tr>
-
                 <td colspan="8">
-
                     <div class="empty">
-
-                        <div class="empty-icon">
-                            ⚠️
-                        </div>
-
-                        Failed to load players.
-
+                        ❌ Failed to load players.<br><br>
+                        ${escapeHtml(error.message)}
                     </div>
-
                 </td>
-
             </tr>
-
         `;
 
+    }finally{
+
+        hideLoader();
+
     }
-    finally{
-
-        hideLoading();
-
-    }
-
 }
 
 
-/* =========================================================
-   NORMALIZE USER
-========================================================= */
+/* ============================================================
+   UPDATE STATS
+============================================================ */
 
-function normalizeUser(user){
+function updateStats(){
 
-    const stats =
-        user.stats || {};
+    $("totalPlayers").textContent = users.length;
 
-    return {
+    $("onlinePlayers").textContent =
+        users.filter(u =>
+            u.online === true ||
+            u.isOnline === true
+        ).length;
 
-        id:
-            user.playerId ||
-            user.player_id ||
-            user.id ||
-            user._id ||
-            "",
+    $("blockedPlayers").textContent =
+        users.filter(u =>
+            u.blocked === true ||
+            u.isBlocked === true
+        ).length;
 
-        name:
-            user.name ||
-            user.username ||
-            user.displayName ||
-            "Unknown Player",
-
-        username:
-            user.username ||
-            "",
-
-        rank:
-            user.rank ??
-            stats.rank ??
-            0,
-
-        wins:
-            user.wins ??
-            stats.wins ??
-            0,
-
-        losses:
-            user.losses ??
-            stats.losses ??
-            0,
-
-        draws:
-            user.draws ??
-            stats.draws ??
-            0,
-
-        games:
-            user.games ??
-            user.gamesPlayed ??
-            stats.games ??
-            stats.gamesPlayed ??
-            0,
-
-        rating:
-            user.rating ??
-            user.elo ??
-            stats.rating ??
-            stats.elo ??
-            0,
-
-        online:
-            user.online ??
-            user.isOnline ??
-            false,
-
-        blocked:
-            user.blocked ??
-            user.isBlocked ??
-            false,
-
-        suspended:
-            user.suspended ??
-            user.isSuspended ??
-            false,
-
-        raw:user
-    };
-
+    $("suspendedPlayers").textContent =
+        users.filter(u =>
+            u.suspended === true ||
+            u.isSuspended === true
+        ).length;
 }
 
 
-/* =========================================================
+/* ============================================================
    RENDER USERS
-========================================================= */
+============================================================ */
 
 function renderUsers(){
 
     const search =
         $("searchInput")
-            .value
-            .trim()
-            .toLowerCase();
+        .value
+        .trim()
+        .toLowerCase();
 
     const filter =
         $("statusFilter").value;
 
-    let filtered =
-        users
-        .map(normalizeUser)
-        .filter(user => {
 
-            const matchesSearch =
-                !search ||
+    let filtered = users.filter(user => {
 
-                user.name
-                    .toLowerCase()
-                    .includes(search) ||
+        const id = String(
+            user.playerId ||
+            user.id ||
+            user._id ||
+            ""
+        ).toLowerCase();
 
-                user.username
-                    .toLowerCase()
-                    .includes(search) ||
+        const name = String(
+            user.name ||
+            user.username ||
+            ""
+        ).toLowerCase();
 
-                user.id
-                    .toLowerCase()
-                    .includes(search);
 
-            if(!matchesSearch){
+        const matchesSearch =
+            !search ||
+            id.includes(search) ||
+            name.includes(search);
 
-                return false;
 
-            }
+        const blocked =
+            user.blocked === true ||
+            user.isBlocked === true;
 
-            if(filter === "active"){
+        const suspended =
+            user.suspended === true ||
+            user.isSuspended === true;
 
-                return !user.blocked &&
-                       !user.suspended;
+        const online =
+            user.online === true ||
+            user.isOnline === true;
 
-            }
 
-            if(filter === "blocked"){
+        let matchesFilter = true;
 
-                return user.blocked;
 
-            }
+        if(filter === "online")
+            matchesFilter = online;
 
-            if(filter === "suspended"){
+        if(filter === "blocked")
+            matchesFilter = blocked;
 
-                return user.suspended;
+        if(filter === "suspended")
+            matchesFilter = suspended;
 
-            }
+        if(filter === "active")
+            matchesFilter =
+                !blocked && !suspended;
 
-            return true;
 
-        });
+        return matchesSearch && matchesFilter;
 
-    $("userCount").textContent =
-        `${filtered.length} players`;
+    });
+
 
     if(!filtered.length){
 
-        $("usersTableBody").innerHTML = `
-
+        $("usersTable").innerHTML = `
             <tr>
-
                 <td colspan="8">
-
                     <div class="empty">
-
-                        <div class="empty-icon">
-                            🔎
-                        </div>
-
                         No players found.
-
                     </div>
-
                 </td>
-
             </tr>
-
         `;
 
         return;
-
     }
 
 
-    $("usersTableBody").innerHTML =
+    $("usersTable").innerHTML =
         filtered.map(user => {
 
-            let status = "";
+            const playerId =
+                user.playerId ||
+                user.id ||
+                user._id ||
+                "";
 
-            if(user.blocked){
+            const name =
+                user.name ||
+                user.username ||
+                "Unknown";
 
-                status =
-                    `<span class="badge badge-blocked">
+            const rank =
+                user.rank ||
+                user.tier ||
+                "Bronze";
+
+            const rating =
+                user.rating ??
+                user.elo ??
+                0;
+
+            const wins =
+                user.wins ??
+                user.stats?.wins ??
+                0;
+
+            const losses =
+                user.losses ??
+                user.stats?.losses ??
+                0;
+
+            const draws =
+                user.draws ??
+                user.stats?.draws ??
+                0;
+
+            const online =
+                user.online === true ||
+                user.isOnline === true;
+
+            const blocked =
+                user.blocked === true ||
+                user.isBlocked === true;
+
+            const suspended =
+                user.suspended === true ||
+                user.isSuspended === true;
+
+
+            let statusHtml = `
+                <span class="badge badge-active">
+                    ACTIVE
+                </span>
+            `;
+
+            if(blocked){
+
+                statusHtml = `
+                    <span class="badge badge-blocked">
                         BLOCKED
-                    </span>`;
+                    </span>
+                `;
 
-            }
-            else if(user.suspended){
+            }else if(suspended){
 
-                status =
-                    `<span class="badge badge-suspended">
+                statusHtml = `
+                    <span class="badge badge-suspended">
                         SUSPENDED
-                    </span>`;
-
-            }
-            else if(user.online){
-
-                status =
-                    `<span class="badge badge-online">
-                        ● ONLINE
-                    </span>`;
-
-            }
-            else{
-
-                status =
-                    `<span class="badge badge-offline">
-                        OFFLINE
-                    </span>`;
-
+                    </span>
+                `;
             }
 
 
             return `
-
                 <tr>
 
                     <td>
+                        <span class="player-id">
+                            ${escapeHtml(playerId)}
+                        </span>
+                    </td>
 
-                        <div class="player-name">
-                            ${escapeHTML(user.name)}
-                        </div>
+                    <td>
+                        <span class="player-name">
+                            ${escapeHtml(name)}
+                        </span>
+                    </td>
 
+                    <td>
+                        <span class="rank">
+                            ${escapeHtml(rank)}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${escapeHtml(rating)}
+                    </td>
+
+                    <td>
+                        ${wins} /
+                        ${losses} /
+                        ${draws}
+                    </td>
+
+                    <td>
+                        ${statusHtml}
+                    </td>
+
+                    <td>
                         ${
-                            user.username
-                            ?
-                            `<div style="
-                                color:#718099;
-                                font-size:10px;
-                                margin-top:3px;
-                            ">
-                                @${escapeHTML(user.username)}
-                            </div>`
-                            :
-                            ""
+                            online
+                            ? `<span class="online">● Online</span>`
+                            : `<span class="offline">● Offline</span>`
                         }
-
                     </td>
-
-
-                    <td>
-
-                        <div class="player-id">
-                            ${escapeHTML(user.id)}
-                        </div>
-
-                    </td>
-
-
-                    <td>
-
-                        <div class="rank-edit">
-
-                            <input
-                                class="rank-input"
-                                id="rank-${escapeHTML(user.id)}"
-                                type="number"
-                                min="0"
-                                value="${Number(user.rank) || 0}"
-                            >
-
-                            <button
-                                class="save-rank"
-                                onclick="quickSaveRank('${encodeURIComponent(user.id)}')"
-                                title="Save Rank"
-                            >
-                                ✓
-                            </button>
-
-                        </div>
-
-                    </td>
-
-
-                    <td>
-                        <strong style="color:#00e676">
-                            ${Number(user.wins) || 0}
-                        </strong>
-                    </td>
-
-
-                    <td>
-                        <strong style="color:#ff5d78">
-                            ${Number(user.losses) || 0}
-                        </strong>
-                    </td>
-
-
-                    <td>
-                        <strong style="color:#ffd54f">
-                            ${Number(user.draws) || 0}
-                        </strong>
-                    </td>
-
-
-                    <td>
-                        ${status}
-                    </td>
-
 
                     <td>
 
                         <div class="actions">
 
                             <button
-                                class="action-btn action-edit"
-                                onclick="openPlayer('${encodeURIComponent(user.id)}')"
+                                class="btn-blue"
+                                onclick="viewPlayer('${safeJs(playerId)}')"
                             >
-                                ✏️ Edit
+                                View
+                            </button>
+
+                            <button
+                                class="btn-red"
+                                onclick="editPlayer('${safeJs(playerId)}')"
+                            >
+                                Edit Rank
                             </button>
 
                             ${
-                                user.blocked
+                                blocked
                                 ?
-                                `
-                                <button
-                                    class="action-btn"
-                                    style="color:#00e676"
-                                    onclick="toggleBlock('${encodeURIComponent(user.id)}',false)"
+                                `<button
+                                    class="btn-green"
+                                    onclick="unblockPlayer('${safeJs(playerId)}')"
                                 >
-                                    🔓 Unblock
-                                </button>
-                                `
+                                    Unblock
+                                </button>`
                                 :
-                                `
-                                <button
-                                    class="action-btn action-block"
-                                    onclick="toggleBlock('${encodeURIComponent(user.id)}',true)"
+                                `<button
+                                    class="btn-orange"
+                                    onclick="blockPlayer('${safeJs(playerId)}')"
                                 >
-                                    🚫 Block
-                                </button>
-                                `
+                                    Block
+                                </button>`
                             }
-
 
                             ${
-                                user.suspended
+                                suspended
                                 ?
-                                `
-                                <button
-                                    class="action-btn"
-                                    style="color:#00e676"
-                                    onclick="toggleSuspend('${encodeURIComponent(user.id)}',false)"
+                                `<button
+                                    class="btn-green"
+                                    onclick="unsuspendPlayer('${safeJs(playerId)}')"
                                 >
-                                    ▶ Unsuspend
-                                </button>
-                                `
+                                    Unsuspend
+                                </button>`
                                 :
-                                `
-                                <button
-                                    class="action-btn action-suspend"
-                                    onclick="toggleSuspend('${encodeURIComponent(user.id)}',true)"
+                                `<button
+                                    class="btn-orange"
+                                    onclick="suspendPlayer('${safeJs(playerId)}')"
                                 >
-                                    ⏸ Suspend
-                                </button>
-                                `
+                                    Suspend
+                                </button>`
                             }
 
-
                             <button
-                                class="action-btn action-delete"
-                                onclick="deletePlayer('${encodeURIComponent(user.id)}')"
+                                class="btn-danger"
+                                onclick="deletePlayer('${safeJs(playerId)}')"
                             >
-                                🗑 Delete
+                                Delete
                             </button>
 
                         </div>
@@ -2034,851 +1397,748 @@ function renderUsers(){
                     </td>
 
                 </tr>
-
             `;
 
         }).join("");
-
 }
 
 
-/* =========================================================
-   COUNTS
-========================================================= */
+/* ============================================================
+   EDIT PLAYER
+============================================================ */
 
-function updateCounts(){
+async function editPlayer(playerId){
 
-    const normalized =
-        users.map(normalizeUser);
-
-    const total =
-        normalized.length;
-
-    const blocked =
-        normalized.filter(
-            x => x.blocked
-        ).length;
-
-    const active =
-        normalized.filter(
-            x => !x.blocked && !x.suspended
-        ).length;
-
-    $("totalPlayers").textContent =
-        total;
-
-    $("blockedPlayers").textContent =
-        blocked;
-
-    $("activePlayers").textContent =
-        active;
-
-}
-
-
-/* =========================================================
-   FIND USER
-========================================================= */
-
-function findUser(playerId){
-
-    return users
-        .map(normalizeUser)
-        .find(
-            user =>
-                String(user.id) ===
-                String(playerId)
+    let user =
+        users.find(u =>
+            String(
+                u.playerId ||
+                u.id ||
+                u._id
+            ) === String(playerId)
         );
 
-}
 
+    /*
+       First use loaded data.
+       If it doesn't contain full information,
+       fetch exact player.
+    */
 
-/* =========================================================
-   QUICK RANK SAVE
-========================================================= */
-
-async function quickSaveRank(encodedId){
-
-    const playerId =
-        decodeURIComponent(encodedId);
-
-    const input =
-        document.getElementById(
-            `rank-${playerId}`
-        );
-
-    if(!input){
-
-        toast(
-            "Rank input not found",
-            "error"
-        );
-
-        return;
-
-    }
-
-    const rank =
-        Number(input.value);
-
-    if(!Number.isFinite(rank) || rank < 0){
-
-        toast(
-            "Enter a valid rank",
-            "error"
-        );
-
-        return;
-
-    }
-
-    showLoading("Updating rank...");
-
-    try{
-
-        await updatePlayerStats(
-            playerId,
-            {
-                rank
-            }
-        );
-
-        toast(
-            "🏆 Rank updated successfully",
-            "success"
-        );
-
-        await loadUsers();
-
-    }
-    catch(error){
-
-        toast(
-            "Rank update failed: " +
-            error.message,
-            "error"
-        );
-
-    }
-    finally{
-
-        hideLoading();
-
-    }
-
-}
-
-
-/* =========================================================
-   OPEN PLAYER
-========================================================= */
-
-async function openPlayer(encodedId){
-
-    const playerId =
-        decodeURIComponent(encodedId);
-
-    selectedPlayerId =
-        playerId;
-
-    showLoading("Loading player details...");
-
-    try{
-
-        let user =
-            findUser(playerId);
-
-        /*
-         * Fetch detailed player from backend.
-         */
+    if(!user){
 
         try{
 
-            const data =
-                await api(
-                    `/admin/users/${encodeURIComponent(playerId)}`
-                );
-
-            user =
-                data.user ||
-                data.player ||
-                data.data ||
-                data;
-
-        }
-        catch(detailError){
-
-            console.warn(
-                "Detailed player fetch failed:",
-                detailError
+            user = await apiFetch(
+                `${API_PREFIX}/admin/users/${encodeURIComponent(playerId)}`
             );
 
+            user =
+                user.user ||
+                user.player ||
+                user.data ||
+                user;
+
+        }catch(error){
+
+            showToast(
+                error.message,
+                "error"
+            );
+
+            return;
         }
+    }
 
 
-        const normalized =
-            normalizeUser(user);
+    currentEditingUser = user;
+
+
+    $("editPlayerId").value =
+        user.playerId ||
+        user.id ||
+        user._id ||
+        playerId;
+
+    $("editId").value =
+        user.playerId ||
+        user.id ||
+        user._id ||
+        playerId;
+
+    $("editName").value =
+        user.name ||
+        user.username ||
+        "Unknown";
+
+
+    $("editRank").value =
+        user.rank ||
+        user.tier ||
+        "Bronze";
+
+
+    $("editRating").value =
+        user.rating ??
+        user.elo ??
+        0;
+
+
+    $("editWins").value =
+        user.wins ??
+        user.stats?.wins ??
+        0;
+
+
+    $("editLosses").value =
+        user.losses ??
+        user.stats?.losses ??
+        0;
+
+
+    $("editDraws").value =
+        user.draws ??
+        user.stats?.draws ??
+        0;
+
+
+    openModal("editModal");
+}
+
+
+/* ============================================================
+   SAVE PLAYER STATS
+============================================================ */
+
+async function savePlayerStats(){
+
+    const playerId =
+        $("editPlayerId").value;
+
+
+    const rank =
+        $("editRank").value;
+
+
+    const rating =
+        Number($("editRating").value || 0);
+
+
+    const wins =
+        Number($("editWins").value || 0);
+
+
+    const losses =
+        Number($("editLosses").value || 0);
+
+
+    const draws =
+        Number($("editDraws").value || 0);
+
+
+    if(
+        rating < 0 ||
+        wins < 0 ||
+        losses < 0 ||
+        draws < 0
+    ){
+
+        showToast(
+            "Values cannot be negative.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    showLoader("Updating player...");
+
+
+    try{
+
+        /*
+         Send common field names.
+         Backend can use the fields it supports.
+        */
+
+        const payload = {
+
+            rank: rank,
+
+            rating: rating,
+
+            elo: rating,
+
+            wins: wins,
+
+            losses: losses,
+
+            draws: draws
+
+        };
+
+
+        const data = await apiFetch(
+            `${API_PREFIX}/admin/users/${encodeURIComponent(playerId)}/stats`,
+            {
+                method:"PUT",
+                body:JSON.stringify(payload)
+            }
+        );
+
+
+        closeModal("editModal");
+
+
+        showToast(
+            data.message ||
+            "Player updated successfully",
+            "success"
+        );
+
+
+        await loadUsers();
+
+
+    }catch(error){
+
+        console.error(
+            "Save stats error:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Failed to update player",
+            "error"
+        );
+
+    }finally{
+
+        hideLoader();
+
+    }
+}
+
+
+/* ============================================================
+   VIEW PLAYER
+============================================================ */
+
+async function viewPlayer(playerId){
+
+    showLoader("Loading player details...");
+
+    try{
+
+        const data = await apiFetch(
+            `${API_PREFIX}/admin/users/${encodeURIComponent(playerId)}`
+        );
+
+
+        const user =
+            data.user ||
+            data.player ||
+            data.data ||
+            data;
+
+
+        const name =
+            user.name ||
+            user.username ||
+            "Unknown";
+
+
+        const rank =
+            user.rank ||
+            user.tier ||
+            "Bronze";
+
+
+        const rating =
+            user.rating ??
+            user.elo ??
+            0;
+
+
+        const wins =
+            user.wins ??
+            user.stats?.wins ??
+            0;
+
+
+        const losses =
+            user.losses ??
+            user.stats?.losses ??
+            0;
+
+
+        const draws =
+            user.draws ??
+            user.stats?.draws ??
+            0;
+
+
+        const blocked =
+            user.blocked === true ||
+            user.isBlocked === true;
+
+
+        const suspended =
+            user.suspended === true ||
+            user.isSuspended === true;
+
+
+        const online =
+            user.online === true ||
+            user.isOnline === true;
 
 
         $("playerDetails").innerHTML = `
 
             <div class="detail-grid">
 
-                <div class="detail-box">
-
-                    <label>PLAYER NAME</label>
-
+                <div class="detail">
+                    <small>PLAYER ID</small>
                     <strong>
-                        ${escapeHTML(normalized.name)}
+                        ${escapeHtml(
+                            user.playerId ||
+                            user.id ||
+                            user._id ||
+                            playerId
+                        )}
                     </strong>
-
                 </div>
 
-
-                <div class="detail-box">
-
-                    <label>PLAYER ID</label>
-
-                    <strong style="
-                        color:#43a6ff;
-                        font-family:monospace;
-                    ">
-                        ${escapeHTML(normalized.id)}
+                <div class="detail">
+                    <small>NAME</small>
+                    <strong>
+                        ${escapeHtml(name)}
                     </strong>
-
                 </div>
 
+                <div class="detail">
+                    <small>RANK</small>
+                    <strong>
+                        ${escapeHtml(rank)}
+                    </strong>
+                </div>
 
-                <div class="detail-box">
+                <div class="detail">
+                    <small>RATING</small>
+                    <strong>
+                        ${escapeHtml(rating)}
+                    </strong>
+                </div>
 
-                    <label>USERNAME</label>
+                <div class="detail">
+                    <small>WINS</small>
+                    <strong>${wins}</strong>
+                </div>
 
+                <div class="detail">
+                    <small>LOSSES</small>
+                    <strong>${losses}</strong>
+                </div>
+
+                <div class="detail">
+                    <small>DRAWS</small>
+                    <strong>${draws}</strong>
+                </div>
+
+                <div class="detail">
+                    <small>ONLINE</small>
                     <strong>
                         ${
-                            escapeHTML(
-                                normalized.username
-                            ) || "—"
+                            online
+                            ? "🟢 Online"
+                            : "⚫ Offline"
                         }
                     </strong>
-
                 </div>
 
-
-                <div class="detail-box">
-
-                    <label>STATUS</label>
-
+                <div class="detail">
+                    <small>BLOCK STATUS</small>
                     <strong>
-
                         ${
-                            normalized.blocked
-                            ?
-                            "🚫 BLOCKED"
-                            :
-                            normalized.suspended
-                            ?
-                            "⏸ SUSPENDED"
-                            :
-                            normalized.online
-                            ?
-                            "🟢 ONLINE"
-                            :
-                            "⚪ OFFLINE"
+                            blocked
+                            ? "🚫 Blocked"
+                            : "✅ Not Blocked"
                         }
-
                     </strong>
+                </div>
 
+                <div class="detail">
+                    <small>SUSPENSION</small>
+                    <strong>
+                        ${
+                            suspended
+                            ? "⏸️ Suspended"
+                            : "✅ Not Suspended"
+                        }
+                    </strong>
                 </div>
 
             </div>
 
+            <div style="
+                margin-top:16px;
+                padding:15px;
+                background:#07111f;
+                border:1px solid #1d3048;
+                border-radius:10px;
+                color:#8fa1b8;
+                font-size:13px;
+                line-height:1.7;
+            ">
+                ${
+                    user.createdAt
+                    ? `Created: ${escapeHtml(user.createdAt)}`
+                    : ""
+                }
+            </div>
         `;
 
 
-        $("editRank").value =
-            Number(normalized.rank) || 0;
-
-        $("editWins").value =
-            Number(normalized.wins) || 0;
-
-        $("editLosses").value =
-            Number(normalized.losses) || 0;
-
-        $("editDraws").value =
-            Number(normalized.draws) || 0;
-
-        $("editGames").value =
-            Number(normalized.games) || 0;
-
-        $("editRating").value =
-            Number(normalized.rating) || 0;
+        openModal("detailsModal");
 
 
-        $("playerModal")
-            .classList.add("show");
+    }catch(error){
 
-    }
-    catch(error){
-
-        toast(
-            "Could not load player: " +
-            error.message,
+        showToast(
+            error.message ||
+            "Unable to fetch player",
             "error"
         );
 
+    }finally{
+
+        hideLoader();
+
     }
-    finally{
-
-        hideLoading();
-
-    }
-
 }
 
 
-/* =========================================================
-   CLOSE PLAYER
-========================================================= */
+/* ============================================================
+   BLOCK PLAYER
+============================================================ */
 
-function closePlayerModal(){
+function blockPlayer(playerId){
 
-    $("playerModal")
-        .classList.remove("show");
+    confirmAction(
+        "🚫 Block Player",
+        `Are you sure you want to block player <b>${escapeHtml(playerId)}</b>?`,
+        async () => {
 
-    selectedPlayerId =
-        null;
+            await performAction(
+                `/admin/users/${encodeURIComponent(playerId)}/block`,
+                "POST",
+                "Blocking player..."
+            );
 
-}
-
-
-/* =========================================================
-   UPDATE STATS
-========================================================= */
-
-async function updatePlayerStats(
-    playerId,
-    stats
-){
-
-    /*
-     * Existing backend route:
-     *
-     * PUT /api/ox/admin/users/<player_id>/stats
-     */
-
-    return await api(
-        `/admin/users/${encodeURIComponent(playerId)}/stats`,
-        {
-            method:"PUT",
-            body:JSON.stringify(stats)
         }
     );
-
 }
 
 
-/* =========================================================
-   SAVE PLAYER STATS
-========================================================= */
+/* ============================================================
+   UNBLOCK PLAYER
+============================================================ */
 
-async function savePlayerStats(){
+function unblockPlayer(playerId){
 
-    if(!selectedPlayerId){
+    confirmAction(
+        "✅ Unblock Player",
+        `Unblock player <b>${escapeHtml(playerId)}</b>?`,
+        async () => {
 
-        toast(
-            "No player selected",
+            await performAction(
+                `/admin/users/${encodeURIComponent(playerId)}/unblock`,
+                "POST",
+                "Unblocking player..."
+            );
+
+        }
+    );
+}
+
+
+/* ============================================================
+   SUSPEND PLAYER
+============================================================ */
+
+function suspendPlayer(playerId){
+
+    confirmAction(
+        "⏸️ Suspend Player",
+        `Suspend player <b>${escapeHtml(playerId)}</b>?`,
+        async () => {
+
+            await performAction(
+                `/admin/users/${encodeURIComponent(playerId)}/suspend`,
+                "POST",
+                "Suspending player..."
+            );
+
+        }
+    );
+}
+
+
+/* ============================================================
+   UNSUSPEND PLAYER
+============================================================ */
+
+function unsuspendPlayer(playerId){
+
+    confirmAction(
+        "▶️ Unsuspend Player",
+        `Remove suspension from <b>${escapeHtml(playerId)}</b>?`,
+        async () => {
+
+            await performAction(
+                `/admin/users/${encodeURIComponent(playerId)}/unsuspend`,
+                "POST",
+                "Removing suspension..."
+            );
+
+        }
+    );
+}
+
+
+/* ============================================================
+   DELETE PLAYER
+============================================================ */
+
+function deletePlayer(playerId){
+
+    confirmAction(
+        "🗑️ Delete Player",
+        `
+        <strong style="color:#ff5555">
+            WARNING
+        </strong><br><br>
+
+        This will permanently delete player
+        <b>${escapeHtml(playerId)}</b>.
+
+        <br><br>
+
+        This action cannot be undone.
+        `,
+        async () => {
+
+            await performAction(
+                `/admin/users/${encodeURIComponent(playerId)}`,
+                "DELETE",
+                "Deleting player..."
+            );
+
+        }
+    );
+}
+
+
+/* ============================================================
+   GENERIC ADMIN ACTION
+============================================================ */
+
+async function performAction(
+    endpoint,
+    method,
+    loaderText
+){
+
+    closeModal("confirmModal");
+
+    showLoader(loaderText);
+
+
+    try{
+
+        const data = await apiFetch(
+            `${API_PREFIX}${endpoint}`,
+            {
+                method:method
+            }
+        );
+
+
+        showToast(
+            data.message ||
+            "Action completed successfully",
+            "success"
+        );
+
+
+        await loadUsers();
+
+
+    }catch(error){
+
+        console.error(
+            "Admin action error:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Action failed",
             "error"
         );
 
-        return;
+    }finally{
+
+        hideLoader();
 
     }
+}
 
 
-    const stats = {
+/* ============================================================
+   CONFIRM ACTION
+============================================================ */
 
-        rank:
-            Number($("editRank").value) || 0,
+function confirmAction(
+    title,
+    text,
+    callback
+){
 
-        wins:
-            Number($("editWins").value) || 0,
+    $("confirmTitle").innerHTML = title;
 
-        losses:
-            Number($("editLosses").value) || 0,
+    $("confirmText").innerHTML = text;
 
-        draws:
-            Number($("editDraws").value) || 0,
 
-        games:
-            Number($("editGames").value) || 0,
+    const button =
+        $("confirmButton");
 
-        rating:
-            Number($("editRating").value) || 0
+
+    button.onclick = async () => {
+
+        await callback();
 
     };
 
 
-    if(
-        stats.rank < 0 ||
-        stats.wins < 0 ||
-        stats.losses < 0 ||
-        stats.draws < 0 ||
-        stats.games < 0 ||
-        stats.rating < 0
-    ){
-
-        toast(
-            "Stats cannot be negative",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    showLoading(
-        "Saving player changes..."
-    );
-
-
-    try{
-
-        await updatePlayerStats(
-            selectedPlayerId,
-            stats
-        );
-
-
-        toast(
-            "✅ Player stats updated",
-            "success"
-        );
-
-
-        closePlayerModal();
-
-        await loadUsers();
-
-        await loadDashboard();
-
-    }
-    catch(error){
-
-        toast(
-            "Update failed: " +
-            error.message,
-            "error"
-        );
-
-    }
-    finally{
-
-        hideLoading();
-
-    }
-
+    openModal("confirmModal");
 }
 
 
-/* =========================================================
-   BLOCK / UNBLOCK
-========================================================= */
+/* ============================================================
+   MODAL
+============================================================ */
 
-async function toggleBlock(
-    encodedId,
-    shouldBlock
-){
+function openModal(id){
 
-    const playerId =
-        decodeURIComponent(encodedId);
-
-    const user =
-        findUser(playerId);
-
-    const name =
-        user?.name ||
-        playerId;
-
-
-    const action =
-        shouldBlock
-        ?
-        "BLOCK"
-        :
-        "UNBLOCK";
-
-
-    if(
-        !confirm(
-            `${action} player "${name}"?\n\nPlayer ID: ${playerId}`
-        )
-    ){
-
-        return;
-
-    }
-
-
-    showLoading(
-        shouldBlock
-        ?
-        "Blocking player..."
-        :
-        "Unblocking player..."
-    );
-
-
-    try{
-
-        const endpoint =
-            shouldBlock
-            ?
-            `/admin/users/${encodeURIComponent(playerId)}/block`
-            :
-            `/admin/users/${encodeURIComponent(playerId)}/unblock`;
-
-
-        await api(
-            endpoint,
-            {
-                method:"POST"
-            }
-        );
-
-
-        toast(
-            shouldBlock
-            ?
-            "🚫 Player blocked"
-            :
-            "🔓 Player unblocked",
-            "success"
-        );
-
-
-        await loadUsers();
-
-        await loadDashboard();
-
-    }
-    catch(error){
-
-        toast(
-            "Action failed: " +
-            error.message,
-            "error"
-        );
-
-    }
-    finally{
-
-        hideLoading();
-
-    }
-
+    $(id).classList.add("show");
 }
 
 
-/* =========================================================
-   SUSPEND / UNSUSPEND
-========================================================= */
+function closeModal(id){
 
-async function toggleSuspend(
-    encodedId,
-    shouldSuspend
-){
-
-    const playerId =
-        decodeURIComponent(encodedId);
-
-    const user =
-        findUser(playerId);
-
-    const name =
-        user?.name ||
-        playerId;
-
-
-    const action =
-        shouldSuspend
-        ?
-        "SUSPEND"
-        :
-        "UNSUSPEND";
-
-
-    if(
-        !confirm(
-            `${action} player "${name}"?\n\nPlayer ID: ${playerId}`
-        )
-    ){
-
-        return;
-
-    }
-
-
-    showLoading(
-        shouldSuspend
-        ?
-        "Suspending player..."
-        :
-        "Unsuspending player..."
-    );
-
-
-    try{
-
-        const endpoint =
-            shouldSuspend
-            ?
-            `/admin/users/${encodeURIComponent(playerId)}/suspend`
-            :
-            `/admin/users/${encodeURIComponent(playerId)}/unsuspend`;
-
-
-        await api(
-            endpoint,
-            {
-                method:"POST"
-            }
-        );
-
-
-        toast(
-            shouldSuspend
-            ?
-            "⏸ Player suspended"
-            :
-            "▶ Player unsuspended",
-            "success"
-        );
-
-
-        await loadUsers();
-
-        await loadDashboard();
-
-    }
-    catch(error){
-
-        toast(
-            "Action failed: " +
-            error.message,
-            "error"
-        );
-
-    }
-    finally{
-
-        hideLoading();
-
-    }
-
+    $(id).classList.remove("show");
 }
 
 
-/* =========================================================
-   DELETE PLAYER
-========================================================= */
+/* ============================================================
+   CLEAR FILTERS
+============================================================ */
 
-async function deletePlayer(
-    encodedId
-){
+function clearFilters(){
 
-    const playerId =
-        decodeURIComponent(encodedId);
+    $("searchInput").value = "";
 
-    const user =
-        findUser(playerId);
+    $("statusFilter").value = "all";
 
-    const name =
-        user?.name ||
-        playerId;
-
-
-    const confirmed =
-        confirm(
-            `⚠️ DELETE PLAYER PERMANENTLY?\n\n` +
-            `Name: ${name}\n` +
-            `Player ID: ${playerId}\n\n` +
-            `This action cannot be undone.`
-        );
-
-
-    if(!confirmed){
-
-        return;
-
-    }
-
-
-    /*
-     * Double confirmation for permanent deletion.
-     */
-
-    const second =
-        confirm(
-            `FINAL CONFIRMATION\n\n` +
-            `Delete "${name}" (${playerId})?`
-        );
-
-
-    if(!second){
-
-        return;
-
-    }
-
-
-    showLoading(
-        "Deleting player..."
-    );
-
-
-    try{
-
-        await api(
-            `/admin/users/${encodeURIComponent(playerId)}`,
-            {
-                method:"DELETE"
-            }
-        );
-
-
-        toast(
-            "🗑 Player deleted successfully",
-            "success"
-        );
-
-
-        users =
-            users.filter(
-                user =>
-                    normalizeUser(user).id !==
-                    playerId
-            );
-
-
-        renderUsers();
-
-        await loadDashboard();
-
-    }
-    catch(error){
-
-        toast(
-            "Delete failed: " +
-            error.message,
-            "error"
-        );
-
-    }
-    finally{
-
-        hideLoading();
-
-    }
-
+    renderUsers();
 }
 
 
-/* =========================================================
-   ADMIN LOGOUT
-========================================================= */
+/* ============================================================
+   SECURITY HELPERS
+============================================================ */
 
-async function adminLogout(){
+function escapeHtml(value){
 
-    try{
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
 
-        if(adminToken){
 
-            await fetch(
-                API_PREFIX + "/admin/logout",
-                {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":
-                            "application/json",
-                        "Authorization":
-                            `Bearer ${adminToken}`,
-                        "X-OX-Admin-Token":
-                            adminToken
-                    }
-                }
-            );
+/*
+ Prevent player IDs from breaking onclick attributes.
+*/
+
+function safeJs(value){
+
+    return String(value ?? "")
+        .replace(/\\/g,"\\\\")
+        .replace(/'/g,"\\'");
+}
+
+
+/* ============================================================
+   CLOSE MODALS WHEN CLICKING BACKDROP
+============================================================ */
+
+document.querySelectorAll(".modal").forEach(modal => {
+
+    modal.addEventListener("click", function(e){
+
+        if(e.target === modal){
+
+            modal.classList.remove("show");
 
         }
 
-    }
-    catch(error){
+    });
 
-        console.log(
-            "Logout request failed",
-            error
-        );
-
-    }
+});
 
 
-    adminToken = "";
+/* ============================================================
+   ESC KEY
+============================================================ */
 
-    localStorage.removeItem(
-        "oxAdminToken"
-    );
+document.addEventListener("keydown", e => {
 
-    users = [];
+    if(e.key === "Escape"){
 
-    showLogin();
+        document
+            .querySelectorAll(".modal.show")
+            .forEach(modal => {
 
-    toast(
-        "Logged out",
-        "success"
-    );
+                modal.classList.remove("show");
 
-}
-
-
-/* =========================================================
-   KEYBOARD / MODAL
-========================================================= */
-
-$("playerModal").addEventListener(
-    "click",
-    function(e){
-
-        if(e.target === this){
-
-            closePlayerModal();
-
-        }
+            });
 
     }
-);
 
+});
+
+
+/* ============================================================
+   INITIAL LOAD
+============================================================ */
 
 document.addEventListener(
-    "keydown",
-    function(e){
+    "DOMContentLoaded",
+    () => {
 
-        if(e.key === "Escape"){
-
-            closePlayerModal();
-
-        }
+        loadUsers();
 
     }
 );
-
-
-/* =========================================================
-   AUTO LOAD
-========================================================= */
-
-checkAdminSession();
 
 </script>
 
 </body>
 </html>
+```
