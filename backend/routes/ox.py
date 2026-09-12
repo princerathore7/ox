@@ -2446,91 +2446,13 @@ def history():
         "history": result
     })
 
-
-# ============================================================
-# ADMIN LOGIN
-# ============================================================
-
-@ox_bp.route("/admin/login", methods=["POST"])
-def admin_login():
-
-    if not ADMIN_USERNAME or not ADMIN_PASSWORD:
-        return jsonify({
-            "success": False,
-            "message": (
-                "Admin credentials are not configured "
-                "on the server."
-            )
-        }), 500
-
-    data = request.get_json(silent=True) or {}
-
-    username = clean_string(
-        data.get("username")
-    )
-
-    password = data.get("password", "")
-
-    if (
-        username != ADMIN_USERNAME or
-        password != ADMIN_PASSWORD
-    ):
-        return jsonify({
-            "success": False,
-            "message": "Invalid admin credentials."
-        }), 401
-
-    token = create_session(
-        "ADMIN",
-        is_admin=True
-    )
-
-    return jsonify({
-        "success": True,
-        "message": "Admin login successful.",
-        "token": token,
-        "admin": {
-            "username": ADMIN_USERNAME
-        }
-    })
-
-
-# ============================================================
-# ADMIN LOGOUT
-# ============================================================
-
-@ox_bp.route("/admin/logout", methods=["POST"])
-def admin_logout():
-
-    session, error = require_admin()
-
-    if error:
-        return error
-
-    token = get_token()
-
-    if token:
-        sessions_col.delete_one({
-            "token": token
-        })
-
-    return jsonify({
-        "success": True,
-        "message": "Admin logged out."
-    })
-
-
 # ============================================================
 # ADMIN — ALL USERS
+# NO AUTHENTICATION
 # ============================================================
 
 @ox_bp.route("/admin/users", methods=["GET"])
 def admin_users():
-
-    session, error = require_admin()
-
-    if error:
-        return error
 
     search = clean_string(
         request.args.get("search")
@@ -2539,7 +2461,6 @@ def admin_users():
     query = {}
 
     if search:
-
         query = {
             "$or": [
                 {
@@ -2573,7 +2494,6 @@ def admin_users():
     result = []
 
     for player in players:
-
         result.append(
             sanitize_player(player)
         )
@@ -2587,15 +2507,11 @@ def admin_users():
 
 # ============================================================
 # ADMIN — SINGLE USER
+# NO AUTHENTICATION
 # ============================================================
 
 @ox_bp.route("/admin/users/<player_id>", methods=["GET"])
 def admin_get_user(player_id):
-
-    session, error = require_admin()
-
-    if error:
-        return error
 
     player = players_col.find_one({
         "playerId": player_id
@@ -2615,15 +2531,11 @@ def admin_get_user(player_id):
 
 # ============================================================
 # ADMIN — EDIT WINS / LOSSES / DRAWS
+# NO AUTHENTICATION
 # ============================================================
 
 @ox_bp.route("/admin/users/<player_id>/stats", methods=["PUT"])
 def admin_edit_stats(player_id):
-
-    session, error = require_admin()
-
-    if error:
-        return error
 
     data = request.get_json(silent=True) or {}
 
@@ -2669,32 +2581,26 @@ def admin_edit_stats(player_id):
             "message": "No statistics supplied."
         }), 400
 
-    if (
-        "wins" in update or
-        "losses" in update or
-        "draws" in update
-    ):
+    current_wins = update.get(
+        "wins",
+        int(player.get("wins", 0))
+    )
 
-        current_wins = update.get(
-            "wins",
-            int(player.get("wins", 0))
-        )
+    current_losses = update.get(
+        "losses",
+        int(player.get("losses", 0))
+    )
 
-        current_losses = update.get(
-            "losses",
-            int(player.get("losses", 0))
-        )
+    current_draws = update.get(
+        "draws",
+        int(player.get("draws", 0))
+    )
 
-        current_draws = update.get(
-            "draws",
-            int(player.get("draws", 0))
-        )
-
-        update["gamesPlayed"] = (
-            current_wins +
-            current_losses +
-            current_draws
-        )
+    update["gamesPlayed"] = (
+        current_wins +
+        current_losses +
+        current_draws
+    )
 
     players_col.update_one(
         {
@@ -2718,15 +2624,11 @@ def admin_edit_stats(player_id):
 
 # ============================================================
 # ADMIN — BLOCK
+# NO AUTHENTICATION
 # ============================================================
 
 @ox_bp.route("/admin/users/<player_id>/block", methods=["POST"])
 def admin_block_user(player_id):
-
-    session, error = require_admin()
-
-    if error:
-        return error
 
     player = players_col.find_one({
         "playerId": player_id
@@ -2768,15 +2670,11 @@ def admin_block_user(player_id):
 
 # ============================================================
 # ADMIN — UNBLOCK
+# NO AUTHENTICATION
 # ============================================================
 
 @ox_bp.route("/admin/users/<player_id>/unblock", methods=["POST"])
 def admin_unblock_user(player_id):
-
-    session, error = require_admin()
-
-    if error:
-        return error
 
     player = players_col.find_one({
         "playerId": player_id
@@ -2810,15 +2708,11 @@ def admin_unblock_user(player_id):
 
 # ============================================================
 # ADMIN — SUSPEND
+# NO AUTHENTICATION
 # ============================================================
 
 @ox_bp.route("/admin/users/<player_id>/suspend", methods=["POST"])
 def admin_suspend_user(player_id):
-
-    session, error = require_admin()
-
-    if error:
-        return error
 
     data = request.get_json(silent=True) or {}
 
@@ -2865,15 +2759,11 @@ def admin_suspend_user(player_id):
 
 # ============================================================
 # ADMIN — UNSUSPEND
+# NO AUTHENTICATION
 # ============================================================
 
 @ox_bp.route("/admin/users/<player_id>/unsuspend", methods=["POST"])
 def admin_unsuspend_user(player_id):
-
-    session, error = require_admin()
-
-    if error:
-        return error
 
     player = players_col.find_one({
         "playerId": player_id
@@ -2908,15 +2798,11 @@ def admin_unsuspend_user(player_id):
 
 # ============================================================
 # ADMIN — DELETE USER
+# NO AUTHENTICATION
 # ============================================================
 
 @ox_bp.route("/admin/users/<player_id>", methods=["DELETE"])
 def admin_delete_user(player_id):
-
-    session, error = require_admin()
-
-    if error:
-        return error
 
     player = players_col.find_one({
         "playerId": player_id
@@ -2948,15 +2834,11 @@ def admin_delete_user(player_id):
 
 # ============================================================
 # ADMIN — DASHBOARD STATS
+# NO AUTHENTICATION
 # ============================================================
 
 @ox_bp.route("/admin/dashboard", methods=["GET"])
 def admin_dashboard():
-
-    session, error = require_admin()
-
-    if error:
-        return error
 
     total_users = players_col.count_documents({})
 
@@ -3003,15 +2885,11 @@ def admin_dashboard():
 
 # ============================================================
 # ADMIN — GAME LIST
+# NO AUTHENTICATION
 # ============================================================
 
 @ox_bp.route("/admin/games", methods=["GET"])
 def admin_games():
-
-    session, error = require_admin()
-
-    if error:
-        return error
 
     limit = request.args.get(
         "limit",
@@ -3039,8 +2917,6 @@ def admin_games():
         "count": len(result),
         "games": result
     })
-
-
 # ============================================================
 # HEALTH
 # ============================================================
